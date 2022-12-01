@@ -11,8 +11,8 @@ This project has the following dependencies:
 
 - [O3DE](https://github.com/o3de/o3de) 
 - [ROS2 Gem](https://github.com/o3de/o3de-extras/tree/development/Gems/ROS2)
-- [RosRobotSample Assets] (https://github.com/o3de/o3de-extras/tree/development/Gems/RosRobotSample)
-- [WarehouseSample Assets] (https://github.com/o3de/o3de-extras/tree/development/Gems/WarehouseSample)
+- [RosRobotSample Assets](https://github.com/o3de/o3de-extras/tree/development/Gems/RosRobotSample)
+- [WarehouseSample Assets](https://github.com/o3de/o3de-extras/tree/development/Gems/WarehouseSample)
 
 Please make sure that `clang` was installed and configured. For details refer to [this section](https://www.o3de.org/docs/welcome-guide/requirements/#linux) of O3DE documentation.
 
