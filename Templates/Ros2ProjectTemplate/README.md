@@ -9,7 +9,8 @@ The example ROS2 navigation stack launchfile is bundled with the template.
 Refer to the [O3DE System Requirements](https://www.o3de.org/docs/welcome-guide/requirements/) documentation to make sure that the system/hardware requirements are met. 
 This project has the following dependencies:
 
-- [O3DE](https://github.com/o3de/o3de) 
+- [O3DE](https://github.com/o3de/o3de)
+- [ROS2](https://www.ros.org/) (galactic or humble)
 - [ROS2 Gem](https://github.com/o3de/o3de-extras/tree/development/Gems/ROS2)
 - [RosRobotSample Assets](https://github.com/o3de/o3de-extras/tree/development/Gems/RosRobotSample)
 - [WarehouseSample Assets](https://github.com/o3de/o3de-extras/tree/development/Gems/WarehouseSample)
@@ -25,7 +26,7 @@ To run the navigation example, two ROS2 packages are also required:
 The following steps will assume the following:
 
 - All of the requirements coming from O3DE are met.
-- You have ROS2 [installed](https://docs.ros.org/en/humble/Installation.html) and environment is [sourced](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Configuring-ROS2-Environment.html#source-the-setup-files).
+- You have ROS2 humble [installed](https://docs.ros.org/en/humble/Installation.html) and environment is [sourced](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Configuring-ROS2-Environment.html#source-the-setup-files).
 - The instructions will be based on a common base folder: `$DEMO_BASE`. For convenience you can export chosen directory name to `$DEMO_BASE`, for example:
 ```shell
 export DEMO_BASE=/home/${USER}/github
@@ -90,6 +91,7 @@ Next, let us the build project with the necessary elements of the O3DE engine an
 
 ```shell
 cd $PROJECT_PATH/Project
+. /opt/ros/humble/setup.bash
 cmake -B build/linux -G "Ninja Multi-Config" -DLY_UNITY_BUILD=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLY_PARALLEL_LINK_JOBS=16 -DLY_STRIP_DEBUG_SYMBOLS=OFF
 cmake --build build/linux --config profile --target $PROJECT_NAME.GameLauncher Editor
 ```
