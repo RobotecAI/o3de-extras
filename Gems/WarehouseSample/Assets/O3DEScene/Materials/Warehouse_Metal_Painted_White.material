@@ -14,6 +14,7 @@
             0.0,
             1.0
         ],
+        "normal.factor": 0.46000000834465027,
         "normal.textureMap": "../Textures/Metal_Painted_002_normal.jpg",
         "opacity.factor": 1.0,
         "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg"

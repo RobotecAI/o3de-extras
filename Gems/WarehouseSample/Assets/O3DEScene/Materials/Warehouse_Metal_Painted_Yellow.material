@@ -3,11 +3,13 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.800000011920929,
-            0.800000011920929,
-            0.800000011920929,
+            0.4298008680343628,
+            0.31328296661376953,
+            0.0,
             1.0
         ],
+        "baseColor.factor": 0.3100000023841858,
+        "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/Metal_Painted_002_basecolor.jpg",
         "emissive.color": [
             0.0,
@@ -15,9 +17,10 @@
             0.0,
             1.0
         ],
-        "normal.factor": 0.800000011920929,
+        "normal.factor": 0.46000000834465027,
         "normal.textureMap": "../Textures/Metal_Painted_002_normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg"
+        "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg",
+        "specularF0.factor": 0.6800000071525574
     }
 }

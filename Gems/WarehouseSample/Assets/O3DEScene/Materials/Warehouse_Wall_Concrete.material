@@ -3,11 +3,13 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.800000011920929,
-            0.800000011920929,
-            0.800000011920929,
+            0.3840238153934479,
+            0.37172502279281616,
+            0.29732203483581543,
             1.0
         ],
+        "baseColor.factor": 0.33000001311302185,
+        "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/Concrete_Wall_005_Base Color.jpg",
         "emissive.color": [
             0.0,
@@ -18,6 +20,8 @@
         "normal.factor": 0.10000000149011612,
         "normal.textureMap": "../Textures/Concrete_Wall_005_Normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Concrete_Wall_005_Roughness.jpg"
+        "roughness.textureMap": "../Textures/Concrete_Wall_005_Roughness.jpg",
+        "uv.tileU": 2.0,
+        "uv.tileV": 2.0
     }
 }

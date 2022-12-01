@@ -3,11 +3,13 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.800000011920929,
-            0.800000011920929,
-            0.800000011920929,
+            0.29372090101242065,
+            0.29105058312416077,
+            0.24290837347507477,
             1.0
         ],
+        "baseColor.factor": 0.5600000023841858,
+        "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/Paper_Recycled_001_COLOR.jpg",
         "emissive.color": [
             0.0,
@@ -17,7 +19,6 @@
         ],
         "normal.factor": 0.800000011920929,
         "normal.textureMap": "../Textures/Paper_Recycled_001_NORM.jpg",
-        "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Paper_Recycled_001_ROUGH.jpg"
+        "opacity.factor": 1.0
     }
 }
