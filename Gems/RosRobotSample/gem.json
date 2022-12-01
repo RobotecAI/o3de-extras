@@ -5,7 +5,7 @@
     "license_url": "https://opensource.org/licenses/Apache-2.0",
     "origin": "Ros2WarehouseDemo",
     "origin_url": "https://github.com/RobotecAI/Ros2WarehouseDemo/tree/main/Gems/RosRobotSample",
-    "type": "Code",
+    "type": "Asset",
     "summary": "This project contains a sample robot asset",
     "canonical_tags": [
         "Gem"
