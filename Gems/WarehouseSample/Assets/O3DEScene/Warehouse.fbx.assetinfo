@@ -6,21 +6,122 @@
             "name": "Warehouse",
             "NodeSelectionList": {
                 "selectedNodes": [
-                    "RootNode.Warehouse - low tex",
-                    "RootNode.Terrain",
-                    "RootNode.Vehicles"
+                    "RootNode.Vehicles",
+                    "RootNode.Vehicles.transform",
+                    "RootNode.Vehicles.UV0",
+                    "RootNode.Vehicles.Blue_Vehicles",
+                    "RootNode.Vehicles.White_Vehicles",
+                    "RootNode.Vehicles.Black_Vehicles",
+                    "RootNode.Vehicles.Tire_Vehicles",
+                    "RootNode.Vehicles.Glass",
+                    "RootNode.Vehicles.Silver_Vehicles",
+                    "RootNode.Vehicles.Yellow_Vehicles",
+                    "RootNode.Vehicles.Black_Plastic_Vehicles",
+                    "RootNode.Vehicles.Gray_Vehicles",
+                    "RootNode.warehouse - low tex",
+                    "RootNode"
                 ],
                 "unselectedNodes": [
-                    "RootNode",
-                    "RootNode.Warehouse - low tex.custom_properties",
-                    "RootNode.Warehouse - low tex.UVMap",
-                    "RootNode.Warehouse - low tex.Warehouse_Diffuse",
-                    "RootNode.Terrain.custom_properties",
-                    "RootNode.Terrain.UVMap",
-                    "RootNode.Terrain.Terrain_Diffuse",
-                    "RootNode.Vehicles.custom_properties",
-                    "RootNode.Vehicles.UVMap",
-                    "RootNode.Vehicles.Vehicles_Diffuse"
+                    "RootNode.warehouse - low tex.transform",
+                    "RootNode.warehouse - low tex.custom_properties",
+                    "RootNode.warehouse - low tex.UV0",
+                    "RootNode.warehouse - low tex.Plastick_Black",
+                    "RootNode.warehouse - low tex.Steering_Panel",
+                    "RootNode.warehouse - low tex.Paper",
+                    "RootNode.warehouse - low tex.Wood",
+                    "RootNode.warehouse - low tex.Metal_Painted_Yellow",
+                    "RootNode.warehouse - low tex.Concrete",
+                    "RootNode.warehouse - low tex.Metal_Galvanized",
+                    "RootNode.warehouse - low tex.White",
+                    "RootNode.warehouse - low tex.Wall_Concrete",
+                    "RootNode.warehouse - low tex.Glass",
+                    "RootNode.warehouse - low tex.Metal_Painted_White",
+                    "RootNode.warehouse - low tex.Metal_Scratched",
+                    "RootNode.warehouse - low tex.Metal_Painted_Red",
+                    "RootNode.warehouse - low tex.Wall_Paint",
+                    "RootNode.warehouse - low tex.Metal_Rusted",
+                    "RootNode.warehouse - low tex.Extinguisher",
+                    "RootNode.warehouse - low tex.Yellow",
+                    "RootNode.Vehicles.custom_properties"
+                ]
+            },
+            "PhysicsMaterialSlots": {
+                "Slots": [
+                    {
+                        "Name": "Blue_Vehicles"
+                    },
+                    {
+                        "Name": "White_Vehicles"
+                    },
+                    {
+                        "Name": "Black_Vehicles"
+                    },
+                    {
+                        "Name": "Tire_Vehicles"
+                    },
+                    {
+                        "Name": "Glass"
+                    },
+                    {
+                        "Name": "Silver_Vehicles"
+                    },
+                    {
+                        "Name": "Yellow_Vehicles"
+                    },
+                    {
+                        "Name": "Black_Plastic_Vehicles"
+                    },
+                    {
+                        "Name": "Gray_Vehicles"
+                    },
+                    {
+                        "Name": "Plastick_Black"
+                    },
+                    {
+                        "Name": "Steering_Panel"
+                    },
+                    {
+                        "Name": "Paper"
+                    },
+                    {
+                        "Name": "Wood"
+                    },
+                    {
+                        "Name": "Metal_Painted_Yellow"
+                    },
+                    {
+                        "Name": "Concrete"
+                    },
+                    {
+                        "Name": "Metal_Galvanized"
+                    },
+                    {
+                        "Name": "White"
+                    },
+                    {
+                        "Name": "Wall_Concrete"
+                    },
+                    {
+                        "Name": "Metal_Painted_White"
+                    },
+                    {
+                        "Name": "Metal_Scratched"
+                    },
+                    {
+                        "Name": "Metal_Painted_Red"
+                    },
+                    {
+                        "Name": "Wall_Paint"
+                    },
+                    {
+                        "Name": "Metal_Rusted"
+                    },
+                    {
+                        "Name": "Extinguisher"
+                    },
+                    {
+                        "Name": "Yellow"
+                    }
                 ]
             },
             "MaterialSlots": [
@@ -40,18 +141,40 @@
             "nodeSelectionList": {
                 "selectedNodes": [
                     "RootNode",
-                    "RootNode.Warehouse - low tex",
-                    "RootNode.Terrain",
+                    "RootNode.warehouse - low tex",
                     "RootNode.Vehicles",
-                    "RootNode.Warehouse - low tex.custom_properties",
-                    "RootNode.Warehouse - low tex.UVMap",
-                    "RootNode.Warehouse - low tex.Warehouse_Diffuse",
-                    "RootNode.Terrain.custom_properties",
-                    "RootNode.Terrain.UVMap",
-                    "RootNode.Terrain.Terrain_Diffuse",
+                    "RootNode.warehouse - low tex.transform",
+                    "RootNode.warehouse - low tex.custom_properties",
+                    "RootNode.warehouse - low tex.UV0",
+                    "RootNode.warehouse - low tex.Plastick_Black",
+                    "RootNode.warehouse - low tex.Steering_Panel",
+                    "RootNode.warehouse - low tex.Paper",
+                    "RootNode.warehouse - low tex.Wood",
+                    "RootNode.warehouse - low tex.Metal_Painted_Yellow",
+                    "RootNode.warehouse - low tex.Concrete",
+                    "RootNode.warehouse - low tex.Metal_Galvanized",
+                    "RootNode.warehouse - low tex.White",
+                    "RootNode.warehouse - low tex.Wall_Concrete",
+                    "RootNode.warehouse - low tex.Glass",
+                    "RootNode.warehouse - low tex.Metal_Painted_White",
+                    "RootNode.warehouse - low tex.Metal_Scratched",
+                    "RootNode.warehouse - low tex.Metal_Painted_Red",
+                    "RootNode.warehouse - low tex.Wall_Paint",
+                    "RootNode.warehouse - low tex.Metal_Rusted",
+                    "RootNode.warehouse - low tex.Extinguisher",
+                    "RootNode.warehouse - low tex.Yellow",
+                    "RootNode.Vehicles.transform",
                     "RootNode.Vehicles.custom_properties",
-                    "RootNode.Vehicles.UVMap",
-                    "RootNode.Vehicles.Vehicles_Diffuse"
+                    "RootNode.Vehicles.UV0",
+                    "RootNode.Vehicles.Blue_Vehicles",
+                    "RootNode.Vehicles.White_Vehicles",
+                    "RootNode.Vehicles.Black_Vehicles",
+                    "RootNode.Vehicles.Tire_Vehicles",
+                    "RootNode.Vehicles.Glass",
+                    "RootNode.Vehicles.Silver_Vehicles",
+                    "RootNode.Vehicles.Yellow_Vehicles",
+                    "RootNode.Vehicles.Black_Plastic_Vehicles",
+                    "RootNode.Vehicles.Gray_Vehicles"
                 ]
             },
             "rules": {

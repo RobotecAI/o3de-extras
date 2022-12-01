@@ -8,13 +8,16 @@
             0.800000011920929,
             1.0
         ],
-        "baseColor.textureMap": "textures/WarehouseDiffuse.png",
+        "baseColor.textureMap": "../Textures/Wood_026_basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "opacity.factor": 1.0
+        "normal.factor": 0.800000011920929,
+        "normal.textureMap": "../Textures/Wood_026_normal.jpg",
+        "opacity.factor": 1.0,
+        "roughness.textureMap": "../Textures/Wood_026_roughness.jpg"
     }
 }
