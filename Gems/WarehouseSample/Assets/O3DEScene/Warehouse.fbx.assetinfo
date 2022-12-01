@@ -1,0 +1,67 @@
+{
+    "values": [
+        {
+            "$type": "{5B03C8E6-8CEE-4DA0-A7FA-CD88689DD45B} MeshGroup",
+            "id": "{7AFD4591-C800-5671-8DF0-752D63942833}",
+            "name": "Warehouse",
+            "NodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode.Warehouse - low tex",
+                    "RootNode.Terrain",
+                    "RootNode.Vehicles"
+                ],
+                "unselectedNodes": [
+                    "RootNode",
+                    "RootNode.Warehouse - low tex.custom_properties",
+                    "RootNode.Warehouse - low tex.UVMap",
+                    "RootNode.Warehouse - low tex.Warehouse_Diffuse",
+                    "RootNode.Terrain.custom_properties",
+                    "RootNode.Terrain.UVMap",
+                    "RootNode.Terrain.Terrain_Diffuse",
+                    "RootNode.Vehicles.custom_properties",
+                    "RootNode.Vehicles.UVMap",
+                    "RootNode.Vehicles.Vehicles_Diffuse"
+                ]
+            },
+            "MaterialSlots": [
+                "Warehouse_Diffuse",
+                "Terrain_Diffuse",
+                "Vehicles_Diffuse"
+            ],
+            "PhysicsMaterials": [
+                "<Default Physics Material>",
+                "<Default Physics Material>",
+                "<Default Physics Material>"
+            ]
+        },
+        {
+            "$type": "{07B356B7-3635-40B5-878A-FAC4EFD5AD86} MeshGroup",
+            "name": "Warehouse",
+            "nodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode",
+                    "RootNode.Warehouse - low tex",
+                    "RootNode.Terrain",
+                    "RootNode.Vehicles",
+                    "RootNode.Warehouse - low tex.custom_properties",
+                    "RootNode.Warehouse - low tex.UVMap",
+                    "RootNode.Warehouse - low tex.Warehouse_Diffuse",
+                    "RootNode.Terrain.custom_properties",
+                    "RootNode.Terrain.UVMap",
+                    "RootNode.Terrain.Terrain_Diffuse",
+                    "RootNode.Vehicles.custom_properties",
+                    "RootNode.Vehicles.UVMap",
+                    "RootNode.Vehicles.Vehicles_Diffuse"
+                ]
+            },
+            "rules": {
+                "rules": [
+                    {
+                        "$type": "MaterialRule"
+                    }
+                ]
+            },
+            "id": "{EF8F806B-0DE5-511F-86AE-4E41824278E0}"
+        }
+    ]
+}
