@@ -10,7 +10,9 @@ Refer to the [O3DE System Requirements](https://www.o3de.org/docs/welcome-guide/
 This project has the following dependencies:
 
 - [O3DE](https://github.com/o3de/o3de) 
-- [ROS2 Gem](https://github.com/RobotecAI/o3de-ros2-gem)
+- [ROS2 Gem](https://github.com/o3de/o3de-extras/tree/development/Gems/ROS2)
+- [RosRobotSample Assets] (https://github.com/o3de/o3de-extras/tree/development/Gems/RosRobotSample)
+- [WarehouseSample Assets] (https://github.com/o3de/o3de-extras/tree/development/Gems/WarehouseSample)
 
 Please make sure that `clang` was installed and configured. For details refer to [this section](https://www.o3de.org/docs/welcome-guide/requirements/#linux) of O3DE documentation.
 
@@ -48,17 +50,7 @@ git lfs pull
 $DEMO_BASE/o3de/scripts/o3de.sh register --this-engine
 ```
 
-### 3. Clone and register the ROS2 Gem locally
-
-ROS2 Gem is an interface between O3DE and ROS2.
-
-```shell
-cd $DEMO_BASE
-git clone https://github.com/RobotecAI/o3de-ros2-gem.git
-$DEMO_BASE/o3de/scripts/o3de.sh register --gem-path $DEMO_BASE/o3de-ros2-gem
-```
-
-### 4. Clone the `o3de-extras` repository containing the template and asset gems
+### 3. Clone the `o3de-extras` repository containing the template and asset gems
 
 ```shell
 cd $DEMO_BASE
@@ -68,12 +60,12 @@ git clone git@github.com:o3de/o3de-extras.git
 Register gems included in this project.
 
 ```shell
+$DEMO_BASE/o3de/scripts/o3de.sh register --gem-path $DEMO_BASE/o3de-extras/Gems/ROS2
 $DEMO_BASE/o3de/scripts/o3de.sh register --gem-path $DEMO_BASE/o3de-extras/Gems/WarehouseSample
 $DEMO_BASE/o3de/scripts/o3de.sh register --gem-path $DEMO_BASE/o3de-extras/Gems/RosRobotSample
 ```
 
-
-### 5. Create a ROS2 project from the template
+### 4. Create a ROS2 project from the template
 
 Assign a name for the new project. In this example, it is assumed that it will be: `WarehouseTest`, and it will be located in `$DEMO_BASE/WarehouseTest` folder. 
 
@@ -84,9 +76,10 @@ $DEMO_BASE/o3de/scripts/o3de.sh create-project --project-path $PROJECT_PATH --te
 $DEMO_BASE/o3de/scripts/o3de.sh register --project-path $PROJECT_PATH/Project
 ```
 
-Enable asset gems.
+Enable gems.
 
 ```shell
+$DEMO_BASE/o3de/scripts/o3de.sh enable-gem --gem-name ROS2 --project-path $PROJECT_PATH/Project
 $DEMO_BASE/o3de/scripts/o3de.sh enable-gem --gem-name WarehouseSample --project-path $PROJECT_PATH/Project
 $DEMO_BASE/o3de/scripts/o3de.sh enable-gem --gem-name RosRobotSample --project-path $PROJECT_PATH/Project
 ```
