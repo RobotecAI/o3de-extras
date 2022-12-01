@@ -2,13 +2,19 @@
     "materialType": "@gemroot:Atom_Feature_Common@/Assets/Materials/Types/StandardPBR.materialtype",
     "materialTypeVersion": 5,
     "propertyValues": {
-        "baseColor.textureMap": "textures/WarehouseVehiclesDiffuse.png",
+        "baseColor.color": [
+            0.04373510181903839,
+            0.04373500123620033,
+            0.04373500123620033,
+            1.0
+        ],
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
+        "normal.textureMap": "../Textures/Tire_Normal.png",
         "opacity.factor": 1.0
     }
 }
