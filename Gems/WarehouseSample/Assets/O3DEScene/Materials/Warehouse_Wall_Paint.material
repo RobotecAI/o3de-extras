@@ -3,11 +3,13 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.800000011920929,
-            0.800000011920929,
-            0.800000011920929,
+            0.3840238153934479,
+            0.34311437606811523,
+            0.269245445728302,
             1.0
         ],
+        "baseColor.factor": 0.3100000023841858,
+        "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/1K-wall_paint-diffuse.jpg",
         "emissive.color": [
             0.0,
@@ -17,6 +19,8 @@
         ],
         "normal.textureMap": "../Textures/1K-wall_paint-normal.jpg",
         "opacity.factor": 1.0,
-        "specularF0.textureMap": "../Textures/1K-wall_paint-specular.jpg"
+        "specularF0.textureMap": "../Textures/1K-wall_paint-specular.jpg",
+        "uv.tileU": 2.0,
+        "uv.tileV": 2.0
     }
 }
