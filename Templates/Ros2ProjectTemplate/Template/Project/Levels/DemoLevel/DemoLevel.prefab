@@ -1218,130 +1218,37 @@
                 }
             }
         },
-        "Entity_[639277404269]": {
-            "Id": "Entity_[639277404269]",
+        "Entity_[623577309298]": {
+            "Id": "Entity_[623577309298]",
             "Name": "Warehouse",
             "Components": {
-                "Component_[11513201143912125872]": {
-                    "$type": "EditorLockComponent",
-                    "Id": 11513201143912125872
-                },
-                "Component_[12169671705923866058]": {
-                    "$type": "EditorDisabledCompositionComponent",
-                    "Id": 12169671705923866058
-                },
-                "Component_[12192225446616099133]": {
-                    "$type": "EditorVisibilityComponent",
-                    "Id": 12192225446616099133
-                },
-                "Component_[12704120924487106115]": {
-                    "$type": "EditorMaterialComponent",
-                    "Id": 12704120924487106115,
-                    "Controller": {
-                        "Configuration": {
-                            "materials": [
-                                {
-                                    "Key": {
-                                        "materialSlotStableId": 1480482908
-                                    },
-                                    "Value": {
-                                        "MaterialAsset": {
-                                            "assetId": {
-                                                "guid": "{3AE13658-8058-5BA4-9870-67E5FE346319}"
-                                            },
-                                            "assetHint": "o3descene/warehouse_terrain_diffuse.azmaterial"
-                                        }
-                                    }
-                                },
-                                {
-                                    "Key": {
-                                        "materialSlotStableId": 2315760051
-                                    },
-                                    "Value": {
-                                        "MaterialAsset": {
-                                            "assetId": {
-                                                "guid": "{CDE8D4BD-1DCF-5A47-BBBC-34FD39CD26B1}"
-                                            },
-                                            "assetHint": "o3descene/warehouse_vehicles_diffuse.azmaterial"
-                                        }
-                                    }
-                                },
-                                {
-                                    "Key": {
-                                        "materialSlotStableId": 4134065892
-                                    },
-                                    "Value": {
-                                        "MaterialAsset": {
-                                            "assetId": {
-                                                "guid": "{1CF532AA-B82C-58ED-9793-DED8BA3731B5}"
-                                            },
-                                            "assetHint": "o3descene/warehouse_warehouse_diffuse.azmaterial"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                },
-                "Component_[14119410538411421630]": {
-                    "$type": "EditorEntityIconComponent",
-                    "Id": 14119410538411421630
-                },
-                "Component_[14995644285653333768]": {
-                    "$type": "EditorOnlyEntityComponent",
-                    "Id": 14995644285653333768
-                },
-                "Component_[15366728622095648456]": {
-                    "$type": "EditorEntitySortComponent",
-                    "Id": 15366728622095648456
-                },
-                "Component_[15457894719969081752]": {
-                    "$type": "EditorColliderComponent",
-                    "Id": 15457894719969081752,
-                    "ColliderConfiguration": {
-                        "MaterialSlots": {
-                            "Slots": [
-                                {
-                                    "Name": "Warehouse_Diffuse"
-                                },
-                                {
-                                    "Name": "Terrain_Diffuse"
-                                },
-                                {
-                                    "Name": "Vehicles_Diffuse"
-                                }
-                            ]
-                        }
-                    },
-                    "ShapeConfiguration": {
-                        "PhysicsAsset": {
-                            "Asset": {
-                                "assetId": {
-                                    "guid": "{2B484CB6-8011-5B56-B194-7B3110DA7629}",
-                                    "subId": 2090086939
-                                },
-                                "assetHint": "o3descene/warehouse.pxmesh"
-                            },
-                            "Configuration": {
-                                "PhysicsAsset": {
-                                    "assetId": {
-                                        "guid": "{2B484CB6-8011-5B56-B194-7B3110DA7629}",
-                                        "subId": 2090086939
-                                    },
-                                    "loadBehavior": "QueueLoad",
-                                    "assetHint": "o3descene/warehouse.pxmesh"
-                                }
-                            }
-                        }
-                    }
-                },
-                "Component_[16674388929306241201]": {
+                "Component_[10670954555018299488]": {
                     "$type": "EditorInspectorComponent",
-                    "Id": 16674388929306241201
+                    "Id": 10670954555018299488
                 },
-                "Component_[7358205587392126318]": {
+                "Component_[12194365436668824793]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 12194365436668824793
+                },
+                "Component_[13823656493018592813]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13823656493018592813
+                },
+                "Component_[1545542302497973797]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 1545542302497973797
+                },
+                "Component_[1836959596730672894]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 1836959596730672894
+                },
+                "Component_[1976302571202485674]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 1976302571202485674
+                },
+                "Component_[3130608849925615607]": {
                     "$type": "AZ::Render::EditorMeshComponent",
-                    "Id": 7358205587392126318,
+                    "Id": 3130608849925615607,
                     "Controller": {
                         "Configuration": {
                             "ModelAsset": {
@@ -1354,14 +1261,353 @@
                         }
                     }
                 },
-                "Component_[7730657339737845809]": {
-                    "$type": "EditorPendingCompositionComponent",
-                    "Id": 7730657339737845809
-                },
-                "Component_[8579819239004393900]": {
+                "Component_[3579789965580572662]": {
                     "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
-                    "Id": 8579819239004393900,
+                    "Id": 3579789965580572662,
                     "Parent Entity": "Entity_[1146574390643]"
+                },
+                "Component_[5074552215749123153]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 5074552215749123153,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 128104633
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{E0DD5DB2-0813-583D-B110-C3FB3A877092}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_paper.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 472957737
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{6406B19D-9970-5275-8F78-D0D95BA56418}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_blue_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 539080687
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{E583E9CA-E9D0-55C0-A80F-00DC9399FFBB}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_yellow_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 863794866
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{ADAAFF07-E1A1-54A1-93D2-218EE06FA310}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_gray_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 915236140
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{374F1E9E-EFED-5211-AC5A-B4642AFA864A}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_tire_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1148632290
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{01F1FFA2-C9B7-5310-8B53-141CCA5E1844}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_painted_yellow.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1189725340
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{4229AC63-D33E-5D3E-8801-CD77926F0821}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_black_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1268344344
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{412E7814-9DD6-5095-8B81-D45E8158AE8A}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_silver_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1346333716
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{FD585CC9-3C4F-565A-B0AE-AB79A2C71821}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_rusted.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1503600304
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{4B02125C-4089-5DB1-9B5E-B0D6BEA4644D}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_plastick_black.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1641645527
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{895DBAF4-C4C8-55C7-B2D6-962A93AB4606}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_scratched.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1662216163
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{B2BBEC6F-25EB-559F-B982-E4185CCB2C5C}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_wall_concrete.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1792258174
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{556663B5-2DC1-558B-9F1E-7BB0D4B6A17F}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_white_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 1815417914
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{4050CC1D-3E63-50B4-8995-1FA0FCD7F2A2}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_black_plastic_vehicles.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2070427900
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{DD3D7DB3-38E0-5F3B-956B-4AC9115423C1}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_steering_panel.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2230552709
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{596F6F47-C5CC-59DB-A62D-42B4C3C6522B}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_concrete.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2270669533
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{1072E6B5-02B2-587B-96E2-19AA1BD0DE5C}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_wall_paint.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2543775058
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{FD618B5A-EA3D-53B9-BF4A-EAA2C16DB2E4}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_extinguisher.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2689721926
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{87E3CBF6-8077-5793-9F39-10CB491E1B86}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_wood.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2703611526
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{B85D0468-011A-59D3-9012-B01E11046123}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_galvanized.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 2709766935
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{FB6271B2-C1B5-517C-9F3A-AAE01AA283C2}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_painted_red.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 3232760133
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{0BC094B5-19E4-5BAF-A85D-8B54CFB2A763}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_glass.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 3415982104
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{26034A46-19A1-58CC-9623-90556DB20DC5}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_yellow.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 3782988514
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{B2BBEC6F-25EB-559F-B982-E4185CCB2C5C}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_wall_concrete.azmaterial"
+                                        }
+                                    }
+                                },
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 3920169135
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{8DAA17D3-7699-5284-94F9-681CD98A91CA}"
+                                            },
+                                            "assetHint": "o3descene/materials/warehouse_metal_painted_white.azmaterial"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[6126526996710685532]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 6126526996710685532
+                },
+                "Component_[8421478587399964878]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 8421478587399964878
                 }
             }
         }
