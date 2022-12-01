@@ -3,11 +3,12 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.30910199880599976,
-            0.0079346913844347,
-            0.0079346913844347,
+            0.2862134873867035,
+            0.2862134873867035,
+            0.2862134873867035,
             1.0
         ],
+        "baseColor.textureMap": "../Textures/Extinguisher.png",
         "emissive.color": [
             0.0,
             0.0,
