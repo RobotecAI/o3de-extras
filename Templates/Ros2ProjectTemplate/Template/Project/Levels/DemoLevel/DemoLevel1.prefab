@@ -1266,112 +1266,6 @@
                     "Id": 3579789965580572662,
                     "Parent Entity": "Entity_[1146574390643]"
                 },
-                "Component_[4478437341574964992]": {
-                    "$type": "EditorColliderComponent",
-                    "Id": 4478437341574964992,
-                    "ColliderConfiguration": {
-                        "MaterialSlots": {
-                            "Slots": [
-                                {
-                                    "Name": "Plastick_Black"
-                                },
-                                {
-                                    "Name": "Steering_Panel"
-                                },
-                                {
-                                    "Name": "Paper"
-                                },
-                                {
-                                    "Name": "Wood"
-                                },
-                                {
-                                    "Name": "Metal_Painted_Yellow"
-                                },
-                                {
-                                    "Name": "Concrete"
-                                },
-                                {
-                                    "Name": "Metal_Galvanized"
-                                },
-                                {
-                                    "Name": "White"
-                                },
-                                {
-                                    "Name": "Wall_Concrete"
-                                },
-                                {
-                                    "Name": "Glass"
-                                },
-                                {
-                                    "Name": "Metal_Painted_White"
-                                },
-                                {
-                                    "Name": "Metal_Scratched"
-                                },
-                                {
-                                    "Name": "Metal_Painted_Red"
-                                },
-                                {
-                                    "Name": "Wall_Paint"
-                                },
-                                {
-                                    "Name": "Metal_Rusted"
-                                },
-                                {
-                                    "Name": "Extinguisher"
-                                },
-                                {
-                                    "Name": "Yellow"
-                                },
-                                {
-                                    "Name": "Blue_Vehicles"
-                                },
-                                {
-                                    "Name": "White_Vehicles"
-                                },
-                                {
-                                    "Name": "Black_Vehicles"
-                                },
-                                {
-                                    "Name": "Tire_Vehicles"
-                                },
-                                {
-                                    "Name": "Silver_Vehicles"
-                                },
-                                {
-                                    "Name": "Yellow_Vehicles"
-                                },
-                                {
-                                    "Name": "Black_Plastic_Vehicles"
-                                },
-                                {
-                                    "Name": "Gray_Vehicles"
-                                }
-                            ]
-                        }
-                    },
-                    "ShapeConfiguration": {
-                        "PhysicsAsset": {
-                            "Asset": {
-                                "assetId": {
-                                    "guid": "{2B484CB6-8011-5B56-B194-7B3110DA7629}",
-                                    "subId": 2090086939
-                                },
-                                "assetHint": "o3descene/warehouse.pxmesh"
-                            },
-                            "Configuration": {
-                                "PhysicsAsset": {
-                                    "assetId": {
-                                        "guid": "{2B484CB6-8011-5B56-B194-7B3110DA7629}",
-                                        "subId": 2090086939
-                                    },
-                                    "loadBehavior": "QueueLoad",
-                                    "assetHint": "o3descene/warehouse.pxmesh"
-                                }
-                            }
-                        }
-                    }
-                },
                 "Component_[5074552215749123153]": {
                     "$type": "EditorMaterialComponent",
                     "Id": 5074552215749123153,
@@ -1746,11 +1640,6 @@
                     "op": "replace",
                     "path": "/ContainerEntity/Components/Component_[18358065267338696147]/Transform Data/Rotate/2",
                     "value": 180.0
-                },
-                {
-                    "op": "replace",
-                    "path": "/Entities/Entity_[394238657263]/Components/Component_[11315452240909602350]/Controller/Configuration/materials/1/Value/MaterialAsset/assetHint",
-                    "value": "robot/robotwheel.azmaterial"
                 },
                 {
                     "op": "replace",
