@@ -1,0 +1,72 @@
+{
+    "values": [
+        {
+            "$type": "{5B03C8E6-8CEE-4DA0-A7FA-CD88689DD45B} MeshGroup",
+            "id": "{0A6B5895-9FD7-5F04-96FE-7A5F4E8FE135}",
+            "name": "robot",
+            "NodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode",
+                    "RootNode.astra",
+                    "RootNode.wheelFL",
+                    "RootNode.wheelBL",
+                    "RootNode.wheelFR",
+                    "RootNode.wheelBR"
+                ],
+                "unselectedNodes": [
+                    "RootNode.astra.transform",
+                    "RootNode.astra.custom_properties",
+                    "RootNode.astra.UVMap",
+                    "RootNode.astra.RobotBodyMaterial_002",
+                    "RootNode.wheelFL.transform",
+                    "RootNode.wheelFL.custom_properties",
+                    "RootNode.wheelFL.UVMap",
+                    "RootNode.wheelFL.Wheel_002",
+                    "RootNode.wheelBL.transform",
+                    "RootNode.wheelBL.custom_properties",
+                    "RootNode.wheelBL.UVMap",
+                    "RootNode.wheelBL.Wheel_002",
+                    "RootNode.wheelFR.transform",
+                    "RootNode.wheelFR.custom_properties",
+                    "RootNode.wheelFR.UVMap",
+                    "RootNode.wheelFR.Wheel_002",
+                    "RootNode.wheelBR.transform",
+                    "RootNode.wheelBR.custom_properties",
+                    "RootNode.wheelBR.UVMap",
+                    "RootNode.wheelBR.Wheel_002"
+                ]
+            },
+            "export method": 1,
+            "MaterialSlots": [
+                "RobotBodyMaterial_002",
+                "Wheel_002"
+            ],
+            "PhysicsMaterials": [
+                "Vehicle",
+                "Vehicle"
+            ]
+        },
+        {
+            "$type": "{07B356B7-3635-40B5-878A-FAC4EFD5AD86} MeshGroup",
+            "name": "robot",
+            "nodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode",
+                    "RootNode.astra",
+                    "RootNode.wheelFL",
+                    "RootNode.wheelBL",
+                    "RootNode.wheelFR",
+                    "RootNode.wheelBR"
+                ]
+            },
+            "rules": {
+                "rules": [
+                    {
+                        "$type": "MaterialRule"
+                    }
+                ]
+            },
+            "id": "{151F7CBB-2889-5F9D-89E7-685994809D0E}"
+        }
+    ]
+}
