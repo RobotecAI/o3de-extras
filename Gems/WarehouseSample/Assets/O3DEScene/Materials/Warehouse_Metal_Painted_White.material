@@ -2,21 +2,20 @@
     "materialType": "@gemroot:Atom_Feature_Common@/Assets/Materials/Types/StandardPBR.materialtype",
     "materialTypeVersion": 5,
     "propertyValues": {
-        "baseColor.color": [
-            0.800000011920929,
-            0.800000011920929,
-            0.800000011920929,
-            1.0
-        ],
+        "baseColor.factor": 0.7200000286102295,
+        "baseColor.textureBlendMode": "Lerp",
+        "baseColor.textureMap": "../Textures/Metal_Painted_002_white_basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "normal.factor": 0.46000000834465027,
+        "normal.factor": 0.23999999463558197,
+        "normal.flipY": true,
         "normal.textureMap": "../Textures/Metal_Painted_002_normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg"
+        "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg",
+        "specularF0.factor": 1.0
     }
 }

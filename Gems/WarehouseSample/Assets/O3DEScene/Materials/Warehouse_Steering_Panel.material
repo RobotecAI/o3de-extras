@@ -9,12 +9,7 @@
             1.0
         ],
         "baseColor.textureMap": "../Textures/Steering_Panel.png",
-        "emissive.color": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-        ],
+        "emissive.intensity": 0.3799999952316284,
         "opacity.factor": 1.0
     }
 }

@@ -17,7 +17,8 @@
             0.0,
             1.0
         ],
-        "normal.factor": 0.3799999952316284,
+        "normal.factor": 0.11999999731779099,
+        "normal.flipY": true,
         "normal.textureMap": "../Textures/Metal_Galvanized_001_normal.jpg",
         "opacity.factor": 1.0,
         "roughness.textureMap": "../Textures/Metal_Galvanized_001_roughness.jpg",
