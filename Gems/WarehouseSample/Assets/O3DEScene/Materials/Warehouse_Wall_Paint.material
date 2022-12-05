@@ -3,12 +3,12 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.3840238153934479,
-            0.34311437606811523,
-            0.269245445728302,
+            0.1753719449043274,
+            0.1753719449043274,
+            0.1753719449043274,
             1.0
         ],
-        "baseColor.factor": 0.3100000023841858,
+        "baseColor.factor": 0.20000000298023224,
         "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/1K-wall_paint-diffuse.jpg",
         "emissive.color": [

@@ -3,12 +3,12 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.1753719449043274,
-            0.1753719449043274,
-            0.1753719449043274,
+            0.11300831288099289,
+            0.125764861702919,
+            0.1290913224220276,
             1.0
         ],
-        "baseColor.factor": 0.4399999976158142,
+        "baseColor.factor": 0.17000000178813934,
         "baseColor.textureBlendMode": "Lerp",
         "baseColor.textureMap": "../Textures/Metal_Rusted_001_COLOR.jpg",
         "emissive.color": [

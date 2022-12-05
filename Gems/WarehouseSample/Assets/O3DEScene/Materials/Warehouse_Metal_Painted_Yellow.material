@@ -8,16 +8,17 @@
             0.0,
             1.0
         ],
-        "baseColor.factor": 0.3100000023841858,
+        "baseColor.factor": 0.5,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Painted_002_basecolor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Painted_002_yellow_basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "normal.factor": 0.46000000834465027,
+        "normal.factor": 0.03999999910593033,
+        "normal.flipY": true,
         "normal.textureMap": "../Textures/Metal_Painted_002_normal.jpg",
         "opacity.factor": 1.0,
         "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg",

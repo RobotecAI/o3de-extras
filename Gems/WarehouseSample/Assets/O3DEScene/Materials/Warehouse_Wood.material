@@ -3,9 +3,9 @@
     "materialTypeVersion": 5,
     "propertyValues": {
         "baseColor.color": [
-            0.043701838701963425,
-            0.03002975508570671,
-            0.02543678879737854,
+            0.026352331042289734,
+            0.024887464940547943,
+            0.02212558127939701,
             1.0
         ],
         "baseColor.factor": 0.25999999046325684,
@@ -17,10 +17,11 @@
             0.0,
             1.0
         ],
-        "normal.factor": 0.800000011920929,
         "normal.textureMap": "../Textures/Wood_026_normal.jpg",
         "opacity.factor": 1.0,
         "roughness.textureMap": "../Textures/Wood_026_roughness.jpg",
-        "uv.rotateDegrees": 90.0
+        "uv.rotateDegrees": 90.0,
+        "uv.tileU": 2.0,
+        "uv.tileV": 2.0
     }
 }
