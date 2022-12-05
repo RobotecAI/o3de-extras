@@ -1,0 +1,177 @@
+{
+    "values": [
+        {
+            "$type": "{5B03C8E6-8CEE-4DA0-A7FA-CD88689DD45B} MeshGroup",
+            "id": "{6966C6EA-0189-5429-AC58-CF02C06F36C8}",
+            "name": "Warehouse",
+            "NodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode",
+                    "RootNode.Vehicles",
+                    "RootNode.warehouse - low tex"
+                ],
+                "unselectedNodes": [
+                    {}
+                ]
+            },
+            "PhysicsMaterialSlots": {
+                "Slots": [
+                    {
+                        "Name": "Blue_Vehicles"
+                    },
+                    {
+                        "Name": "White_Vehicles"
+                    },
+                    {
+                        "Name": "Black_Vehicles"
+                    },
+                    {
+                        "Name": "Tire_Vehicles"
+                    },
+                    {
+                        "Name": "Glass"
+                    },
+                    {
+                        "Name": "Silver_Vehicles"
+                    },
+                    {
+                        "Name": "Yellow_Vehicles"
+                    },
+                    {
+                        "Name": "Black_Plastic_Vehicles"
+                    },
+                    {
+                        "Name": "Gray_Vehicles"
+                    },
+                    {
+                        "Name": "Plastick_Black"
+                    },
+                    {
+                        "Name": "Steering_Panel"
+                    },
+                    {
+                        "Name": "Paper"
+                    },
+                    {
+                        "Name": "Wood"
+                    },
+                    {
+                        "Name": "Metal_Painted_Yellow"
+                    },
+                    {
+                        "Name": "Concrete"
+                    },
+                    {
+                        "Name": "Metal_Galvanized"
+                    },
+                    {
+                        "Name": "White"
+                    },
+                    {
+                        "Name": "Wall_Concrete"
+                    },
+                    {
+                        "Name": "Metal_Painted_White"
+                    },
+                    {
+                        "Name": "Metal_Scratched"
+                    },
+                    {
+                        "Name": "Metal_Painted_Red"
+                    },
+                    {
+                        "Name": "Wall_Paint"
+                    },
+                    {
+                        "Name": "Metal_Rusted"
+                    },
+                    {
+                        "Name": "Extinguisher"
+                    },
+                    {
+                        "Name": "Yellow"
+                    }
+                ]
+            }
+        },
+        {
+            "$type": "{07B356B7-3635-40B5-878A-FAC4EFD5AD86} MeshGroup",
+            "name": "Warehouse",
+            "nodeSelectionList": {
+                "selectedNodes": [
+                    {},
+                    "RootNode",
+                    "RootNode.warehouse - low tex",
+                    "RootNode.Vehicles"
+                ]
+            },
+            "rules": {
+                "rules": [
+                    {
+                        "$type": "MaterialRule"
+                    }
+                ]
+            },
+            "id": "{30F16F94-FD26-5F9C-BC30-0A9287A0A159}"
+        },
+        {
+            "$type": "{07B356B7-3635-40B5-878A-FAC4EFD5AD86} MeshGroup",
+            "name": "default_Warehouse_06FD3121_C75F_578C_9CE9_7231D1AA9928_",
+            "nodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode.warehouse - low tex"
+                ],
+                "unselectedNodes": [
+                    "RootNode.Vehicles"
+                ]
+            },
+            "rules": {
+                "rules": [
+                    {
+                        "$type": "ProceduralMeshGroupRule"
+                    },
+                    {
+                        "$type": "CoordinateSystemRule",
+                        "useAdvancedData": true
+                    },
+                    {
+                        "$type": "{6E796AC8-1484-4909-860A-6D3F22A7346F} LodRule"
+                    }
+                ]
+            },
+            "id": "{06FD3121-C75F-578C-9CE9-7231D1AA9928}"
+        },
+        {
+            "$type": "{07B356B7-3635-40B5-878A-FAC4EFD5AD86} MeshGroup",
+            "name": "default_Warehouse_BCC556B0_B90C_5A6B_B555_1C312540BB5A_",
+            "nodeSelectionList": {
+                "selectedNodes": [
+                    "RootNode.Vehicles"
+                ],
+                "unselectedNodes": [
+                    "RootNode.warehouse - low tex"
+                ]
+            },
+            "rules": {
+                "rules": [
+                    {
+                        "$type": "ProceduralMeshGroupRule"
+                    },
+                    {
+                        "$type": "CoordinateSystemRule",
+                        "useAdvancedData": true
+                    },
+                    {
+                        "$type": "{6E796AC8-1484-4909-860A-6D3F22A7346F} LodRule"
+                    }
+                ]
+            },
+            "id": "{BCC556B0-B90C-5A6B-B555-1C312540BB5A}"
+        },
+        {
+            "$type": "PrefabGroup",
+            "name": "O3DEScene/Warehouse_fbx.procprefab",
+            "id": "{23D4319C-050B-5706-8239-C293267F786D}"
+        }
+    ]
+}
