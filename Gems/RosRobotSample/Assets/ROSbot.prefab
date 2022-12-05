@@ -388,13 +388,36 @@
                     "$type": "EditorEntityIconComponent",
                     "Id": 11895140916889160460
                 },
+                "Component_[12239569133497840749]": {
+                    "$type": "AZ::Render::EditorBloomComponent",
+                    "Id": 12239569133497840749,
+                    "Controller": {
+                        "Configuration": {
+                            "Enabled": true,
+                            "Threshold": 0.4000000059604645,
+                            "Knee": 0.44999998807907104,
+                            "Intensity": 0.05999999865889549,
+                            "KernelSizeScale": 1.100000023841858
+                        }
+                    }
+                },
+                "Component_[15561745274242080851]": {
+                    "$type": "AZ::Render::EditorSsaoComponent",
+                    "Id": 15561745274242080851,
+                    "Controller": {
+                        "Configuration": {
+                            "Strength": 0.4399999976158142,
+                            "SamplingRadius": 0.03500000014901161
+                        }
+                    }
+                },
                 "Component_[16880285896855930892]": {
                     "$type": "{CA11DA46-29FF-4083-B5F6-E02C3A8C3A3D} EditorCameraComponent",
                     "Id": 16880285896855930892,
                     "Controller": {
                         "Configuration": {
                             "Field of View": 55.0,
-                            "EditorEntityId": 7880208127517809482
+                            "EditorEntityId": 940661292503997071
                         }
                     }
                 },
@@ -426,6 +449,10 @@
                 "Component_[2654521436129313160]": {
                     "$type": "EditorVisibilityComponent",
                     "Id": 2654521436129313160
+                },
+                "Component_[3823523978087831336]": {
+                    "$type": "AZ::Render::EditorPostFxLayerComponent",
+                    "Id": 3823523978087831336
                 },
                 "Component_[5265045084611556958]": {
                     "$type": "EditorDisabledCompositionComponent",
