@@ -7,89 +7,293 @@
             "NodeSelectionList": {
                 "selectedNodes": [
                     "RootNode",
+                    "RootNode.warehouse - low tex",
                     "RootNode.Vehicles",
-                    "RootNode.warehouse - low tex"
-                ],
-                "unselectedNodes": [
-                    {}
+                    "RootNode.warehouse - low tex.transform",
+                    "RootNode.warehouse - low tex.custom_properties",
+                    "RootNode.warehouse - low tex.UV0",
+                    "RootNode.warehouse - low tex.Plastick_Black",
+                    "RootNode.warehouse - low tex.Steering_Panel",
+                    "RootNode.warehouse - low tex.Paper",
+                    "RootNode.warehouse - low tex.Wood",
+                    "RootNode.warehouse - low tex.Metal_Painted_Yellow",
+                    "RootNode.warehouse - low tex.Concrete",
+                    "RootNode.warehouse - low tex.Metal_Galvanized",
+                    "RootNode.warehouse - low tex.White",
+                    "RootNode.warehouse - low tex.Wall_Concrete",
+                    "RootNode.warehouse - low tex.Glass",
+                    "RootNode.warehouse - low tex.Metal_Painted_White",
+                    "RootNode.warehouse - low tex.Metal_Scratched",
+                    "RootNode.warehouse - low tex.Metal_Painted_Red",
+                    "RootNode.warehouse - low tex.Wall_Paint",
+                    "RootNode.warehouse - low tex.Metal_Rusted",
+                    "RootNode.warehouse - low tex.Extinguisher",
+                    "RootNode.warehouse - low tex.Yellow",
+                    "RootNode.Vehicles.transform",
+                    "RootNode.Vehicles.custom_properties",
+                    "RootNode.Vehicles.UV0",
+                    "RootNode.Vehicles.Blue_Vehicles",
+                    "RootNode.Vehicles.White_Vehicles",
+                    "RootNode.Vehicles.Black_Vehicles",
+                    "RootNode.Vehicles.Tire_Vehicles",
+                    "RootNode.Vehicles.Glass",
+                    "RootNode.Vehicles.Silver_Vehicles",
+                    "RootNode.Vehicles.Yellow_Vehicles",
+                    "RootNode.Vehicles.Black_Plastic_Vehicles",
+                    "RootNode.Vehicles.Gray_Vehicles"
                 ]
             },
             "PhysicsMaterialSlots": {
                 "Slots": [
                     {
-                        "Name": "Blue_Vehicles"
+                        "Name": "Plastick_Black",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "White_Vehicles"
+                        "Name": "Steering_Panel",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Black_Vehicles"
+                        "Name": "Paper",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Tire_Vehicles"
+                        "Name": "Wood",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Glass"
+                        "Name": "Metal_Painted_Yellow",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Silver_Vehicles"
+                        "Name": "Concrete",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Yellow_Vehicles"
+                        "Name": "Metal_Galvanized",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Black_Plastic_Vehicles"
+                        "Name": "White",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Gray_Vehicles"
+                        "Name": "Wall_Concrete",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Plastick_Black"
+                        "Name": "Glass",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Steering_Panel"
+                        "Name": "Metal_Painted_White",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Paper"
+                        "Name": "Metal_Scratched",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Wood"
+                        "Name": "Metal_Painted_Red",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Painted_Yellow"
+                        "Name": "Wall_Paint",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Concrete"
+                        "Name": "Metal_Rusted",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Galvanized"
+                        "Name": "Extinguisher",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "White"
+                        "Name": "Yellow",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Wall_Concrete"
+                        "Name": "Blue_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Painted_White"
+                        "Name": "White_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Scratched"
+                        "Name": "Black_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Painted_Red"
+                        "Name": "Tire_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Wall_Paint"
+                        "Name": "Silver_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Metal_Rusted"
+                        "Name": "Yellow_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Extinguisher"
+                        "Name": "Black_Plastic_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     },
                     {
-                        "Name": "Yellow"
+                        "Name": "Gray_Vehicles",
+                        "MaterialAsset": {
+                            "assetId": {
+                                "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                "subId": 1
+                            },
+                            "assetHint": "physx/glass.physicsmaterial"
+                        }
                     }
                 ]
             }
@@ -99,10 +303,41 @@
             "name": "Warehouse",
             "nodeSelectionList": {
                 "selectedNodes": [
-                    {},
                     "RootNode",
                     "RootNode.warehouse - low tex",
-                    "RootNode.Vehicles"
+                    "RootNode.Vehicles",
+                    "RootNode.warehouse - low tex.transform",
+                    "RootNode.warehouse - low tex.custom_properties",
+                    "RootNode.warehouse - low tex.UV0",
+                    "RootNode.warehouse - low tex.Plastick_Black",
+                    "RootNode.warehouse - low tex.Steering_Panel",
+                    "RootNode.warehouse - low tex.Paper",
+                    "RootNode.warehouse - low tex.Wood",
+                    "RootNode.warehouse - low tex.Metal_Painted_Yellow",
+                    "RootNode.warehouse - low tex.Concrete",
+                    "RootNode.warehouse - low tex.Metal_Galvanized",
+                    "RootNode.warehouse - low tex.White",
+                    "RootNode.warehouse - low tex.Wall_Concrete",
+                    "RootNode.warehouse - low tex.Glass",
+                    "RootNode.warehouse - low tex.Metal_Painted_White",
+                    "RootNode.warehouse - low tex.Metal_Scratched",
+                    "RootNode.warehouse - low tex.Metal_Painted_Red",
+                    "RootNode.warehouse - low tex.Wall_Paint",
+                    "RootNode.warehouse - low tex.Metal_Rusted",
+                    "RootNode.warehouse - low tex.Extinguisher",
+                    "RootNode.warehouse - low tex.Yellow",
+                    "RootNode.Vehicles.transform",
+                    "RootNode.Vehicles.custom_properties",
+                    "RootNode.Vehicles.UV0",
+                    "RootNode.Vehicles.Blue_Vehicles",
+                    "RootNode.Vehicles.White_Vehicles",
+                    "RootNode.Vehicles.Black_Vehicles",
+                    "RootNode.Vehicles.Tire_Vehicles",
+                    "RootNode.Vehicles.Glass",
+                    "RootNode.Vehicles.Silver_Vehicles",
+                    "RootNode.Vehicles.Yellow_Vehicles",
+                    "RootNode.Vehicles.Black_Plastic_Vehicles",
+                    "RootNode.Vehicles.Gray_Vehicles"
                 ]
             },
             "rules": {
