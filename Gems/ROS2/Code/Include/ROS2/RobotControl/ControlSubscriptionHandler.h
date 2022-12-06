@@ -25,6 +25,7 @@ namespace ROS2
         //! @param subscriberConfiguration configuration with topic and qos
         virtual void Activate(const AZ::Entity* entity, const TopicConfiguration& subscriberConfiguration) = 0;
         //! Interface handling component deactivation
+        //! Interface handling component deactivation
         virtual void Deactivate() = 0;
         virtual ~IControlSubscriptionHandler() = default;
     };
@@ -55,7 +56,7 @@ namespace ROS2
             }
         };
 
-        void Deactivate() final
+        void Deactivate() override final
         {
             m_active = false;
             m_controlSubscription.reset(); // Note: topic and qos can change, need to re-subscribe

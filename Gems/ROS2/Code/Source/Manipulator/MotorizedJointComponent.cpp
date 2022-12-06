@@ -165,7 +165,7 @@ namespace ROS2
         {
             AZ_Printf(
                 "MotorizedJointComponent",
-                " %s | pos: %f | err: %f | cntrl : %f | set : %f |",
+                " %s | pos: %f | err: %f | cntrl : %f | set : %f |\n",
                 GetEntity()->GetName().c_str(),
                 measurement,
                 control_position_error,

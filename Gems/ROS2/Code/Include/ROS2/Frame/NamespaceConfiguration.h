@@ -25,7 +25,7 @@ namespace ROS2
 
         //! A choice of methods to handle namespaces.
         //! @note Top level ROS2FrameComponent will likely be associated with an interesting object (robot). For multi-robot
-        //! simulation, namespaces are often derived from the robot name itself. For this reason, the default behavior
+        //! simulations, namespaces are often derived from the robot name itself. For this reason, the default behavior
         //! for top level ROS2FrameComponent is to generate the namespace from entity name.
         enum NamespaceStrategy
         {

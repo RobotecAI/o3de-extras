@@ -59,20 +59,20 @@ namespace ROS2
         //! Deinitializes rendering pipeline for the camera sensor
         virtual ~CameraSensor();
 
-        //! Function publish Image Message frame from rendering pipeline
+        //! Publish Image Message frame from rendering pipeline
         //! @param publisher - ROS2 publisher to publish image in future
         //! @param header - header with filled message information (frame, timestamp, seq)
         //! @param cameraPose - current camera pose from which the rendering should take place
-        void publishMassage(
+        void PublishMassage(
             std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>> publisher,
             const AZ::Transform& cameraPose,
             const std_msgs::msg::Header& header);
 
-        //! Function to get camera sensor description
+        //! Get the camera sensor description
         [[nodiscard]] const CameraSensorDescription& GetCameraSensorDescription() const;
 
     private:
-        //! Function requesting frame from rendering pipeline
+        //! Request a frame from the rendering pipeline
         //! @param cameraPose - current camera pose from which the rendering should take place
         //! @param callback - callback function object that will be called when capture is ready
         //!                   it's argument is readback structure containing, among other thins, captured image
@@ -91,7 +91,7 @@ namespace ROS2
 
     protected:
         //! Read and setup Atom Passes
-        void setupPasses();
+        void SetupPasses();
     };
 
     class CameraDepthSensor : public CameraSensor
