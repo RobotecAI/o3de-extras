@@ -7,10 +7,10 @@
  */
 #pragma once
 
-#include "AzCore/Component/ComponentBus.h"
-#include "AzCore/Component/Entity.h"
+#include <AzCore/Component/ComponentBus.h>
+#include <AzCore/Component/Entity.h>
 #ifdef ROS2_EDITOR
-#include "AzToolsFramework/ToolsComponents/GenericComponentWrapper.h"
+#include <AzToolsFramework/ToolsComponents/GenericComponentWrapper.h>
 #endif
 namespace ROS2
 {
@@ -19,7 +19,7 @@ namespace ROS2
         /// Create component for a given entity in safe way.
         /// \param entityId entity that will own component
         /// \param componentType Uuid of component to create
-        /// \return created componentId, if it fails, it returns invalid id
+        /// @return The created componentId if successful, otherwise returns an invalid id
         AZ::ComponentId CreateComponent(const AZ::EntityId entityId, const AZ::Uuid componentType);
 
         /// Retrieve component from entity given by a pointer. It is a way to get game components and wrapped components.

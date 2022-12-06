@@ -40,7 +40,7 @@ namespace VehicleDynamics
 
         //! Steer input version which is relative to limits.
         //! @param steering is -1 to 1, which applies as a fraction of vehicle model steering limits.
-        //! Note that the actual angle applied is subject to limits and implementation (e.g. smoothing).
+        //! @note The actual angle applied is subject to limits and implementation (e.g. smoothing).
         virtual void SetTargetSteeringFraction(float steeringFraction) = 0;
 
         //! Speed input version which is relative to limits.

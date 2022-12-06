@@ -6,11 +6,11 @@
  *
  */
 
-#include "ROS2/Manipulator/MotorizedJointComponent.h"
-#include "AzFramework/Physics/Components/SimulatedBodyComponentBus.h"
+#include "MotorizedJointComponent.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Serialization/EditContext.h>
+#include <AzFramework/Physics/Components/SimulatedBodyComponentBus.h>
 #include <AzFramework/Physics/RigidBodyBus.h>
 
 namespace ROS2

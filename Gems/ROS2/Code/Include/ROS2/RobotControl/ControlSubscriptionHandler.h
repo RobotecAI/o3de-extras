@@ -7,10 +7,10 @@
  */
 #pragma once
 
-#include "ROS2/Communication/TopicConfiguration.h"
-#include "ROS2/Frame/ROS2FrameComponent.h"
-#include "ROS2/ROS2Bus.h"
-#include "ROS2/Utilities/ROS2Names.h"
+#include <ROS2/Communication/TopicConfiguration.h>
+#include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/ROS2Bus.h>
+#include <ROS2/Utilities/ROS2Names.h>
 #include <rclcpp/rclcpp.hpp>
 
 namespace ROS2
@@ -24,6 +24,7 @@ namespace ROS2
         //! @param entity Activation context for the owning Component - the entity it belongs to.
         //! @param subscriberConfiguration configuration with topic and qos
         virtual void Activate(const AZ::Entity* entity, const TopicConfiguration& subscriberConfiguration) = 0;
+        //! Interface handling component deactivation
         virtual void Deactivate() = 0;
         virtual ~IControlSubscriptionHandler() = default;
     };
@@ -34,7 +35,7 @@ namespace ROS2
     class ControlSubscriptionHandler : public IControlSubscriptionHandler
     {
     public:
-        void Activate(const AZ::Entity* entity, const TopicConfiguration& subscriberConfiguration) final
+        void Activate(const AZ::Entity* entity, const TopicConfiguration& subscriberConfiguration) override final
         {
             m_active = true;
             m_entityId = entity->GetId();
@@ -72,7 +73,9 @@ namespace ROS2
         void OnControlMessage(const T& message)
         {
             if (!m_active)
+            {
                 return;
+            }
 
             SendToBus(message);
         };
