@@ -26,6 +26,7 @@ namespace ROS2
         virtual void Activate(const AZ::Entity* entity, const TopicConfiguration& subscriberConfiguration) = 0;
         //! Interface handling component deactivation
         //! Interface handling component deactivation
+        //! Interface handling component deactivation
         virtual void Deactivate() = 0;
         virtual ~IControlSubscriptionHandler() = default;
     };

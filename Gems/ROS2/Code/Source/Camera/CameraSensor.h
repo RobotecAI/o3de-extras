@@ -84,7 +84,7 @@ namespace ROS2
         AZ::RPI::RenderPipelinePtr m_pipeline;
         AZ::RPI::ViewPtr m_view;
         AZ::RPI::Scene* m_scene = nullptr;
-        const AZ::Transform kAtomToRos{ AZ::Transform::CreateFromQuaternion(
+        const AZ::Transform AtomToRos{ AZ::Transform::CreateFromQuaternion(
             AZ::Quaternion::CreateFromMatrix3x3(AZ::Matrix3x3::CreateFromRows({ 1, 0, 0 }, { 0, -1, 0 }, { 0, 0, -1 }))) };
         virtual AZStd::string getPipelineTemplateName() = 0;
         virtual AZStd::string getPipelineTypeName() = 0;

@@ -81,7 +81,7 @@ ly_create_alias(NAME ROS2.Servers NAMESPACE Gem TARGETS Gem::ROS2)
 # will also depend on ROS2.Static
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_add_target(
-        NAME ROS2.Editor.Static STATIC
+        NAME ${gem_name}.Editor.Static STATIC
         NAMESPACE Gem
         FILES_CMAKE
             ros2_editor_files.cmake
@@ -154,7 +154,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
             BUILD_DEPENDENCIES
                 PRIVATE
                     AZ::AzTest
-                    Gem::ROS2.Static
+                    Gem::${gem_name}.Static
         )
 
         # Add ROS2.Tests to googletest

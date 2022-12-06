@@ -31,7 +31,7 @@ namespace ROS2
                 addComponentsOutcome.GetError().c_str());
         }
         const auto& added = addComponentsOutcome.GetValue().at(entityId).m_componentsAdded;
-        if (added.size())
+        if (!added.empty())
         {
             return added.front()->GetId();
         }
