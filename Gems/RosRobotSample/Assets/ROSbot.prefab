@@ -74,10 +74,10 @@
                                     "Name": "Wheel_002",
                                     "MaterialAsset": {
                                         "assetId": {
-                                            "guid": "{7B8A6116-BDE8-5255-AF75-0AA93B1392A2}",
+                                            "guid": "{54097FD0-79D8-542F-9F95-0A61B75C4E61}",
                                             "subId": 1
                                         },
-                                        "assetHint": "physics/ice.physicsmaterial"
+                                        "assetHint": "physics/slippery_glass.physicsmaterial"
                                     }
                                 }
                             ]
