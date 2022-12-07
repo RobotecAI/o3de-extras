@@ -50,6 +50,93 @@
         }
     },
     "Entities": {
+        "Entity_[3085863297295]": {
+            "Id": "Entity_[3085863297295]",
+            "Name": "robot_visual",
+            "Components": {
+                "Component_[10706482935805834841]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 10706482935805834841
+                },
+                "Component_[13236800438882980055]": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 13236800438882980055,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
+                                    "subId": 278806404
+                                },
+                                "assetHint": "robot/rosbot.azmodel"
+                            }
+                        }
+                    }
+                },
+                "Component_[13405262029220435165]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 13405262029220435165
+                },
+                "Component_[13850492101500359341]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13850492101500359341
+                },
+                "Component_[14606640623102036124]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 14606640623102036124
+                },
+                "Component_[1492485745363431693]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 1492485745363431693
+                },
+                "Component_[15008321095221962176]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 15008321095221962176,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 164162197
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{3E8E1DD3-A2A5-5C8B-8397-405FBADC231E}"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[2044107832964673391]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 2044107832964673391,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Rotate": [
+                            0.0,
+                            0.0,
+                            180.0
+                        ]
+                    }
+                },
+                "Component_[3211866724210739623]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 3211866724210739623
+                },
+                "Component_[4261624290069943482]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 4261624290069943482
+                },
+                "Component_[923732977505485004]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 923732977505485004
+                }
+            }
+        },
         "Entity_[394238657263]": {
             "Id": "Entity_[394238657263]",
             "Name": "Robot",
@@ -61,23 +148,13 @@
                         "MaterialSlots": {
                             "Slots": [
                                 {
-                                    "Name": "RobotBodyMaterial_002",
+                                    "Name": "Rosbot_Mat",
                                     "MaterialAsset": {
                                         "assetId": {
                                             "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
                                             "subId": 1
                                         },
                                         "assetHint": "physx/glass.physicsmaterial"
-                                    }
-                                },
-                                {
-                                    "Name": "Wheel_002",
-                                    "MaterialAsset": {
-                                        "assetId": {
-                                            "guid": "{54097FD0-79D8-542F-9F95-0A61B75C4E61}",
-                                            "subId": 1
-                                        },
-                                        "assetHint": "physics/slippery_glass.physicsmaterial"
                                     }
                                 }
                             ]
@@ -97,58 +174,22 @@
                         "PhysicsAsset": {
                             "Asset": {
                                 "assetId": {
-                                    "guid": "{980A37DB-2EDF-5437-9B4B-52F1B4D93FEF}",
-                                    "subId": 2040808389
+                                    "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
+                                    "subId": 2761445079
                                 },
-                                "assetHint": "robot/robot.pxmesh"
+                                "assetHint": "robot/rosbot.pxmesh"
                             },
                             "Configuration": {
                                 "PhysicsAsset": {
                                     "assetId": {
-                                        "guid": "{980A37DB-2EDF-5437-9B4B-52F1B4D93FEF}",
-                                        "subId": 2040808389
+                                        "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
+                                        "subId": 2761445079
                                     },
                                     "loadBehavior": "QueueLoad",
-                                    "assetHint": "robot/robot.pxmesh"
+                                    "assetHint": "robot/rosbot.pxmesh"
                                 },
                                 "UseMaterialsFromAsset": false
                             }
-                        }
-                    }
-                },
-                "Component_[11315452240909602350]": {
-                    "$type": "EditorMaterialComponent",
-                    "Id": 11315452240909602350,
-                    "Controller": {
-                        "Configuration": {
-                            "materials": [
-                                {
-                                    "Key": {
-                                        "materialSlotStableId": 1788112187
-                                    },
-                                    "Value": {
-                                        "MaterialAsset": {
-                                            "assetId": {
-                                                "guid": "{C7F21F53-AC73-5AEC-AC93-D9191D47B292}"
-                                            },
-                                            "assetHint": "robot/robotbodymaterial.azmaterial"
-                                        }
-                                    }
-                                },
-                                {
-                                    "Key": {
-                                        "materialSlotStableId": 3912421596
-                                    },
-                                    "Value": {
-                                        "MaterialAsset": {
-                                            "assetId": {
-                                                "guid": "{9F077894-318C-5A25-80D3-5BC69715835B}"
-                                            },
-                                            "assetHint": "robot/robotwheel.azmaterial"
-                                        }
-                                    }
-                                }
-                            ]
                         }
                     }
                 },
@@ -168,20 +209,20 @@
                         "Compute Mass": false,
                         "Mass": 10.0,
                         "Centre of mass offset": [
-                            -0.010666988790035248,
-                            0.0008324435329996049,
-                            0.08906049281358719
+                            0.00016798623255454004,
+                            0.000011250272109464277,
+                            0.04515321925282478
                         ],
                         "Inertia tensor": [
-                            0.07912038266658783,
+                            0.0639280453324318,
                             0.0,
                             0.0,
                             0.0,
-                            0.0749262273311615,
+                            0.08276905864477158,
                             0.0,
                             0.0,
                             0.0,
-                            0.09323489665985107
+                            0.13631463050842285
                         ],
                         "Maximum Angular Velocity": 3.140000104904175
                     }
@@ -221,21 +262,6 @@
                     "$type": "EditorLockComponent",
                     "Id": 2252255488684264259
                 },
-                "Component_[3665142490224767418]": {
-                    "$type": "AZ::Render::EditorMeshComponent",
-                    "Id": 3665142490224767418,
-                    "Controller": {
-                        "Configuration": {
-                            "ModelAsset": {
-                                "assetId": {
-                                    "guid": "{980A37DB-2EDF-5437-9B4B-52F1B4D93FEF}",
-                                    "subId": 271285988
-                                },
-                                "assetHint": "robot/robot.azmodel"
-                            }
-                        }
-                    }
-                },
                 "Component_[4531367159171096772]": {
                     "$type": "EditorInspectorComponent",
                     "Id": 4531367159171096772,
@@ -248,7 +274,7 @@
                             "SortIndex": 1
                         },
                         {
-                            "ComponentId": 11315452240909602350,
+                            "ComponentId": 18174863805909923030,
                             "SortIndex": 2
                         },
                         {
@@ -256,24 +282,20 @@
                             "SortIndex": 3
                         },
                         {
-                            "ComponentId": 10255275203288329637,
+                            "ComponentId": 16549089385710831514,
                             "SortIndex": 4
                         },
                         {
-                            "ComponentId": 12399796004250012151,
+                            "ComponentId": 10255275203288329637,
                             "SortIndex": 5
                         },
                         {
-                            "ComponentId": 9245122284170206283,
+                            "ComponentId": 12399796004250012151,
                             "SortIndex": 6
                         },
                         {
-                            "ComponentId": 14372972504299901007,
+                            "ComponentId": 6174307932842194373,
                             "SortIndex": 7
-                        },
-                        {
-                            "ComponentId": 14695313887595972561,
-                            "SortIndex": 8
                         }
                     ]
                 },
@@ -282,7 +304,8 @@
                     "Id": 4895172860961119090,
                     "Child Entity Order": [
                         "Entity_[851599476385]",
-                        "Entity_[619022704110]"
+                        "Instance_[445023822927]/ContainerEntity",
+                        "Entity_[3085863297295]"
                     ]
                 },
                 "Component_[515315448682290260]": {
@@ -302,85 +325,6 @@
                 }
             }
         },
-        "Entity_[619022704110]": {
-            "Id": "Entity_[619022704110]",
-            "Name": "Lidar",
-            "Components": {
-                "Component_[11572685227958414430]": {
-                    "$type": "EditorDisabledCompositionComponent",
-                    "Id": 11572685227958414430
-                },
-                "Component_[13777205305195864809]": {
-                    "$type": "EditorInspectorComponent",
-                    "Id": 13777205305195864809
-                },
-                "Component_[16829695612435968605]": {
-                    "$type": "EditorLockComponent",
-                    "Id": 16829695612435968605
-                },
-                "Component_[16881859919470625779]": {
-                    "$type": "GenericComponentWrapper",
-                    "Id": 16881859919470625779,
-                    "m_template": {
-                        "$type": "ROS2LidarSensorComponent",
-                        "SensorConfiguration": {
-                            "Publishers": {
-                                "sensor_msgs::msg::PointCloud2": {
-                                    "Type": "sensor_msgs::msg::PointCloud2",
-                                    "Topic": "pc",
-                                    "QoS": {
-                                        "Reliability": 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "Component_[17085680925863458488]": {
-                    "$type": "EditorPendingCompositionComponent",
-                    "Id": 17085680925863458488
-                },
-                "Component_[259085584225798023]": {
-                    "$type": "GenericComponentWrapper",
-                    "Id": 259085584225798023,
-                    "m_template": {
-                        "$type": "ROS2FrameComponent",
-                        "Namespace Configuration": {
-                            "Namespace Strategy": 1
-                        },
-                        "Frame Name": "lidar"
-                    }
-                },
-                "Component_[3183944672285351573]": {
-                    "$type": "EditorOnlyEntityComponent",
-                    "Id": 3183944672285351573
-                },
-                "Component_[3923685223132067795]": {
-                    "$type": "EditorEntitySortComponent",
-                    "Id": 3923685223132067795
-                },
-                "Component_[4866639910804050404]": {
-                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
-                    "Id": 4866639910804050404,
-                    "Parent Entity": "Entity_[394238657263]",
-                    "Transform Data": {
-                        "Translate": [
-                            0.0,
-                            0.0,
-                            0.2535579204559326
-                        ]
-                    }
-                },
-                "Component_[4923171208704782939]": {
-                    "$type": "EditorVisibilityComponent",
-                    "Id": 4923171208704782939
-                },
-                "Component_[8818456479688435698]": {
-                    "$type": "EditorEntityIconComponent",
-                    "Id": 8818456479688435698
-                }
-            }
-        },
         "Entity_[851599476385]": {
             "Id": "Entity_[851599476385]",
             "Name": "FollowCamera",
@@ -395,10 +339,10 @@
                     "Controller": {
                         "Configuration": {
                             "Enabled": true,
-                            "Threshold": 0.30000001192092896,
+                            "Threshold": 0.4000000059604645,
                             "Knee": 0.4399999976158142,
-                            "Intensity": 0.2199999988079071,
-                            "KernelSizeScale": 0.800000011920929,
+                            "Intensity": 0.20000000298023224,
+                            "KernelSizeScale": 0.699999988079071,
                             "KernelSizeStage0": 0.1899999976158142,
                             "KernelSizeStage1": 0.029999999329447746,
                             "KernelSizeStage3": 0.28999999165534973
@@ -423,7 +367,7 @@
                     "Controller": {
                         "Configuration": {
                             "Field of View": 55.0,
-                            "EditorEntityId": 940661292503997071
+                            "EditorEntityId": 13832703169962220306
                         }
                     }
                 },
@@ -486,6 +430,23 @@
                     "Id": 9129253381063760879
                 }
             }
+        }
+    },
+    "Instances": {
+        "Instance_[445023822927]": {
+            "Source": "Prefabs/Sensors/LidarOS2.prefab",
+            "Patches": [
+                {
+                    "op": "replace",
+                    "path": "/ContainerEntity/Components/Component_[5989395931141545750]/Parent Entity",
+                    "value": "../Entity_[394238657263]"
+                },
+                {
+                    "op": "replace",
+                    "path": "/ContainerEntity/Components/Component_[5989395931141545750]/Transform Data/Translate/2",
+                    "value": 0.13202188909053802
+                }
+            ]
         }
     }
 }
