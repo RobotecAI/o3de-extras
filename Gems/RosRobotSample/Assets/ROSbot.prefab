@@ -103,7 +103,8 @@
                                         "MaterialAsset": {
                                             "assetId": {
                                                 "guid": "{3E8E1DD3-A2A5-5C8B-8397-405FBADC231E}"
-                                            }
+                                            },
+                                            "assetHint": "robot/rosbot_rosbot_mat.azmaterial"
                                         }
                                     }
                                 }
@@ -304,8 +305,8 @@
                     "Id": 4895172860961119090,
                     "Child Entity Order": [
                         "Entity_[851599476385]",
-                        "Instance_[445023822927]/ContainerEntity",
-                        "Entity_[3085863297295]"
+                        "Entity_[3085863297295]",
+                        "Entity_[486368783356]"
                     ]
                 },
                 "Component_[515315448682290260]": {
@@ -322,6 +323,78 @@
                     "m_template": {
                         "$type": "RigidBodyTwistControlComponent"
                     }
+                }
+            }
+        },
+        "Entity_[486368783356]": {
+            "Id": "Entity_[486368783356]",
+            "Name": "Lidar",
+            "Components": {
+                "Component_[10175599162298714021]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 10175599162298714021
+                },
+                "Component_[12294253912190821640]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 12294253912190821640
+                },
+                "Component_[14359464797835707875]": {
+                    "$type": "GenericComponentWrapper",
+                    "Id": 14359464797835707875,
+                    "m_template": {
+                        "$type": "ROS2LidarSensorComponent",
+                        "SensorConfiguration": {
+                            "Publishers": {
+                                "sensor_msgs::msg::PointCloud2": {
+                                    "Type": "sensor_msgs::msg::PointCloud2",
+                                    "Topic": "pc"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Component_[15777545995098509393]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 15777545995098509393,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.24054183065891266
+                        ]
+                    }
+                },
+                "Component_[16671528916148743006]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 16671528916148743006
+                },
+                "Component_[17513936394025675903]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 17513936394025675903
+                },
+                "Component_[18076477197000109763]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 18076477197000109763
+                },
+                "Component_[3560440020062253741]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 3560440020062253741
+                },
+                "Component_[3747950151441269110]": {
+                    "$type": "GenericComponentWrapper",
+                    "Id": 3747950151441269110,
+                    "m_template": {
+                        "$type": "ROS2FrameComponent"
+                    }
+                },
+                "Component_[3793896653679807863]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 3793896653679807863
+                },
+                "Component_[9794520366915080952]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 9794520366915080952
                 }
             }
         },
@@ -430,23 +503,6 @@
                     "Id": 9129253381063760879
                 }
             }
-        }
-    },
-    "Instances": {
-        "Instance_[445023822927]": {
-            "Source": "Prefabs/Sensors/LidarOS2.prefab",
-            "Patches": [
-                {
-                    "op": "replace",
-                    "path": "/ContainerEntity/Components/Component_[5989395931141545750]/Parent Entity",
-                    "value": "../Entity_[394238657263]"
-                },
-                {
-                    "op": "replace",
-                    "path": "/ContainerEntity/Components/Component_[5989395931141545750]/Transform Data/Translate/2",
-                    "value": 0.13202188909053802
-                }
-            ]
         }
     }
 }
