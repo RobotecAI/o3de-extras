@@ -31,7 +31,7 @@ The following steps will assume the following:
 - The O3DE gems, projects and templates will be placed in the O3DE home folder: `/home/${USER}/O3DE`
 - You have the O3DE engine [downloaded and built](https://www.o3de.org/docs/welcome-guide/setup/setup-from-github) and it is located in `${USER}/Engines/Development`.
 
-In this tutorial, CLI tools will be used. It is also possible to use O3DE gui to set up a project from template. See the [O3DE Project manager documentation](https://www.o3de.org/docs/user-guide/project-config/project-manager/) for more details. In such case it is required to source your ROS2 distro before launching O3DE manager.
+In this tutorial, CLI tools will be used. It is also possible to use O3DE gui to set up a project from template. See the [O3DE Project manager documentation](https://www.o3de.org/docs/user-guide/project-config/project-manager/) for more details. In such case it is required to source your ROS2 distro before launching O3DE manager:
 
 ```shell
 source /opt/ros/humble/setup.bash
@@ -56,6 +56,7 @@ export O3DE_ENGINE=${O3DE_HOME}/Engines/Development
 Clone the `o3de-extras` repository containing the template and asset gems
 
 ```shell
+mkdir -p ${O3DE_HOME}/Projects
 cd ${O3DE_HOME}/Projects
 git clone git@github.com:o3de/o3de-extras.git
 ```
@@ -63,6 +64,7 @@ git clone git@github.com:o3de/o3de-extras.git
 Copy gems to the O3DE home.
 
 ```shell
+mkdir -p ${O3DE_HOME}/Gems
 cp o3de-extras/Gems/ROS2 ${O3DE_HOME}/Gems
 cp o3de-extras/Gems/WarehouseSample ${O3DE_HOME}/Gems
 cp o3de-extras/Gems/RosRobotSample ${O3DE_HOME}/Gems
