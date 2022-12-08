@@ -6,6 +6,8 @@ The example ROS2 navigation stack launchfile is bundled with the template.
 
 ## Requirements
 
+Due to ROS2 dependency, this project was prepared and tested on Linux operating system. It is recomended to use Ubuntu [20.04](https://releases.ubuntu.com/focal) or [22.10](https://releases.ubuntu.com/kinetic), however any distribution meeting following requirements may be used.
+
 Refer to the [O3DE System Requirements](https://www.o3de.org/docs/welcome-guide/requirements/) documentation to make sure that the system/hardware requirements are met. 
 This project has the following dependencies:
 
@@ -25,17 +27,11 @@ To run the navigation example, two ROS2 packages are also required:
 
 The following steps will assume the following:
 
-- All of the requirements coming from O3DE are met.
 - You have ROS2 humble [installed](https://docs.ros.org/en/humble/Installation.html) and environment is [sourced](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Configuring-ROS2-Environment.html#source-the-setup-files).
-- CLI tools would be used,
-- The O3DE engine and, gems projects and templates will be placed in the O3DE home folder: `/home/${USER}/O3DE`
-- You have the O3DE engine downloaded and built, and it is located in `${USER}/Engines/Development`. For convenienience, we'll define a shell variable:
-```shell
-export O3DE_HOME=/home/${USER}/O3DE
-export O3DE_ENGINE=${O3DE_HOME}/Engines/Development
-```
+- The O3DE gems, projects and templates will be placed in the O3DE home folder: `/home/${USER}/O3DE`
+- You have the O3DE engine [downloaded and built](https://www.o3de.org/docs/welcome-guide/setup/setup-from-github) and it is located in `${USER}/Engines/Development`.
 
-It is also possible to use O3DE gui to set up a project from template. See the [O3DE Project manager documentation](https://www.o3de.org/docs/user-guide/project-config/project-manager/) for more details. It is also required to source your ROS2 distro before launching O3DE manager.
+In this tutorial, CLI tools will be used. It is also possible to use O3DE gui to set up a project from template. See the [O3DE Project manager documentation](https://www.o3de.org/docs/user-guide/project-config/project-manager/) for more details. In such case it is required to source your ROS2 distro before launching O3DE manager.
 
 ```shell
 source /opt/ros/humble/setup.bash
@@ -48,14 +44,23 @@ source /opt/ros/humble/setup.bash
 sudo apt install ros-${ROS_DISTRO}-slam-toolbox ros-${ROS_DISTRO}-navigation2 ros-${ROS_DISTRO}-nav2-bringup ros-${ROS_DISTRO}-pointcloud-to-laserscan ros-${ROS_DISTRO}-teleop-twist-keyboard ros-${ROS_DISTRO}-ackermann-msgs ros-${ROS_DISTRO}-gazebo-msgs ros-${ROS_DISTRO}-control-toolbox
 ```
 
-### 2. Clone the `o3de-extras` repository containing the template and asset gems
+### 2. Download the template and asset gems
+
+For convenienience, we'll define a shell variables with o3de folders:
+
+```shell
+export O3DE_HOME=/home/${USER}/O3DE
+export O3DE_ENGINE=${O3DE_HOME}/Engines/Development
+```
+
+Clone the `o3de-extras` repository containing the template and asset gems
 
 ```shell
 cd ${O3DE_HOME}/Projects
 git clone git@github.com:o3de/o3de-extras.git
 ```
 
-Copy gems included in this project to the O3DE home.
+Copy gems to the O3DE home.
 
 ```shell
 cp o3de-extras/Gems/ROS2 ${O3DE_HOME}/Gems
