@@ -75,7 +75,7 @@ Register these gems.
 ```shell
 ${O3DE_ENGINE}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/ROS2
 ${O3DE_ENGINE}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/WarehouseSample
-${O3DE_ENGINE}/scripts/o3de.sh register --gem-path ${O3DE_HOME}s/Gems/RosRobotSample
+${O3DE_ENGINE}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/RosRobotSample
 ```
 
 ### 3. Create a ROS2 project from the template
