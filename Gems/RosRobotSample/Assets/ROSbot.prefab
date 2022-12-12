@@ -152,10 +152,10 @@
                                     "Name": "Rosbot_Mat",
                                     "MaterialAsset": {
                                         "assetId": {
-                                            "guid": "{EF76347C-319F-584E-9DDE-A06D328F4304}",
+                                            "guid": "{54097FD0-79D8-542F-9F95-0A61B75C4E61}",
                                             "subId": 1
                                         },
-                                        "assetHint": "physx/glass.physicsmaterial"
+                                        "assetHint": "physics/slippery_glass.physicsmaterial"
                                     }
                                 }
                             ]
