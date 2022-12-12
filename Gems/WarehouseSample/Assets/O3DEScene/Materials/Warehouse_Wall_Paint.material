@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.20000000298023224,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/1K_Wall_Paint_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/1K_Wall_Paint_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,

@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.5,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Painted_Yellow_002_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Painted_Yellow_002_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,

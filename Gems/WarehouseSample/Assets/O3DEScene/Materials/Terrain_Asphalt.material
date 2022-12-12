@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.10999999940395355,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Concrete_019_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Concrete_019_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
