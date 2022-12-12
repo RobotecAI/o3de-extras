@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.11999999731779099,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Galvanized_001_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Galvanized_001_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,

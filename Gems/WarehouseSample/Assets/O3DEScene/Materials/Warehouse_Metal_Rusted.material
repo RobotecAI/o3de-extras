@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.17000000178813934,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Rusted_001_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Rusted_001_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,

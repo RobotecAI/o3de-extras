@@ -4,7 +4,7 @@
     "propertyValues": {
         "baseColor.factor": 0.7200000286102295,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Painted_White_002_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Painted_White_002_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,

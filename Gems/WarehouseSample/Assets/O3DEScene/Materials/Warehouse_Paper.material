@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.5099999904632568,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Paper_Recycled_001_BaseColor.jpg",
+        "baseColor.textureMap": "../Textures/Paper_Recycled_001_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
