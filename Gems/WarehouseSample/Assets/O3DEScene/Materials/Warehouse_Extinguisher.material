@@ -8,7 +8,7 @@
             0.2862134873867035,
             1.0
         ],
-        "baseColor.textureMap": "../Textures/Extinguisher.png",
+        "baseColor.textureMap": "../Textures/Extinguisher_BaseColor.png",
         "emissive.color": [
             0.0,
             0.0,

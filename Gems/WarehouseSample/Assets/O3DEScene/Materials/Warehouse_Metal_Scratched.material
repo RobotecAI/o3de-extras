@@ -8,7 +8,7 @@
             0.800000011920929,
             1.0
         ],
-        "baseColor.textureMap": "../Textures/Metal_scratched_007_basecolor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Scratched_007_BaseColor.jpg",
         "emissive.color": [
             0.0,
             0.0,
@@ -16,8 +16,8 @@
             1.0
         ],
         "normal.factor": 0.800000011920929,
-        "normal.textureMap": "../Textures/Metal_scratched_007_normal.jpg",
+        "normal.textureMap": "../Textures/Metal_Scratched_007_Normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Metal_scratched_007_roughness.jpg"
+        "roughness.textureMap": "../Textures/Metal_Scratched_007_Roughness.jpg"
     }
 }

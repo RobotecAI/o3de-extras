@@ -10,7 +10,7 @@
         ],
         "baseColor.factor": 0.5,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Painted_002_yellow_basecolor.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Painted_Yellow_002_BaseColor.jpg",
         "emissive.color": [
             0.0,
             0.0,
@@ -19,9 +19,9 @@
         ],
         "normal.factor": 0.03999999910593033,
         "normal.flipY": true,
-        "normal.textureMap": "../Textures/Metal_Painted_002_normal.jpg",
+        "normal.textureMap": "../Textures/Metal_Painted_002_Normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Metal_Painted_002_roughness.jpg",
+        "roughness.textureMap": "../Textures/Metal_Painted_002_Roughness.jpg",
         "specularF0.factor": 0.6800000071525574
     }
 }

@@ -102,9 +102,9 @@
                                     "Value": {
                                         "MaterialAsset": {
                                             "assetId": {
-                                                "guid": "{3E8E1DD3-A2A5-5C8B-8397-405FBADC231E}"
+                                                "guid": "{988CEB57-770F-54E3-9E70-D1C628F3DA3C}"
                                             },
-                                            "assetHint": "robot/rosbot_rosbot_mat.azmaterial"
+                                            "assetHint": "robot/rosbot_mat.azmaterial"
                                         }
                                     }
                                 }
