@@ -8,18 +8,18 @@
             0.800000011920929,
             1.0
         ],
-        "baseColor.textureMap": "../Textures/Grass_001_COLOR.jpg",
+        "baseColor.textureMap": "../Textures/Grass_001_BaseColor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "normal.textureMap": "../Textures/Grass_001_NORM.jpg",
+        "normal.textureMap": "../Textures/Grass_001_Normal.jpg",
         "opacity.factor": 1.0,
-        "parallax.textureMap": "../Textures/Grass_001_DISP.png",
+        "parallax.textureMap": "../Textures/Grass_001_Displacement.png",
         "roughness.lowerBound": 0.7300000190734863,
-        "roughness.textureMap": "../Textures/Grass_001_ROUGH.jpg",
+        "roughness.textureMap": "../Textures/Grass_001_Roughness.jpg",
         "uv.tileU": 5.0,
         "uv.tileV": 5.0
     }

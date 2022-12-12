@@ -10,16 +10,16 @@
         ],
         "baseColor.factor": 0.17000000178813934,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Metal_Rusted_001_COLOR.jpg",
+        "baseColor.textureMap": "../Textures/Metal_Rusted_001_BaseColor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "normal.textureMap": "../Textures/Metal_Rusted_001_NRM.jpg",
+        "normal.textureMap": "../Textures/Metal_Rusted_001_Normal.jpg",
         "opacity.factor": 1.0,
-        "specularF0.textureMap": "../Textures/Metal_Rusted_001_SPEC.jpg",
+        "specularF0.textureMap": "../Textures/Metal_Rusted_001_Specular.jpg",
         "uv.tileU": 5.0,
         "uv.tileV": 5.0
     }

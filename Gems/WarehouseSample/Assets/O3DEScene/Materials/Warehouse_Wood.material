@@ -10,16 +10,16 @@
         ],
         "baseColor.factor": 0.25999999046325684,
         "baseColor.textureBlendMode": "Lerp",
-        "baseColor.textureMap": "../Textures/Wood_026_basecolor.jpg",
+        "baseColor.textureMap": "../Textures/Wood_026_Basecolor.jpg",
         "emissive.color": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "normal.textureMap": "../Textures/Wood_026_normal.jpg",
+        "normal.textureMap": "../Textures/Wood_026_Normal.jpg",
         "opacity.factor": 1.0,
-        "roughness.textureMap": "../Textures/Wood_026_roughness.jpg",
+        "roughness.textureMap": "../Textures/Wood_026_Roughness.jpg",
         "uv.rotateDegrees": 90.0,
         "uv.tileU": 2.0,
         "uv.tileV": 2.0

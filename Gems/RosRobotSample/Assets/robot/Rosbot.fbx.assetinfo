@@ -10,6 +10,8 @@
                     "RootNode.Rosbot_Body.custom_properties",
                     "RootNode.Rosbot_Body.UVMap",
                     "RootNode.Rosbot_Body.Rosbot_Mat",
+                    "RootNode.Rosbot_Body.Rosbot_Back_Wheels",
+                    "RootNode.Rosbot_Body.Rosbot_Front_Wheels",
                     "RootNode.Rosbot_Body.Rosbot_Back_Wheels.transform",
                     "RootNode.Rosbot_Body.Rosbot_Back_Wheels.custom_properties",
                     "RootNode.Rosbot_Body.Rosbot_Back_Wheels.UVMap",
@@ -17,13 +19,11 @@
                     "RootNode.Rosbot_Body.Rosbot_Front_Wheels.transform",
                     "RootNode.Rosbot_Body.Rosbot_Front_Wheels.custom_properties",
                     "RootNode.Rosbot_Body.Rosbot_Front_Wheels.UVMap",
-                    "RootNode.Rosbot_Body.Rosbot_Front_Wheels.Rosbot_Mat",
-                    "RootNode.Rosbot_Body.Rosbot_Back_Wheels",
-                    "RootNode.Rosbot_Body.Rosbot_Front_Wheels"
+                    "RootNode.Rosbot_Body.Rosbot_Front_Wheels.Rosbot_Mat"
                 ],
                 "unselectedNodes": [
-                    "RootNode.Rosbot_Body",
-                    "RootNode"
+                    "RootNode",
+                    "RootNode.Rosbot_Body"
                 ]
             },
             "export method": 1,

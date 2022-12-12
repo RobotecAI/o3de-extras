@@ -15,6 +15,10 @@
         "normal.textureMap": "../textures/Rosbot_Normal.png",
         "occlusion.diffuseTextureMap": "../textures/Rosbot_AO.png",
         "opacity.factor": 1.0,
-        "specularF0.textureMap": "../textures/Rosbot_Roughness.png"
+        "parallax.algorithm": "Basic",
+        "parallax.factor": 0.0020000000949949026,
+        "parallax.quality": "High",
+        "parallax.textureMap": "../textures/Rosbot_Height.png",
+        "roughness.textureMap": "../textures/Rosbot_Roughness.png"
     }
 }

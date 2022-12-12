@@ -14,7 +14,7 @@
             0.0,
             1.0
         ],
-        "normal.textureMap": "../Textures/Paper_Recycled_001_NORM.jpg",
+        "normal.textureMap": "../Textures/Paper_Recycled_001_Normal.jpg",
         "opacity.factor": 1.0
     }
 }
