@@ -6,6 +6,11 @@ To run the navigation example with your project:
 
 1. Make sure your project is based on `Ros2ProjectTemplate`
 
+1. Install ROS2 packages:
+```shell
+sudo apt install ros-${ROS_DISTRO}-slam-toolbox ros-${ROS_DISTRO}-navigation2 ros-${ROS_DISTRO}-nav2-bringup ros-${ROS_DISTRO}-pointcloud-to-laserscan ros-${ROS_DISTRO}-teleop-twist-keyboard
+```
+
 1. Run your project in O3DE editor
 
 1. Open `DemoLevel`
