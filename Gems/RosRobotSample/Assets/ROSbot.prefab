@@ -50,6 +50,531 @@
         }
     },
     "Entities": {
+        "Entity_[1456199684153]": {
+            "Id": "Entity_[1456199684153]",
+            "Name": "Wheel_RR",
+            "Components": {
+                "Component_[11549554083221514822]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 11549554083221514822
+                },
+                "Component_[12004651529384584643]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 12004651529384584643,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Translate": [
+                            -0.0851597785949707,
+                            -0.10490930080413818,
+                            0.04500389099121094
+                        ],
+                        "Rotate": [
+                            89.99994659423828,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                "Component_[12922435996397177869]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12922435996397177869
+                },
+                "Component_[13452499268484538347]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13452499268484538347
+                },
+                "Component_[13504629183637491151]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 13504629183637491151
+                },
+                "Component_[14984394342563044714]": {
+                    "$type": "EditorRigidBodyComponent",
+                    "Id": 14984394342563044714,
+                    "Configuration": {
+                        "entityId": "",
+                        "Compute Mass": false,
+                        "Mass": 2.0,
+                        "Centre of mass offset": [
+                            0.0000892818788997829,
+                            0.00005843234248459339,
+                            0.016175949946045876
+                        ],
+                        "Compute inertia": false,
+                        "Inertia tensor": [
+                            0.011447000317275524,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.011459999717772007,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.01986899971961975
+                        ]
+                    },
+                    "PhysXSpecificConfiguration": {
+                        "SolverPositionIterations": 10,
+                        "SolverVelocityIterations": 5
+                    }
+                },
+                "Component_[15313913817318137712]": {
+                    "$type": "EditorHingeJointComponent",
+                    "Id": 15313913817318137712,
+                    "Configuration": {
+                        "Local Rotation": [
+                            0.0,
+                            90.0,
+                            0.0
+                        ],
+                        "Parent Entity": "Entity_[394238657263]",
+                        "Child Entity": "Entity_[1456199684153]"
+                    },
+                    "Angular Limit": {
+                        "Standard Limit Configuration": {
+                            "Is Limited": false
+                        }
+                    }
+                },
+                "Component_[17924633867119219017]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 17924633867119219017
+                },
+                "Component_[258381313471064362]": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 258381313471064362,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 279283751
+                                },
+                                "assetHint": "robot/rosbot_wheel.azmodel"
+                            }
+                        }
+                    }
+                },
+                "Component_[295764026141986194]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 295764026141986194
+                },
+                "Component_[3241807021813980335]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 3241807021813980335
+                },
+                "Component_[3901827148527434250]": {
+                    "$type": "EditorColliderComponent",
+                    "Id": 3901827148527434250,
+                    "ColliderConfiguration": {
+                        "MaterialSlots": {
+                            "Slots": [
+                                {
+                                    "Name": "Rosbot_Mat"
+                                }
+                            ]
+                        }
+                    },
+                    "ShapeConfiguration": {
+                        "PhysicsAsset": {
+                            "Asset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 2468983379
+                                },
+                                "assetHint": "robot/rosbot_wheel.pxmesh"
+                            },
+                            "Configuration": {
+                                "PhysicsAsset": {
+                                    "assetId": {
+                                        "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                        "subId": 2468983379
+                                    },
+                                    "loadBehavior": "QueueLoad",
+                                    "assetHint": "robot/rosbot_wheel.pxmesh"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Component_[4005459796009700502]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 4005459796009700502,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 164162197
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{988CEB57-770F-54E3-9E70-D1C628F3DA3C}"
+                                            },
+                                            "assetHint": "robot/rosbot_mat.azmaterial"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[4015970786302234137]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 4015970786302234137
+                }
+            }
+        },
+        "Entity_[1473379553337]": {
+            "Id": "Entity_[1473379553337]",
+            "Name": "Wheel_LF",
+            "Components": {
+                "Component_[11549554083221514822]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 11549554083221514822
+                },
+                "Component_[12004651529384584643]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 12004651529384584643,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.08431792259216309,
+                            0.10453301668167114,
+                            0.04500389099121094
+                        ],
+                        "Rotate": [
+                            -89.99994659423828,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                "Component_[12922435996397177869]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12922435996397177869
+                },
+                "Component_[13452499268484538347]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13452499268484538347
+                },
+                "Component_[13504629183637491151]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 13504629183637491151
+                },
+                "Component_[14984394342563044714]": {
+                    "$type": "EditorRigidBodyComponent",
+                    "Id": 14984394342563044714,
+                    "Configuration": {
+                        "entityId": "",
+                        "Compute Mass": false,
+                        "Mass": 2.0,
+                        "Centre of mass offset": [
+                            0.0000892818788997829,
+                            0.00005843234248459339,
+                            0.016175949946045876
+                        ],
+                        "Compute inertia": false,
+                        "Inertia tensor": [
+                            0.011447000317275524,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.011459999717772007,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.01986899971961975
+                        ]
+                    },
+                    "PhysXSpecificConfiguration": {
+                        "SolverPositionIterations": 10,
+                        "SolverVelocityIterations": 5
+                    }
+                },
+                "Component_[15313913817318137712]": {
+                    "$type": "EditorHingeJointComponent",
+                    "Id": 15313913817318137712,
+                    "Configuration": {
+                        "Local Rotation": [
+                            0.0,
+                            90.0,
+                            0.0
+                        ],
+                        "Parent Entity": "Entity_[394238657263]",
+                        "Child Entity": "Entity_[1473379553337]"
+                    },
+                    "Angular Limit": {
+                        "Standard Limit Configuration": {
+                            "Is Limited": false
+                        }
+                    }
+                },
+                "Component_[17924633867119219017]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 17924633867119219017
+                },
+                "Component_[258381313471064362]": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 258381313471064362,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 279283751
+                                },
+                                "assetHint": "robot/rosbot_wheel.azmodel"
+                            }
+                        }
+                    }
+                },
+                "Component_[295764026141986194]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 295764026141986194
+                },
+                "Component_[3241807021813980335]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 3241807021813980335
+                },
+                "Component_[3901827148527434250]": {
+                    "$type": "EditorColliderComponent",
+                    "Id": 3901827148527434250,
+                    "ColliderConfiguration": {
+                        "MaterialSlots": {
+                            "Slots": [
+                                {
+                                    "Name": "Rosbot_Mat"
+                                }
+                            ]
+                        }
+                    },
+                    "ShapeConfiguration": {
+                        "PhysicsAsset": {
+                            "Asset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 2468983379
+                                },
+                                "assetHint": "robot/rosbot_wheel.pxmesh"
+                            },
+                            "Configuration": {
+                                "PhysicsAsset": {
+                                    "assetId": {
+                                        "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                        "subId": 2468983379
+                                    },
+                                    "loadBehavior": "QueueLoad",
+                                    "assetHint": "robot/rosbot_wheel.pxmesh"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Component_[4005459796009700502]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 4005459796009700502,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 164162197
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{988CEB57-770F-54E3-9E70-D1C628F3DA3C}"
+                                            },
+                                            "assetHint": "robot/rosbot_mat.azmaterial"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[4015970786302234137]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 4015970786302234137
+                }
+            }
+        },
+        "Entity_[1477674520633]": {
+            "Id": "Entity_[1477674520633]",
+            "Name": "Wheel_LR",
+            "Components": {
+                "Component_[11549554083221514822]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 11549554083221514822
+                },
+                "Component_[12004651529384584643]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 12004651529384584643,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Translate": [
+                            -0.0851597785949707,
+                            0.10453301668167114,
+                            0.04500389099121094
+                        ],
+                        "Rotate": [
+                            -89.99994659423828,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                "Component_[12922435996397177869]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12922435996397177869
+                },
+                "Component_[13452499268484538347]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13452499268484538347
+                },
+                "Component_[13504629183637491151]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 13504629183637491151
+                },
+                "Component_[14984394342563044714]": {
+                    "$type": "EditorRigidBodyComponent",
+                    "Id": 14984394342563044714,
+                    "Configuration": {
+                        "entityId": "",
+                        "Compute Mass": false,
+                        "Mass": 2.0,
+                        "Centre of mass offset": [
+                            0.0000892818788997829,
+                            0.00005843234248459339,
+                            0.016175949946045876
+                        ],
+                        "Compute inertia": false,
+                        "Inertia tensor": [
+                            0.011447000317275524,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.011459999717772007,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.01986899971961975
+                        ]
+                    },
+                    "PhysXSpecificConfiguration": {
+                        "SolverPositionIterations": 10,
+                        "SolverVelocityIterations": 5
+                    }
+                },
+                "Component_[15313913817318137712]": {
+                    "$type": "EditorHingeJointComponent",
+                    "Id": 15313913817318137712,
+                    "Configuration": {
+                        "Local Rotation": [
+                            0.0,
+                            90.0,
+                            0.0
+                        ],
+                        "Parent Entity": "Entity_[394238657263]",
+                        "Child Entity": "Entity_[1477674520633]"
+                    },
+                    "Angular Limit": {
+                        "Standard Limit Configuration": {
+                            "Is Limited": false
+                        }
+                    }
+                },
+                "Component_[17924633867119219017]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 17924633867119219017
+                },
+                "Component_[258381313471064362]": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 258381313471064362,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 279283751
+                                },
+                                "assetHint": "robot/rosbot_wheel.azmodel"
+                            }
+                        }
+                    }
+                },
+                "Component_[295764026141986194]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 295764026141986194
+                },
+                "Component_[3241807021813980335]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 3241807021813980335
+                },
+                "Component_[3901827148527434250]": {
+                    "$type": "EditorColliderComponent",
+                    "Id": 3901827148527434250,
+                    "ColliderConfiguration": {
+                        "MaterialSlots": {
+                            "Slots": [
+                                {
+                                    "Name": "Rosbot_Mat"
+                                }
+                            ]
+                        }
+                    },
+                    "ShapeConfiguration": {
+                        "PhysicsAsset": {
+                            "Asset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 2468983379
+                                },
+                                "assetHint": "robot/rosbot_wheel.pxmesh"
+                            },
+                            "Configuration": {
+                                "PhysicsAsset": {
+                                    "assetId": {
+                                        "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                        "subId": 2468983379
+                                    },
+                                    "loadBehavior": "QueueLoad",
+                                    "assetHint": "robot/rosbot_wheel.pxmesh"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Component_[4005459796009700502]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 4005459796009700502,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 164162197
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{988CEB57-770F-54E3-9E70-D1C628F3DA3C}"
+                                            },
+                                            "assetHint": "robot/rosbot_mat.azmaterial"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[4015970786302234137]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 4015970786302234137
+                }
+            }
+        },
         "Entity_[3085863297295]": {
             "Id": "Entity_[3085863297295]",
             "Name": "robot_visual",
@@ -142,61 +667,63 @@
             "Id": "Entity_[394238657263]",
             "Name": "Robot",
             "Components": {
-                "Component_[10255275203288329637]": {
-                    "$type": "EditorColliderComponent",
-                    "Id": 10255275203288329637,
-                    "ColliderConfiguration": {
-                        "MaterialSlots": {
-                            "Slots": [
-                                {
-                                    "Name": "Rosbot_Mat",
-                                    "MaterialAsset": {
-                                        "assetId": {
-                                            "guid": "{54097FD0-79D8-542F-9F95-0A61B75C4E61}",
-                                            "subId": 1
-                                        },
-                                        "assetHint": "physics/slippery_glass.physicsmaterial"
-                                    }
-                                }
-                            ]
-                        },
-                        "MaterialSelection": {
-                            "MaterialIds": [
-                                {
-                                    "MaterialId": "{4080A6D4-AF4E-41CE-B7C9-7699C07123E7}"
-                                },
-                                {
-                                    "MaterialId": "{4080A6D4-AF4E-41CE-B7C9-7699C07123E7}"
-                                }
-                            ]
-                        }
-                    },
-                    "ShapeConfiguration": {
-                        "PhysicsAsset": {
-                            "Asset": {
-                                "assetId": {
-                                    "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
-                                    "subId": 2761445079
-                                },
-                                "assetHint": "robot/rosbot.pxmesh"
-                            },
-                            "Configuration": {
-                                "PhysicsAsset": {
-                                    "assetId": {
-                                        "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
-                                        "subId": 2761445079
-                                    },
-                                    "loadBehavior": "QueueLoad",
-                                    "assetHint": "robot/rosbot.pxmesh"
-                                },
-                                "UseMaterialsFromAsset": false
-                            }
-                        }
-                    }
-                },
                 "Component_[11864781117211182598]": {
                     "$type": "EditorDisabledCompositionComponent",
-                    "Id": 11864781117211182598
+                    "Id": 11864781117211182598,
+                    "DisabledComponents": [
+                        {
+                            "$type": "EditorColliderComponent",
+                            "Id": 10255275203288329637,
+                            "ColliderConfiguration": {
+                                "MaterialSlots": {
+                                    "Slots": [
+                                        {
+                                            "Name": "Rosbot_Mat",
+                                            "MaterialAsset": {
+                                                "assetId": {
+                                                    "guid": "{54097FD0-79D8-542F-9F95-0A61B75C4E61}",
+                                                    "subId": 1
+                                                },
+                                                "assetHint": "physics/slippery_glass.physicsmaterial"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "MaterialSelection": {
+                                    "MaterialIds": [
+                                        {
+                                            "MaterialId": "{4080A6D4-AF4E-41CE-B7C9-7699C07123E7}"
+                                        },
+                                        {
+                                            "MaterialId": "{4080A6D4-AF4E-41CE-B7C9-7699C07123E7}"
+                                        }
+                                    ]
+                                }
+                            },
+                            "ShapeConfiguration": {
+                                "PhysicsAsset": {
+                                    "Asset": {
+                                        "assetId": {
+                                            "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
+                                            "subId": 2761445079
+                                        },
+                                        "assetHint": "robot/rosbot.pxmesh"
+                                    },
+                                    "Configuration": {
+                                        "PhysicsAsset": {
+                                            "assetId": {
+                                                "guid": "{ED28D3D2-9EC6-5C8C-8C07-CAB0B967567F}",
+                                                "subId": 2761445079
+                                            },
+                                            "loadBehavior": "QueueLoad",
+                                            "assetHint": "robot/rosbot.pxmesh"
+                                        },
+                                        "UseMaterialsFromAsset": false
+                                    }
+                                }
+                            }
+                        }
+                    ]
                 },
                 "Component_[12194302030282512361]": {
                     "$type": "EditorEntityIconComponent",
@@ -209,22 +736,6 @@
                         "entityId": "",
                         "Compute Mass": false,
                         "Mass": 10.0,
-                        "Centre of mass offset": [
-                            0.00016798623255454004,
-                            0.000011250272109464277,
-                            0.04515321925282478
-                        ],
-                        "Inertia tensor": [
-                            0.0639280453324318,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.08276905864477158,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.13631463050842285
-                        ],
                         "Maximum Angular Velocity": 3.140000104904175
                     }
                 },
@@ -306,7 +817,11 @@
                     "Child Entity Order": [
                         "Entity_[851599476385]",
                         "Entity_[3085863297295]",
-                        "Entity_[486368783356]"
+                        "Entity_[486368783356]",
+                        "Entity_[408227663929]",
+                        "Entity_[1456199684153]",
+                        "Entity_[1477674520633]",
+                        "Entity_[1473379553337]"
                     ]
                 },
                 "Component_[515315448682290260]": {
@@ -323,6 +838,181 @@
                     "m_template": {
                         "$type": "RigidBodyTwistControlComponent"
                     }
+                }
+            }
+        },
+        "Entity_[408227663929]": {
+            "Id": "Entity_[408227663929]",
+            "Name": "Wheel_RF",
+            "Components": {
+                "Component_[11549554083221514822]": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 11549554083221514822
+                },
+                "Component_[12004651529384584643]": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 12004651529384584643,
+                    "Parent Entity": "Entity_[394238657263]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.08431792259216309,
+                            -0.10490930080413818,
+                            0.04500389099121094
+                        ],
+                        "Rotate": [
+                            89.99994659423828,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                "Component_[12922435996397177869]": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 12922435996397177869
+                },
+                "Component_[13452499268484538347]": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 13452499268484538347
+                },
+                "Component_[13504629183637491151]": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 13504629183637491151
+                },
+                "Component_[14984394342563044714]": {
+                    "$type": "EditorRigidBodyComponent",
+                    "Id": 14984394342563044714,
+                    "Configuration": {
+                        "entityId": "",
+                        "Compute Mass": false,
+                        "Mass": 2.0,
+                        "Centre of mass offset": [
+                            0.0000892818788997829,
+                            0.00005843234248459339,
+                            0.016175949946045876
+                        ],
+                        "Compute inertia": false,
+                        "Inertia tensor": [
+                            0.011447000317275524,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.011459999717772007,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.01986899971961975
+                        ]
+                    },
+                    "PhysXSpecificConfiguration": {
+                        "SolverPositionIterations": 10,
+                        "SolverVelocityIterations": 5
+                    }
+                },
+                "Component_[15313913817318137712]": {
+                    "$type": "EditorHingeJointComponent",
+                    "Id": 15313913817318137712,
+                    "Configuration": {
+                        "Local Rotation": [
+                            0.0,
+                            90.0,
+                            0.0
+                        ],
+                        "Parent Entity": "Entity_[394238657263]",
+                        "Child Entity": "Entity_[408227663929]"
+                    },
+                    "Angular Limit": {
+                        "Standard Limit Configuration": {
+                            "Is Limited": false
+                        }
+                    }
+                },
+                "Component_[17924633867119219017]": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 17924633867119219017
+                },
+                "Component_[258381313471064362]": {
+                    "$type": "AZ::Render::EditorMeshComponent",
+                    "Id": 258381313471064362,
+                    "Controller": {
+                        "Configuration": {
+                            "ModelAsset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 279283751
+                                },
+                                "assetHint": "robot/rosbot_wheel.azmodel"
+                            }
+                        }
+                    }
+                },
+                "Component_[295764026141986194]": {
+                    "$type": "EditorLockComponent",
+                    "Id": 295764026141986194
+                },
+                "Component_[3241807021813980335]": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 3241807021813980335
+                },
+                "Component_[3901827148527434250]": {
+                    "$type": "EditorColliderComponent",
+                    "Id": 3901827148527434250,
+                    "ColliderConfiguration": {
+                        "MaterialSlots": {
+                            "Slots": [
+                                {
+                                    "Name": "Rosbot_Mat"
+                                }
+                            ]
+                        }
+                    },
+                    "ShapeConfiguration": {
+                        "PhysicsAsset": {
+                            "Asset": {
+                                "assetId": {
+                                    "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                    "subId": 2468983379
+                                },
+                                "assetHint": "robot/rosbot_wheel.pxmesh"
+                            },
+                            "Configuration": {
+                                "PhysicsAsset": {
+                                    "assetId": {
+                                        "guid": "{33672D2E-63FD-5BA4-9DC0-B59067DD9A72}",
+                                        "subId": 2468983379
+                                    },
+                                    "loadBehavior": "QueueLoad",
+                                    "assetHint": "robot/rosbot_wheel.pxmesh"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Component_[4005459796009700502]": {
+                    "$type": "EditorMaterialComponent",
+                    "Id": 4005459796009700502,
+                    "Controller": {
+                        "Configuration": {
+                            "materials": [
+                                {
+                                    "Key": {
+                                        "materialSlotStableId": 164162197
+                                    },
+                                    "Value": {
+                                        "MaterialAsset": {
+                                            "assetId": {
+                                                "guid": "{988CEB57-770F-54E3-9E70-D1C628F3DA3C}"
+                                            },
+                                            "assetHint": "robot/rosbot_mat.azmaterial"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "Component_[4015970786302234137]": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 4015970786302234137
                 }
             }
         },
@@ -440,7 +1130,7 @@
                     "Controller": {
                         "Configuration": {
                             "Field of View": 55.0,
-                            "EditorEntityId": 13832703169962220306
+                            "EditorEntityId": 6181030604040911748
                         }
                     }
                 },
@@ -458,14 +1148,14 @@
                     "Parent Entity": "Entity_[394238657263]",
                     "Transform Data": {
                         "Translate": [
-                            -1.4992449283599854,
-                            -0.0015068650245666504,
-                            0.998738169670105
+                            -1.423696517944336,
+                            0.5282517671585083,
+                            0.9541754722595215
                         ],
                         "Rotate": [
-                            0.0,
-                            30.144287109375,
-                            -90.06346893310547
+                            5.774212837219238,
+                            29.637245178222656,
+                            -101.62052917480469
                         ]
                     }
                 },
