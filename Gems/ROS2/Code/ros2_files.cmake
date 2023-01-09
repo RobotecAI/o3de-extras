@@ -44,6 +44,8 @@ set(FILES
         Source/RobotControl/Controllers/AckermannController/AckermannControlComponent.h
         Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponent.cpp
         Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponent.h
+        Source/RobotControl/Controllers/SkidSteeringController/SkidSteeringControlComponent.cpp
+        Source/RobotControl/Controllers/SkidSteeringController/SkidSteeringControlComponent.h
         Source/RobotControl/ROS2RobotControlComponent.cpp
         Source/RobotControl/ROS2RobotControlComponent.h
         Source/RobotControl/Twist/TwistSubscriptionHandler.cpp
@@ -70,6 +72,8 @@ set(FILES
         Source/VehicleDynamics/ManualControlEventHandler.h
         Source/VehicleDynamics/Utilities.cpp
         Source/VehicleDynamics/Utilities.h
+        Source/VehicleDynamics/SkidSteeringModelLimits.cpp
+        Source/VehicleDynamics/SkidSteeringModelLimits.h
         Source/VehicleDynamics/VehicleConfiguration.cpp
         Source/VehicleDynamics/VehicleConfiguration.h
         Source/VehicleDynamics/VehicleInputsState.h

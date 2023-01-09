@@ -34,7 +34,7 @@ namespace ROS2::VehicleDynamics
         static void Reflect(AZ::ReflectContext* context);
 
         AZ::EntityId m_steeringEntity; //!< Rigid body to apply velocity to.
-        float  m_velocityScale{ 1.0 }; //!< The direction of torque applied to wheel entity when speed is applied
-        float  m_steeringScale{ 1.0 }; //!< The direction of torque applied to steering entity when steering is applied
+        float m_wheelRadius{ 1.0 }; //!< The direction of torque applied to wheel entity when speed is applied
+        float m_steeringScale{ 1.0 }; //!< The direction of torque applied to steering entity when steering is applied
     };
 } // namespace ROS2::VehicleDynamics
