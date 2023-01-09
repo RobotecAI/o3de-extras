@@ -33,7 +33,8 @@ namespace ROS2::Utils
 
     AZStd::unordered_map<AZ::Crc32, AvailableAsset> GetInterestingSourceAssetsCRC()
     {
-        const AZStd::unordered_set<AZStd::string> kInterestingExtensions{ ".dae", ".stl", ".obj" };
+        const AZStd::unordered_set<AZStd::string> kInterestingExtensions{ ".dae", ".stl", ".obj", ".fbx" };
+        const AZStd::string kAzModelExtension(".azmodel");
         AZStd::unordered_map<AZ::Crc32, AvailableAsset> availableAssets;
 
         // take all meshes in catalog
@@ -42,7 +43,7 @@ namespace ROS2::Utils
         {
             if (AZ::Data::AssetManager::Instance().GetHandler(info.m_assetType))
             {
-                if (!info.m_relativePath.ends_with(".azmodel"))
+                if (!info.m_relativePath.ends_with(kAzModelExtension))
                 {
                     return;
                 }
@@ -78,7 +79,19 @@ namespace ROS2::Utils
                 t.m_assetId = info.m_assetId;
                 t.m_sourceAssetGlobalPath = fullSourcePathStr;
                 t.m_productAssetRelativePath = info.m_relativePath;
-                availableAssets[crc] = t;
+                if (availableAssets.contains(crc))
+                {
+                    const AZStd::string stem(fullSourcePath.Stem().Native());
+                    // probably there is already submesh added. Replace only if there is exact name
+                    if (info.m_relativePath.contains(stem + kAzModelExtension))
+                    {
+                        availableAssets[crc] = t;
+                    }
+                }
+                else
+                {
+                    availableAssets[crc] = t;
+                }
             }
         };
         AZ::Data::AssetCatalogRequestBus::Broadcast(
