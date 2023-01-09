@@ -9,6 +9,7 @@
 #include "Utilities.h"
 #include "WheelControllerComponent.h"
 #include <PhysX/Joint/PhysXJointRequestsBus.h>
+#include <HingeJointComponent.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/std/string/string.h>
@@ -147,7 +148,6 @@ namespace ROS2::VehicleDynamics::Utilities
                         axle.m_axleTag.c_str());
                     continue;
                 }
-                float velocityScale = controllerComponent->m_velocityScale;
 
                 PhysX::HingeJointComponent* hingeComponent{ nullptr };
                 hingeComponent = wheelEntity->FindComponent<PhysX::HingeJointComponent>();
@@ -165,11 +165,29 @@ namespace ROS2::VehicleDynamics::Utilities
                 VehicleDynamics::WheelDynamicsData wheelData;
                 wheelData.m_wheelEntity = wheel;
                 wheelData.m_hingeJoint = hingeComponent->GetId();
-                wheelData.m_velocityScale = velocityScale;
                 wheelData.m_wheelRadius = axle.m_wheelRadius;
                 driveWheelEntities.push_back(wheelData);
             }
         }
         return driveWheelEntities;
     }
+
+    AZ::EntityComponentIdPair GetWheelPhysxHinge(const AZ::EntityId entityId)
+    {
+        AZ::Entity* wheelEntity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(wheelEntity, &AZ::ComponentApplicationRequests::FindEntity, entityId);
+        if (!wheelEntity){
+            AZ_Warning("GetWheelDynamicData", false , "Entity %s was not found", entityId.ToString().c_str() );
+            return  AZ::EntityComponentIdPair();
+        }
+        PhysX::HingeJointComponent* hingeComponent{ nullptr };
+        hingeComponent = wheelEntity->FindComponent<PhysX::HingeJointComponent>();
+        if (!hingeComponent){
+            AZ_Warning("GetWheelDynamicData", false , "Entity %s has no PhysX::HingeJointComponent", entityId.ToString().c_str() );
+            return  AZ::EntityComponentIdPair();
+        }
+        return AZ::EntityComponentIdPair(entityId, hingeComponent->GetId());
+    }
+
+
 } // namespace ROS2::VehicleDynamics::Utilities

@@ -10,6 +10,7 @@
 #include "DriveModels/AckermannDriveModel.h"
 #include "Utilities.h"
 #include "VehicleConfiguration.h"
+#include "SkidSteeringModelLimits.h"
 #include <AzCore/Debug/Trace.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
@@ -39,6 +40,7 @@ namespace ROS2::VehicleDynamics
         DriveModel::Reflect(context);
         AckermannDriveModel::Reflect(context);
         VehicleModelLimits::Reflect(context);
+        SkidSteeringModelLimits::Reflect(context);
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<VehicleModelComponent, AZ::Component>()

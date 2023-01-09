@@ -17,7 +17,6 @@ namespace ROS2::VehicleDynamics
     {
         AZ::EntityId m_wheelEntity; //!< An entity which is expected to have a WheelControllerComponent.
         AZ::ComponentId m_hingeJoint; //!< Steering joint
-        float m_velocityScale{1.f}; //!< Scale of applied velocity
         float m_wheelRadius{ 0.25f }; //!< Radius of the wheel in meters.
     };
 

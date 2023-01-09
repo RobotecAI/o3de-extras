@@ -45,7 +45,7 @@ namespace ROS2::VehicleDynamics
             serialize->Class<WheelControllerComponent, AZ::Component>()
                 ->Version(3)
                 ->Field("SteeringEntity", &WheelControllerComponent::m_steeringEntity)
-                ->Field("VelocityScale", &WheelControllerComponent::m_velocityScale)
+                ->Field("VelocityScale", &WheelControllerComponent::m_wheelRadius)
                 ->Field("SteeringScale", &WheelControllerComponent::m_steeringScale);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
@@ -56,7 +56,12 @@ namespace ROS2::VehicleDynamics
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
-                        &WheelControllerComponent::m_velocityScale,
+                        &WheelControllerComponent::m_steeringEntity,
+                        "Steering entity",
+                        "Entity which steers the wheel - typically a parent entity")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &WheelControllerComponent::m_wheelRadius,
                         "Scale of drive axis",
                         "The direction of torque applied to the wheel entity")
                     ->DataElement(
