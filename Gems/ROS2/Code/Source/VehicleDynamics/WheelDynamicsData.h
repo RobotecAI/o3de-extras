@@ -7,13 +7,17 @@
  */
 #pragma once
 
+#include <AzCore/Component/ComponentBus.h>
+#include <AzCore/Component/EntityId.h>
+
 namespace ROS2::VehicleDynamics
 {
     //! Data structure to pass wheel dynamics data for a single wheel entity.
     struct WheelDynamicsData
     {
         AZ::EntityId m_wheelEntity; //!< An entity which is expected to have a WheelControllerComponent.
-        AZ::Vector3 m_driveAxis{ AZ::Vector3::CreateAxisZ() }; //!< An axis of force application for the wheel to move forward.
+        AZ::ComponentId m_hingeJoint; //!< Steering joint
+        float m_velocityScale{1.f}; //!< Scale of applied velocity
         float m_wheelRadius{ 0.25f }; //!< Radius of the wheel in meters.
     };
 
@@ -21,8 +25,7 @@ namespace ROS2::VehicleDynamics
     struct SteeringDynamicsData
     {
         AZ::EntityId m_steeringEntity; //!< Steering entity needs to be connected (directly or indirectly) by a Joint with a wheelEntity.
-        AZ::Vector3 m_turnAxis{
-            AZ::Vector3::CreateAxisZ()
-        }; //!< An axis of force application for the steering element to turn the attached wheel sideways.
+        AZ::ComponentId m_hingeJoint; //!< Steering joint
+        float m_steeringScale {1.f}; //!< Scale for direction for the steering element to turn the attached wheel sideways.
     };
 } // namespace ROS2::VehicleDynamics
