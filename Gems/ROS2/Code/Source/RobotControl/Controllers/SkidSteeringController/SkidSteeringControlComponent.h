@@ -1,10 +1,10 @@
 /*
-* Copyright (c) Contributors to the Open 3D Engine Project.
-* For complete copyright and license terms please see the LICENSE at the root of this distribution.
-*
-* SPDX-License-Identifier: Apache-2.0 OR MIT
-*
-*/
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
 #pragma once
 
 #include <AzCore/Component/Component.h>
@@ -16,32 +16,31 @@
 namespace ROS2
 {
 
-   class SkidSteeringControlComponent
-       : public AZ::Component
-       , private TwistNotificationBus::Handler
-   {
-   public:
-       AZ_COMPONENT(SkidSteeringControlComponent, "{7FEE7851-1284-4AE5-9C2C-763916BFE641}", AZ::Component);
-       SkidSteeringControlComponent() = default;
+    class SkidSteeringControlComponent
+        : public AZ::Component
+        , private TwistNotificationBus::Handler
+    {
+    public:
+        AZ_COMPONENT(SkidSteeringControlComponent, "{7FEE7851-1284-4AE5-9C2C-763916BFE641}", AZ::Component);
+        SkidSteeringControlComponent() = default;
 
-       //////////////////////////////////////////////////////////////////////////
-       // Component overrides
-       void Activate() override;
-       void Deactivate() override;
-       //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // Component overrides
+        void Activate() override;
+        void Deactivate() override;
+        //////////////////////////////////////////////////////////////////////////
 
-       static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
-       static void Reflect(AZ::ReflectContext* context);
+        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
+        static void Reflect(AZ::ReflectContext* context);
 
-   private:
-       //////////////////////////////////////////////////////////////////////////
-       // TwistNotificationBus::Handler overrides
-       void TwistReceived(const AZ::Vector3& linear, const AZ::Vector3& angular) override;
-       //////////////////////////////////////////////////////////////////////////
-       AZStd::vector<AZ::EntityId> m_wheels;
-       AZStd::vector<AZ::EntityComponentIdPair> m_wheelsData;
-       float m_wheelRadius;
-       VehicleDynamics::SkidSteeringModelLimits m_limits;
-
-   };
+    private:
+        //////////////////////////////////////////////////////////////////////////
+        // TwistNotificationBus::Handler overrides
+        void TwistReceived(const AZ::Vector3& linear, const AZ::Vector3& angular) override;
+        //////////////////////////////////////////////////////////////////////////
+        AZStd::vector<AZ::EntityId> m_wheels;
+        AZStd::vector<AZ::EntityComponentIdPair> m_wheelsData;
+        float m_wheelRadius{ 1.0f };
+        VehicleDynamics::SkidSteeringModelLimits m_limits;
+    };
 } // namespace ROS2

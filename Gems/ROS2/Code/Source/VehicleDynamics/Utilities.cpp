@@ -8,11 +8,11 @@
 
 #include "Utilities.h"
 #include "WheelControllerComponent.h"
-#include <PhysX/Joint/PhysXJointRequestsBus.h>
-#include <HingeJointComponent.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/std/string/string.h>
+#include <HingeJointComponent.h>
+#include <PhysX/Joint/PhysXJointRequestsBus.h>
 
 namespace ROS2::VehicleDynamics::Utilities
 {
@@ -89,9 +89,10 @@ namespace ROS2::VehicleDynamics::Utilities
                 float steeringScale = controllerComponent->m_steeringScale;
 
                 PhysX::HingeJointComponent* hingeComponent{ nullptr };
-                AZ::Entity * steeringEntityptr{ nullptr };
-                AZ::ComponentApplicationBus::BroadcastResult(steeringEntityptr, &AZ::ComponentApplicationRequests::FindEntity, steeringEntity);
-                AZ_Assert(steeringEntityptr, "Cannot find steeringEntity ptr for %s",steeringEntity.ToString().c_str() );
+                AZ::Entity* steeringEntityptr{ nullptr };
+                AZ::ComponentApplicationBus::BroadcastResult(
+                    steeringEntityptr, &AZ::ComponentApplicationRequests::FindEntity, steeringEntity);
+                AZ_Assert(steeringEntityptr, "Cannot find steeringEntity ptr for %s", steeringEntity.ToString().c_str());
                 hingeComponent = steeringEntityptr->FindComponent<PhysX::HingeJointComponent>();
 
                 if (!hingeComponent)
@@ -176,18 +177,19 @@ namespace ROS2::VehicleDynamics::Utilities
     {
         AZ::Entity* wheelEntity = nullptr;
         AZ::ComponentApplicationBus::BroadcastResult(wheelEntity, &AZ::ComponentApplicationRequests::FindEntity, entityId);
-        if (!wheelEntity){
-            AZ_Warning("GetWheelDynamicData", false , "Entity %s was not found", entityId.ToString().c_str() );
-            return  AZ::EntityComponentIdPair();
+        if (!wheelEntity)
+        {
+            AZ_Warning("GetWheelDynamicData", false, "Entity %s was not found", entityId.ToString().c_str());
+            return AZ::EntityComponentIdPair();
         }
         PhysX::HingeJointComponent* hingeComponent{ nullptr };
         hingeComponent = wheelEntity->FindComponent<PhysX::HingeJointComponent>();
-        if (!hingeComponent){
-            AZ_Warning("GetWheelDynamicData", false , "Entity %s has no PhysX::HingeJointComponent", entityId.ToString().c_str() );
-            return  AZ::EntityComponentIdPair();
+        if (!hingeComponent)
+        {
+            AZ_Warning("GetWheelDynamicData", false, "Entity %s has no PhysX::HingeJointComponent", entityId.ToString().c_str());
+            return AZ::EntityComponentIdPair();
         }
         return AZ::EntityComponentIdPair(entityId, hingeComponent->GetId());
     }
-
 
 } // namespace ROS2::VehicleDynamics::Utilities

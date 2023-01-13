@@ -53,6 +53,8 @@ namespace ROS2::VehicleDynamics::Utilities
     AZStd::vector<VehicleDynamics::WheelDynamicsData> GetAllDriveWheelsData(const VehicleConfiguration& vehicleConfig);
 
     //! Get Physx Hinge Joint Component AZ::EntityComponentIdPair from Entity
+    //! @param entityId id of entity that has Physx Hinge Joint Controller
+    //! @returns EntityComponentIdPair that contains id of Hinge component and @param entityId
     AZ::EntityComponentIdPair GetWheelPhysxHinge(const AZ::EntityId entityId);
 
 } // namespace ROS2::VehicleDynamics::Utilities

@@ -66,7 +66,6 @@ namespace ROS2::VehicleDynamics
 
     void AckermannDriveModel::ApplyWheelSteering(SteeringDynamicsData& wheelData, float steering, double deltaTimeNs)
     {
-
         const auto& steeringEntity = wheelData.m_steeringEntity;
         const auto& hingeComponent = wheelData.m_hingeJoint;
 
@@ -76,7 +75,7 @@ namespace ROS2::VehicleDynamics
             id,
             [&](PhysX::JointRequests* joint)
             {
-                double  currentSteeringAngle = joint->GetPosition();
+                double currentSteeringAngle = joint->GetPosition();
                 const double pidCommand = m_steeringPid.ComputeCommand(steering - currentSteeringAngle, deltaTimeNs);
                 PhysX::JointRequestBus::EventResult(currentSteeringAngle, id, &PhysX::JointRequests::GetPosition);
                 joint->SetVelocity(pidCommand);
