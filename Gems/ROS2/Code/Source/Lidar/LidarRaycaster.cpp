@@ -13,6 +13,7 @@
 #include <AzFramework/Physics/PhysicsScene.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 #include <AzFramework/Physics/Shape.h>
+#include <AzCore/Debug/Profiler.h>
 
 namespace ROS2
 {
@@ -29,6 +30,7 @@ namespace ROS2
         bool ignoreLayer,
         unsigned int ignoredLayerIndex) const
     {
+        AZ_PROFILE_SCOPE(Physics, "LidarRaycaster::PerformRaycast");
         AZStd::vector<AZ::Vector3> results;
         if (m_sceneHandle == AzPhysics::InvalidSceneHandle)
         {

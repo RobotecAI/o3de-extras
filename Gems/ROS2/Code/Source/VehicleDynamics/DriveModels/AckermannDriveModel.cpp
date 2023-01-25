@@ -110,6 +110,9 @@ namespace ROS2::VehicleDynamics
 
     void AckermannDriveModel::ApplySpeed(float speed, AZ::u64 deltaTimeNs)
     {
+        const float acceleration = m_limits.GetLinearAcceleration();
+        const float maxSpeed = m_limits.GetLinearSpeedLimit();
+        m_speedCommand = Utilities::RampVelocity(speed, m_speedCommand, deltaTimeNs, acceleration, maxSpeed);
         if (m_disabled)
         {
             return;
@@ -127,7 +130,7 @@ namespace ROS2::VehicleDynamics
             const auto hingeComponent = wheelData.m_hingeJoint;
             const auto id = AZ::EntityComponentIdPair(wheelEntity, hingeComponent);
             AZ_Assert(wheelRadius != 0, "wheelRadius must be non-zero");
-            auto desiredAngularSpeedX = (speed / wheelRadius);
+            auto desiredAngularSpeedX = (m_speedCommand / wheelRadius);
             PhysX::JointRequestBus::Event(id, &PhysX::JointRequests::SetVelocity, desiredAngularSpeedX);
         }
     }

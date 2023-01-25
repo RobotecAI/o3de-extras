@@ -57,4 +57,13 @@ namespace ROS2::VehicleDynamics::Utilities
     //! @returns EntityComponentIdPair that contains id of Hinge component and @param wheelEntityId
     AZ::EntityComponentIdPair GetWheelPhysxHinge(const AZ::EntityId wheelEntityId);
 
+    //! Computes ramped velocity.
+    //! @param targetVelocity commanded velocity to robot.
+    //! @param lastVelocity last commanded Velocity
+    //! @param deltaTimeNs duration between calls in nanoseconds
+    //! @param acceleration acceleration
+    //! @param maxVelocity maximumVelocity
+    //! @returns ramped velocity according to time, acceleration and clamped to @param maxVelocity
+    float RampVelocity(float targetVelocity, float lastVelocity, AZ::u64 deltaTimeNs, float acceleration, float maxVelocity);
+
 } // namespace ROS2::VehicleDynamics::Utilities

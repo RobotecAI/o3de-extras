@@ -42,7 +42,8 @@ namespace ROS2::VehicleDynamics
         AZStd::vector<WheelDynamicsData> m_driveWheelsData;
         AZStd::vector<SteeringDynamicsData> m_steeringData;
         PidConfiguration m_steeringPid;
-        float m_steeringDeadZone = 0.01;
+        float m_steeringDeadZone = 0.01f;
+        float m_speedCommand = 0.f;
         AckermannModelLimits m_limits;
     };
 } // namespace ROS2::VehicleDynamics

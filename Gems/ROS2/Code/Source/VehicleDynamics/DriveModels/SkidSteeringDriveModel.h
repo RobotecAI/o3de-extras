@@ -38,5 +38,7 @@ namespace ROS2::VehicleDynamics
         SkidSteeringModelLimits m_limits;
         AZStd::unordered_map<AZ::EntityId, AZ::EntityComponentIdPair> m_wheelsData;
         VehicleConfiguration m_config;
+        float m_currentLinearVelocity = 0;
+        float m_currentAngularVelocity = 0;
     };
 } // namespace ROS2::VehicleDynamics
