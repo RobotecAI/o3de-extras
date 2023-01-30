@@ -14,6 +14,8 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <std_msgs/msg/header.hpp>
 
+#include "ROS2CameraSensorPublisher.h"
+
 namespace ROS2
 {
 
@@ -60,10 +62,12 @@ namespace ROS2
         //! @param publisher - ROS2 publisher to publish image in future
         //! @param header - header with filled message information (frame, timestamp, seq)
         //! @param cameraPose - current camera pose from which the rendering should take place
-        void RequestMessagePublication(
-            std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>> publisher,
-            const AZ::Transform& cameraPose,
-            const std_msgs::msg::Header& header);
+        
+        //void RequestMessagePublication(
+        //    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>> publisher,
+        //    const AZ::Transform& cameraPose,
+        //    const std_msgs::msg::Header& header);        
+        void RequestMessagePublication(ROS2CameraSensorPublisher cameraPublisher);
 
         //! Get the camera sensor description
         [[nodiscard]] const CameraSensorDescription& GetCameraSensorDescription() const;

@@ -185,26 +185,13 @@ namespace ROS2
         return m_cameraSensorDescription;
     }
 
-    void CameraSensor::RequestMessagePublication(
-        std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>> publisher,
-        const AZ::Transform& cameraPose,
-        const std_msgs::msg::Header& header)
+    void CameraSensor::RequestMessagePublication(ROS2CameraSensorPublisher cameraPublisher)
     {
         RequestFrame(
-            cameraPose,
-            [header, publisher](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
+            cameraPublisher.getCameraPose(),
+            [cameraPublisher](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
-                const AZ::RHI::ImageDescriptor& descriptor = result.m_imageDescriptor;
-                const auto format = descriptor.m_format;
-                AZ_Assert(Internal::FormatMappings.contains(format), "Unknown format in result %u", static_cast<uint32_t>(format));
-                sensor_msgs::msg::Image message;
-                message.encoding = Internal::FormatMappings.at(format);
-                message.width = descriptor.m_size.m_width;
-                message.height = descriptor.m_size.m_height;
-                message.step = message.width * Internal::BitDepth.at(format);
-                message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
-                message.header = header;
-                publisher->publish(message);
+                cameraPublisher.Publish(result);
             });
     }
 

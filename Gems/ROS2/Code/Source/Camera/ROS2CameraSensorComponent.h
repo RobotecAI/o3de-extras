@@ -19,6 +19,7 @@
 #include <ROS2/Frame/ROS2Transform.h>
 
 #include "CameraSensor.h"
+#include "ROS2CameraSensorPublisher.h"
 
 namespace ROS2
 {
@@ -48,7 +49,8 @@ namespace ROS2
         using CameraInfoPublisherPtrType = std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>>;
 
         //! Type that combines pointer to ROS2 publisher and CameraSensor
-        using PublisherSensorPtrPair = AZStd::pair<ImagePublisherPtrType, AZStd::shared_ptr<CameraSensor>>;
+        //using PublisherSensorPtrPair = AZStd::pair<ImagePublisherPtrType, AZStd::shared_ptr<CameraSensor>>;
+        using PublisherSensorPtrPair = AZStd::pair<ROS2CameraSensorPublisher, AZStd::shared_ptr<CameraSensor>>;
 
         //! Helper to construct a PublisherSensorPtrPair with a pointer to ROS2 publisher and intrinsic calibration
         //! @tparam CameraType type of camera sensor (eg 'CameraColorSensor')
@@ -56,7 +58,7 @@ namespace ROS2
         //! @param description CameraSensorDescription with intrinsic calibration
         //! @return PublisherSensorPtrPair with all provided parameters
         template<typename CameraType>
-        PublisherSensorPtrPair CreatePair(ImagePublisherPtrType publisher, const CameraSensorDescription& description) const
+        PublisherSensorPtrPair CreatePair(ROS2CameraSensorPublisher publisher, const CameraSensorDescription& description) const
         {
             return { publisher, AZStd::make_shared<CameraType>(description) };
         }

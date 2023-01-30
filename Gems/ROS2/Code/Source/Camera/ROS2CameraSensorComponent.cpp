@@ -114,7 +114,9 @@ namespace ROS2
             AZStd::string cameraImageFullTopic = ROS2Names::GetNamespacedName(GetNamespace(), cameraImagePublisherConfig.m_topic);
             auto publisher =
                 ros2Node->create_publisher<sensor_msgs::msg::Image>(cameraImageFullTopic.data(), cameraImagePublisherConfig.GetQoS());
-            m_cameraSensorsWithPublihsers.emplace_back(CreatePair<CameraColorSensor>(publisher, description));
+            auto cameraPublisher = ROS2CameraSensorPublisher();
+            cameraPublisher.AddPublisher(publisher);
+            m_cameraSensorsWithPublihsers.emplace_back(CreatePair<CameraColorSensor>(cameraPublisher, description));
         }
         if (m_depthCamera)
         {
@@ -122,7 +124,9 @@ namespace ROS2
             AZStd::string cameraImageFullTopic = ROS2Names::GetNamespacedName(GetNamespace(), cameraImagePublisherConfig.m_topic);
             auto publisher =
                 ros2Node->create_publisher<sensor_msgs::msg::Image>(cameraImageFullTopic.data(), cameraImagePublisherConfig.GetQoS());
-            m_cameraSensorsWithPublihsers.emplace_back(CreatePair<CameraDepthSensor>(publisher, description));
+            auto cameraPublisher = ROS2CameraSensorPublisher();
+            cameraPublisher.AddPublisher(publisher);
+            m_cameraSensorsWithPublihsers.emplace_back(CreatePair<CameraDepthSensor>(cameraPublisher, description));
         }
         const auto* component = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         AZ_Assert(component, "Entity has no ROS2FrameComponent");
@@ -160,7 +164,8 @@ namespace ROS2
         }
         for (auto& [publisher, sensor] : m_cameraSensorsWithPublihsers)
         {
-            sensor->RequestMessagePublication(publisher, transform, ros_header);
+            publisher.SetupPublisher(transform, ros_header);
+            sensor->RequestMessagePublication(publisher);
         }
     }
 } // namespace ROS2
