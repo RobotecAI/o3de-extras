@@ -22,9 +22,25 @@
 #include <PostProcess/PostProcessFeatureProcessor.h>
 
 #include <Atom/RPI.Public/Pass/PassFactory.h>
+#include <AzCore/Time/ITime.h>
+#include <AzCore/Utils/Utils.h>
 
 namespace ROS2
 {
+
+    int64_t  CameraStatistic::GetTimeStamp()
+    {
+        if (auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
+        {
+            return static_cast<int64_t>(timeSystem->GetElapsedTimeUs());
+        }
+        else
+        {
+            AZ_Error("SimulationClock", false, "No ITime interface available for ROS2 Gem simulation clock");
+            return 0;
+        }
+    }
+
     namespace Internal
     {
 
@@ -146,6 +162,9 @@ namespace ROS2
         {
             fp->SetViewAlias(m_view, targetView);
         }
+        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+        m_cameraStats.clear();
+        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraSensor::SetupPasses"});
     }
 
     CameraSensor::~CameraSensor()
@@ -162,6 +181,13 @@ namespace ROS2
         m_passHierarchy.clear();
         m_pipeline.reset();
         m_view.reset();
+
+        AZStd::string report{"timestamp\tevent\n"};
+        for (const auto & f : m_cameraStats){
+            report+= AZStd::string::format("%ld\t%s\n", f.executionTime, f.eventName.c_str());
+        }
+        const auto outcome = AZ::Utils::WriteFile(report, AZStd::string::format("/tmp/events_%s.csv", this->m_cameraSensorDescription.m_cameraName.c_str()));
+        AZ_Printf("CameraSensor::~CameraSensor", "Outcome : %s", outcome.GetError().c_str())
     }
 
     void CameraSensor::RequestFrame(
@@ -180,6 +206,8 @@ namespace ROS2
             AZStd::string("Output"),
             callback,
             AZ::RPI::PassAttachmentReadbackOption::Output);
+        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraSensor::RequestFrame"});
     }
 
     const CameraSensorDescription& CameraSensor::GetCameraSensorDescription() const
@@ -194,10 +222,14 @@ namespace ROS2
     {
         RequestFrame(
             cameraPose,
-            [header, publisher](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
+            [header, publisher, this](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
                 if (result.m_state == AZ::RPI::AttachmentReadback::ReadbackState::Success)
                 {
+                    {
+                        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+                        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraRGBDSensor::StartPublishRGB"});
+                    }
                     const AZ::RHI::ImageDescriptor& descriptor = result.m_imageDescriptor;
                     const auto format = descriptor.m_format;
                     AZ_Assert(Internal::FormatMappings.contains(format), "Unknown format in result %u", static_cast<uint32_t>(format));
@@ -209,6 +241,10 @@ namespace ROS2
                     message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
                     message.header = header;
                     publisher->publish(message);
+                    {
+                        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+                        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraRGBDSensor::EndPublishRGB"});
+                    }
                 }
             });
     }
@@ -282,10 +318,14 @@ namespace ROS2
         AZ_Assert(publishers.size()==2, "RequestMessagePublication for CameraRGBDSensor should be called with exactly two publishers");
         const auto publisherDepth = publishers.back();
         ReadBackDepth(
-            [header, publisherDepth](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
+            [header, publisherDepth, this](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
                 if (result.m_state == AZ::RPI::AttachmentReadback::ReadbackState::Success)
                 {
+                    {
+                        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+                        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraRGBDSensor::StartPublishDepth"});
+                    }
                     const AZ::RHI::ImageDescriptor& descriptor = result.m_imageDescriptor;
                     const auto format = descriptor.m_format;
                     AZ_Assert(Internal::FormatMappings.contains(format), "Unknown format in result %u", static_cast<uint32_t>(format));
@@ -297,6 +337,10 @@ namespace ROS2
                     message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
                     message.header = header;
                     publisherDepth->publish(message);
+                    {
+                        AZStd::scoped_lock<AZStd::mutex> lock(m_cameraStatsMutex);
+                        m_cameraStats.emplace_back(CameraStatistic{CameraStatistic::GetTimeStamp(), "CameraRGBDSensor::EndPublishDepth"});
+                    }
                 }
             });
         CameraSensor::RequestMessagePublication(publishers,cameraPose,header);
