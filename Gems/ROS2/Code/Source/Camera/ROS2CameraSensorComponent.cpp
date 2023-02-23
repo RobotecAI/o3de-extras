@@ -19,6 +19,7 @@
 
 #include <sensor_msgs/distortion_models.hpp>
 
+
 namespace ROS2
 {
     ROS2CameraSensorComponent::ROS2CameraSensorComponent(

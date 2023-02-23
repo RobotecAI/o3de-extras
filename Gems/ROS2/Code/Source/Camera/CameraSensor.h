@@ -17,7 +17,11 @@
 
 namespace ROS2
 {
-
+    struct CameraStatistic{
+        int64_t executionTime;
+        AZStd::string eventName;
+        static int64_t  GetTimeStamp();
+    };
     //! Structure containing all information required to create the camera sensor
     struct CameraSensorDescription
     {
@@ -112,6 +116,10 @@ namespace ROS2
 
         //! Read and setup Atom Passes
         void SetupPasses();
+
+        //! For profiling
+        AZStd::mutex m_cameraStatsMutex;
+        AZStd::deque<CameraStatistic> m_cameraStats;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces depth image

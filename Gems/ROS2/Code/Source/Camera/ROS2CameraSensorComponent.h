@@ -96,6 +96,5 @@ namespace ROS2
         AZStd::vector<ImagePublisherPtrType> m_imagePublishers;
         AZStd::shared_ptr<CameraSensor> m_cameraSensor;
         CameraInfoPublisherPtrType m_cameraInfoPublisher;
-
     };
 } // namespace ROS2
