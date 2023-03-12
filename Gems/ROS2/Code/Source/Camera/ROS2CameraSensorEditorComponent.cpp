@@ -63,8 +63,8 @@ namespace ROS2
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default, 
                         &ROS2CameraSensorEditorComponent::m_renderPipelineAllowModification, 
-                        "Allow Render Modifiers (Post-processing)", 
-                        "Allow Render Modifiers (Post-processing)");
+                        "Allow Render Pipeline Modification", 
+                        "Allow Render Pipeline Modification (Global illumination, Post-processing, etc.)");
             }
         }
     }

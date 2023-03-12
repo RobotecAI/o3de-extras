@@ -27,7 +27,7 @@ namespace ROS2
         //! @param width - camera image width in pixels
         //! @param height - camera image height in pixels
         //! @param entityId - entityId of camera sensor
-        //! @param renderPipelineAllowModification - allow pipeline modification by post-processing
+        //! @param renderPipelineAllowModification - allow render pipeline modification (required to enable postprocessing, GI, etc.)
         CameraSensorDescription(const AZStd::string& cameraName, float verticalFov, 
             int width, int height, AZ::EntityId entityId, bool renderPipelineAllowModification);
 
@@ -35,7 +35,7 @@ namespace ROS2
         const int m_width; //!< camera image width in pixels
         const int m_height; //!< camera image height in pixels
         const AZStd::string m_cameraName; //!< camera name to differentiate cameras in a multi-camera setup
-        const bool m_renderPipelineAllowModification; //!< allow pipeline modification by post-processing
+        const bool m_renderPipelineAllowModification; //!< allow render pipeline modification (required to enable postprocessing, GI, etc.)
 
         const float m_aspectRatio; //!< camera image aspect ratio; equal to (width / height)
         const AZ::Matrix4x4 m_viewToClipMatrix; //!< camera view to clip space transform matrix; derived from other parameters
