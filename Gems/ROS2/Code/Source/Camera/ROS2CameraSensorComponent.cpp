@@ -27,12 +27,14 @@ namespace ROS2
         int width,
         int height,
         bool colorCamera,
-        bool depthCamera)
+        bool depthCamera,
+        bool renderPipelineAllowModification)
         : m_verticalFieldOfViewDeg(verticalFieldOfViewDeg)
         , m_width(width)
         , m_height(height)
         , m_colorCamera(colorCamera)
         , m_depthCamera(depthCamera)
+        , m_renderPipelineAllowModification(renderPipelineAllowModification)
     {
         m_sensorConfiguration = sensorConfiguration;
     }
@@ -48,7 +50,8 @@ namespace ROS2
                 ->Field("Width", &ROS2CameraSensorComponent::m_width)
                 ->Field("Height", &ROS2CameraSensorComponent::m_height)
                 ->Field("Depth", &ROS2CameraSensorComponent::m_depthCamera)
-                ->Field("Color", &ROS2CameraSensorComponent::m_colorCamera);
+                ->Field("Color", &ROS2CameraSensorComponent::m_colorCamera)
+                ->Field("AllowModification", &ROS2CameraSensorComponent::m_renderPipelineAllowModification);
         }
     }
 
@@ -66,7 +69,7 @@ namespace ROS2
             ros2Node->create_publisher<sensor_msgs::msg::CameraInfo>(cameraInfoFullTopic.data(), cameraInfoPublisherConfig.GetQoS());
 
         const CameraSensorDescription description{
-            GetCameraNameFromFrame(GetEntity()), m_verticalFieldOfViewDeg, m_width, m_height, GetEntityId()
+            GetCameraNameFromFrame(GetEntity()), m_verticalFieldOfViewDeg, m_width, m_height, GetEntityId(), m_renderPipelineAllowModification
         };
         if (m_colorCamera)
         {

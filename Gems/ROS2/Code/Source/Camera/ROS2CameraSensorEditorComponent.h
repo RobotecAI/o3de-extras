@@ -54,5 +54,6 @@ namespace ROS2
         int m_height = 480;
         bool m_colorCamera = true;
         bool m_depthCamera = true;
+        bool m_renderPipelineAllowModification = false;
     };
 } // namespace ROS2

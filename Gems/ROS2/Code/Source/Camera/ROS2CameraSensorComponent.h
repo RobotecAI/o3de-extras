@@ -49,7 +49,8 @@ namespace ROS2
             int width,
             int height,
             bool colorCamera,
-            bool depthCamera);
+            bool depthCamera,
+            bool renderPipelineAllowModification);
 
         ~ROS2CameraSensorComponent() override = default;
         AZ_COMPONENT(ROS2CameraSensorComponent, "{3C6B8AE6-9721-4639-B8F9-D8D28FD7A071}", ROS2SensorComponent);
@@ -90,6 +91,8 @@ namespace ROS2
         bool m_colorCamera = true;
         bool m_depthCamera = true;
         AZStd::string m_frameName;
+
+        bool m_renderPipelineAllowModification = false;
 
         void FrequencyTick() override;
 
