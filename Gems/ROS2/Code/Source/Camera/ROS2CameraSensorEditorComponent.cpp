@@ -35,7 +35,8 @@ namespace ROS2
                 ->Field("Height", &ROS2CameraSensorEditorComponent::m_height)
                 ->Field("Depth", &ROS2CameraSensorEditorComponent::m_depthCamera)
                 ->Field("Color", &ROS2CameraSensorEditorComponent::m_colorCamera)
-                ->Field("SensorConfig", &ROS2CameraSensorEditorComponent::m_sensorConfiguration);
+                ->Field("SensorConfig", &ROS2CameraSensorEditorComponent::m_sensorConfiguration)
+                ->Field("AllowModification", &ROS2CameraSensorEditorComponent::m_renderPipelineAllowModification);                
 
             if (AZ::EditContext* editContext = serialize->GetEditContext())
             {
@@ -58,7 +59,12 @@ namespace ROS2
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default, &ROS2CameraSensorEditorComponent::m_colorCamera, "Color Camera", "Color Camera")
                     ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &ROS2CameraSensorEditorComponent::m_depthCamera, "Depth Camera", "Depth Camera");
+                        AZ::Edit::UIHandlers::Default, &ROS2CameraSensorEditorComponent::m_depthCamera, "Depth Camera", "Depth Camera")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default, 
+                        &ROS2CameraSensorEditorComponent::m_renderPipelineAllowModification, 
+                        "Allow Render Modifiers (Post-processing)", 
+                        "Allow Render Modifiers (Post-processing)");
             }
         }
     }
@@ -93,7 +99,7 @@ namespace ROS2
     void ROS2CameraSensorEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
         gameEntity->CreateComponent<ROS2::ROS2CameraSensorComponent>(
-            m_sensorConfiguration, m_VerticalFieldOfViewDeg, m_width, m_height, m_colorCamera, m_depthCamera);
+            m_sensorConfiguration, m_VerticalFieldOfViewDeg, m_width, m_height, m_colorCamera, m_depthCamera, m_renderPipelineAllowModification);
     }
 
     void ROS2CameraSensorEditorComponent::DisplayEntityViewport(

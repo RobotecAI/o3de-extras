@@ -52,7 +52,7 @@ namespace ROS2
         };
 
     } // namespace Internal
-    CameraSensorDescription::CameraSensorDescription(const AZStd::string& cameraName, float verticalFov, int width, int height, AZ::EntityId entityId)
+    CameraSensorDescription::CameraSensorDescription(const AZStd::string& cameraName, float verticalFov, int width, int height, AZ::EntityId entityId, bool renderPipelineAllowModification)
         : m_verticalFieldOfViewDeg(verticalFov)
         , m_width(width)
         , m_height(height)
@@ -61,6 +61,7 @@ namespace ROS2
         , m_viewToClipMatrix(MakeViewToClipMatrix())
         , m_cameraIntrinsics(MakeCameraIntrinsics())
         , m_entityId(entityId)
+        , m_renderPipelineAllowModification(renderPipelineAllowModification)
     {
         ValidateParameters();
     }
@@ -126,6 +127,8 @@ namespace ROS2
         pipelineDesc.m_rootPassTemplate = GetPipelineTemplateName();
 
         pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
+        pipelineDesc.m_allowModification = m_cameraSensorDescription.m_renderPipelineAllowModification;
+
         m_pipeline = AZ::RPI::RenderPipeline::CreateRenderPipeline(pipelineDesc);
         m_pipeline->RemoveFromRenderTick();
 
