@@ -24,7 +24,7 @@
 
 namespace ROS2
 {
-    constexpr AZStd::string_view EnablePhysicsSteadyClockConfigurationKey = "/O3DE/ROS2/SteadyClock";
+    constexpr AZStd::string_view EnablePhysicsSteadyClock = "/O3DE/ROS2/SteadyClock";
 
     void ROS2SystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -76,21 +76,21 @@ namespace ROS2
         }
 
         bool useSteadyTime = false;
-        auto* registry = AZ::SettingsRegistry::Get();
-        AZ_Assert(registry, "No Registry available");
-        if (registry)
+        if (auto* registry = AZ::SettingsRegistry::Get())
         {
-            registry->Get(useSteadyTime, EnablePhysicsSteadyClockConfigurationKey);
+            registry->Get(useSteadyTime, EnablePhysicsSteadyClock);
             if (useSteadyTime)
             {
                 AZ_Printf("ROS2SystemComponent", "Enabling Physical steady clock");
                 m_simulationClock = AZStd::make_unique<PhysicallyStableClock>();
-                return;
             }
         }
-        AZ_Printf("ROS2SystemComponent", "Enabling realtime clock");
-        m_simulationClock = AZStd::make_unique<SimulationClock>();
-        return;
+        if (m_simulationClock== nullptr)
+        {
+            AZ_Printf("ROS2SystemComponent", "Enabling realtime clock");
+            m_simulationClock = AZStd::make_unique<SimulationClock>();
+        }
+
     }
 
     ROS2SystemComponent::~ROS2SystemComponent()

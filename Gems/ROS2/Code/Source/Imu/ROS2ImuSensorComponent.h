@@ -18,6 +18,7 @@
 
 namespace ROS2
 {
+
     //! An IMU (Inertial Measurement Unit) sensor Component.
     //! IMUs typically include gyroscopes, accelerometers and magnetometers. This component encapsulates data
     //! acquisition and its publishing to ROS2 ecosystem. IMU Component requires ROS2FrameComponent.
@@ -42,24 +43,22 @@ namespace ROS2
         int m_filterSize{ 10 };
 
         //! Include gravity acceleration
-        bool m_includeGravity{ true };
+        bool m_includeGravity {true};
 
         //! Measure also absolute rotation
-        bool m_absoluteRotation{ true };
+        bool m_absoluteRotation {true};
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Imu>> m_imuPublisher;
         sensor_msgs::msg::Imu m_imuMsg;
         AZ::Vector3 m_previousLinearVelocity = AZ::Vector3::CreateZero();
 
+        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_onSceneSimulationEvent;
+        AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;
         AZ::Vector3 m_acceleration{ 0 };
         AZStd::deque<AZ::Vector3> m_filterAcceleration;
         AZStd::deque<AZ::Vector3> m_filterAngularVelocity;
-
-    private:
+    protected:
         // ROS2SensorComponent overrides ...
         void SetupRefreshLoop() override;
-
-        // ROS2::Utils::PhysicsCallbackHandler overrides ...
-        void OnPhysicsSimulationFinished(AzPhysics::SceneHandle sceneHandle, float deltaTime) override;
     };
 } // namespace ROS2

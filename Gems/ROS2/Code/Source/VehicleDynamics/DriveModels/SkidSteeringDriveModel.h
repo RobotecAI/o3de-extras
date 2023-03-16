@@ -16,6 +16,7 @@
 #include <VehicleDynamics/VehicleInputs.h>
 #include <VehicleDynamics/WheelControllerComponent.h>
 #include <VehicleDynamics/WheelDynamicsData.h>
+#include <VehicleDynamics/WheelControllerComponent.h>
 
 namespace ROS2::VehicleDynamics
 {

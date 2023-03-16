@@ -13,11 +13,16 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/PhysicsScene.h>
-#include <AzFramework/Physics/SimulatedBodies/RigidBody.h>
 #include <ROS2/Sensor/ROS2SensorComponent.h>
 #include <Utilities/PhysicsCallbackHandler.h>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/publisher.hpp>
+#include <AzFramework/Physics/SimulatedBodies/RigidBody.h>
+#include <AzFramework/Physics/Common/PhysicsEvents.h>
+#include <AzCore/Math/Transform.h>
+#include <AzCore/Math/Vector3.h>
+#include <AzCore/Math/Quaternion.h>
+
 
 namespace ROS2
 {
@@ -44,14 +49,13 @@ namespace ROS2
     private:
         std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> m_odometryPublisher;
         nav_msgs::msg::Odometry m_odometryMsg;
+        AZ::Vector3 m_robotPose {0};
+        AZ::Quaternion m_robotRotation {0,0,0,1};
+        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_onSceneSimulationEvent;
+        AzPhysics::RigidBody* m_rigidBodyPtr{ nullptr };
         AZ::Transform m_initialTransform;
-
-    private:
+    protected:
         // ROS2SensorComponent overrides ...
         void SetupRefreshLoop() override;
-
-        // ROS2::Utils::PhysicsCallbackHandler overrides ...
-        void OnPhysicsSimulationFinished(AzPhysics::SceneHandle sceneHandle, float deltaTime) override;
-        void OnPhysicsInitialization(AzPhysics::SceneHandle sceneHandle) override;
     };
 } // namespace ROS2
