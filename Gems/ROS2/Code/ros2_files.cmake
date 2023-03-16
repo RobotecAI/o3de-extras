@@ -14,6 +14,7 @@ set(FILES
         Source/Camera/ROS2CameraSensorComponent.cpp
         Source/Camera/ROS2CameraSensorComponent.h
         Source/Clock/SimulationClock.cpp
+        Source/Clock/PhysicallyStableClock.cpp
         Source/Communication/QoS.cpp
         Source/Communication/TopicConfiguration.cpp
         Source/Frame/NamespaceConfiguration.cpp
@@ -40,6 +41,8 @@ set(FILES
         Source/Manipulator/MotorizedJointComponent.cpp
         Source/Odometry/ROS2OdometrySensorComponent.cpp
         Source/Odometry/ROS2OdometrySensorComponent.h
+        Source/Odometry/ROS2WheelOdometry.cpp
+        Source/Odometry/ROS2WheelOdometry.h
         Source/RobotControl/Ackermann/AckermannSubscriptionHandler.cpp
         Source/RobotControl/Ackermann/AckermannSubscriptionHandler.h
         Source/RobotControl/ControlConfiguration.cpp
