@@ -10,11 +10,21 @@
 #include "SensorConfiguration.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/TickBus.h>
+#include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <ROS2/ROS2GemUtilities.h>
 
 namespace ROS2
 {
+    //! FIXME Here will be doc
+    enum class FrequencyTickType
+    {
+        None, //!< FIXME
+        TickBus, //!< FIXME
+        ActiveSimulatedBodiesEvent //!< FIXME
+    };
+
+
     //! Captures common behavior of ROS2 sensor Components.
     //! Sensors acquire data from the simulation engine and publish it to ROS2 ecosystem.
     //! Derive this Component to implement a new ROS2 sensor. Each sensor Component requires ROS2FrameComponent.
@@ -51,12 +61,19 @@ namespace ROS2
         SensorConfiguration m_sensorConfiguration;
 
     private:
+        //! Executes the sensor action (acquire data -> publish) according to frequency.
+        //! Override to implement a specific sensor behavior.
+        virtual void FrequencyTick(float deltaTime){};
+
+        virtual const FrequencyTickType getFrequencyTickType() const { return FrequencyTickType::TickBus; };
+
         //! Visualise sensor operation.
         //! For example, draw points or rays for a lidar, viewport for a camera, etc.
         //! Visualisation can be turned on or off in SensorConfiguration.
         virtual void Visualise(){};
 
         //! The number of ticks that are expected to pass to trigger next measurement.
-        AZ::s32 m_tickCountDown{ 0 };
+        AZ::s32 m_tickCountDown = 0;
+        AzPhysics::SceneEvents::OnSceneActiveSimulatedBodiesEvent::Handler m_simulatedBodiesEventHandler;
     };
 } // namespace ROS2

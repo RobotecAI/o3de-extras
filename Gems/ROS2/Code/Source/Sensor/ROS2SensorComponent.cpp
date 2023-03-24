@@ -20,7 +20,21 @@ namespace ROS2
 {
     void ROS2SensorComponent::Activate()
     {
+        AZ_Printf("ROS2SensorComponent", "Activate");
         AZ::TickBus::Handler::BusConnect();
+        if (getFrequencyTickType() == FrequencyTickType::ActiveSimulatedBodiesEvent)
+        {
+            auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+            AzPhysics::SceneHandle sceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
+
+            m_simulatedBodiesEventHandler = AzPhysics::SceneEvents::OnSceneActiveSimulatedBodiesEvent::Handler(
+                [this](AzPhysics::SceneHandle sceneHandle, const AzPhysics::SimulatedBodyHandleList& activeBodyList, float deltaTime)
+                {
+                    FrequencyTick(deltaTime);
+                });
+
+            sceneInterface->RegisterSceneActiveSimulatedBodiesHandler(sceneHandle, m_simulatedBodiesEventHandler);
+        }
     }
 
     void ROS2SensorComponent::Deactivate()
@@ -68,7 +82,19 @@ namespace ROS2
 
     void ROS2SensorComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
+        AZ_Printf("ROS2SensorComponent", "OnTick1");
         Visualise(); // each frame
+        if (getFrequencyTickType() == FrequencyTickType::TickBus)
+        {
+            AZ_Printf("ROS2SensorComponent", "OnTick2");
+            const AZStd::chrono::duration<float, AZStd::chrono::seconds::period> expectedLoopTime =
+                ROS2Interface::Get()->GetSimulationClock().GetExpectedSimulationLoopTime();
+            if (IsPublicationDeadline(deltaTime, expectedLoopTime.count()))
+            {
+                AZ_Printf("ROS2SensorComponent", "OnTick3");
+                FrequencyTick(deltaTime);
+            }
+        }
     }
 
     bool ROS2SensorComponent::IsPublicationDeadline(float deltaTime, float expectedLoopTime)

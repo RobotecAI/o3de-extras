@@ -58,7 +58,6 @@ set(FILES
         Source/ROS2SystemComponent.cpp
         Source/ROS2SystemComponent.h
         Source/Sensor/ROS2SensorComponent.cpp
-        Source/Sensor/ROS2SensorTickableComponent.cpp
         Source/Sensor/SensorConfiguration.cpp
         Source/Spawner/ROS2SpawnerComponent.cpp
         Source/Spawner/ROS2SpawnerComponent.h

@@ -26,7 +26,7 @@ namespace ROS2
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serialize->Class<ROS2OdometrySensorComponent, ROS2SensorTickableComponent>()->Version(1);
+            serialize->Class<ROS2OdometrySensorComponent, ROS2SensorComponent>()->Version(1);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -48,7 +48,7 @@ namespace ROS2
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, tc));
     }
 
-    void ROS2OdometrySensorComponent::FrequencyTick()
+    void ROS2OdometrySensorComponent::FrequencyTick(float deltaTime)
     {
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         AZ_Assert(ros2Frame, "ROS2Frame must be present for ROS2OdometrySensorComponent");

@@ -30,7 +30,7 @@ namespace ROS2
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serialize->Class<ROS2GNSSSensorComponent, ROS2SensorTickableComponent>()
+            serialize->Class<ROS2GNSSSensorComponent, ROS2SensorComponent>()
                 ->Version(1)
                 ->Field("gnssOriginLatitude", &ROS2GNSSSensorComponent::m_gnssOriginLatitudeDeg)
                 ->Field("gnssOriginLongitude", &ROS2GNSSSensorComponent::m_gnssOriginLongitudeDeg)
@@ -89,7 +89,7 @@ namespace ROS2
         m_gnssPublisher.reset();
     }
 
-    void ROS2GNSSSensorComponent::FrequencyTick()
+    void ROS2GNSSSensorComponent::FrequencyTick(float deltaTime)
     {
         const AZ::Vector3 currentPosition = GetCurrentPose().GetTranslation();
         const AZ::Vector3 currentPositionECEF =

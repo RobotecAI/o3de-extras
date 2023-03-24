@@ -18,7 +18,6 @@ set(FILES
         Include/ROS2/ROS2Bus.h
         Include/ROS2/ROS2GemUtilities.h
         Include/ROS2/Sensor/ROS2SensorComponent.h
-        Include/ROS2/Sensor/ROS2SensorTickableComponent.h
         Include/ROS2/Sensor/SensorConfiguration.h
         Include/ROS2/Spawner/SpawnerBus.h
         Include/ROS2/Utilities/Controllers/PidConfiguration.h

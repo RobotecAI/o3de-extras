@@ -37,14 +37,21 @@ namespace ROS2
         //////////////////////////////////////////////////////////////////////////
 
     private:
-        int m_filterSize{ 10 };
+        //////////////////////////////////////////////////////////////////////////
+        // ROS2SensorComponent overrides
+        void FrequencyTick(float deltaTime) override;
+        const FrequencyTickType getFrequencyTickType() const override { return FrequencyTickType::ActiveSimulatedBodiesEvent; };
+        //////////////////////////////////////////////////////////////////////////
+
+        AZ::Vector3 m_previousLinearVelocity = AZ::Vector3::CreateZero();
+        AZ::Vector3 m_acceleration = AZ::Vector3::CreateZero();
+        int m_filterSize = 10;
+        AZStd::deque<AZ::Vector3> m_filter;
+
+        AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;
+        double m_time = 0;
+
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Imu>> m_imuPublisher;
         sensor_msgs::msg::Imu m_imuMsg;
-        AZ::Vector3 m_previousLinearVelocity = AZ::Vector3::CreateZero();
-        AzPhysics::SceneEvents::OnSceneActiveSimulatedBodiesEvent::Handler m_simulatedBodiesEventHandler;
-        AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;
-        AZ::Vector3 m_acceleration{ 0 };
-        AZStd::deque<AZ::Vector3> m_filter;
-        double m_time = 0;
     };
 } // namespace ROS2

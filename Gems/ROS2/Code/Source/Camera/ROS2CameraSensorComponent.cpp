@@ -42,7 +42,7 @@ namespace ROS2
         auto* serialize = azrtti_cast<AZ::SerializeContext*>(context);
         if (serialize)
         {
-            serialize->Class<ROS2CameraSensorComponent, ROS2SensorTickableComponent>()
+            serialize->Class<ROS2CameraSensorComponent, ROS2SensorComponent>()
                 ->Version(3)
                 ->Field("VerticalFieldOfViewDeg", &ROS2CameraSensorComponent::m_verticalFieldOfViewDeg)
                 ->Field("Width", &ROS2CameraSensorComponent::m_width)
@@ -95,7 +95,7 @@ namespace ROS2
         ROS2SensorComponent::Deactivate();
     }
 
-    void ROS2CameraSensorComponent::FrequencyTick()
+    void ROS2CameraSensorComponent::FrequencyTick(float deltaTime)
     {
         const AZ::Transform transform = GetEntity()->GetTransform()->GetWorldTM();
         const auto timestamp = ROS2Interface::Get()->GetROSTimestamp();
