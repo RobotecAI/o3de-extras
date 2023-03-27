@@ -16,12 +16,12 @@
 
 namespace ROS2
 {
-    //! FIXME Here will be doc
+    //! The activation mechanism type for FrequencyTick method.
     enum class FrequencyTickType
     {
-        None, //!< FIXME
-        TickBus, //!< FIXME
-        ActiveSimulatedBodiesEvent //!< FIXME
+        None, //!< no acctivation.
+        TickBus, //!< by AZ::TickBus ; it is standard solution. Up to ~60Hz.
+        ActiveSimulatedBodiesEvent //!< by AzPhysics::SceneEvents::OnSceneActiveSimulatedBodiesEvent ; a framerate is limited by Physics time step.
     };
 
 
@@ -63,8 +63,11 @@ namespace ROS2
     private:
         //! Executes the sensor action (acquire data -> publish) according to frequency.
         //! Override to implement a specific sensor behavior.
+        //! @param deltaTime time elapsed from the last call in seconds.
         virtual void FrequencyTick(float deltaTime){};
 
+        //! Defines the activation type for object
+        //! Override to implement a specific sensor behavior.
         virtual const FrequencyTickType getFrequencyTickType() const { return FrequencyTickType::TickBus; };
 
         //! Visualise sensor operation.
