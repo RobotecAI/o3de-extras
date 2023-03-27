@@ -20,7 +20,6 @@ namespace ROS2
 {
     void ROS2SensorComponent::Activate()
     {
-        AZ_Printf("ROS2SensorComponent", "Activate");
         AZ::TickBus::Handler::BusConnect();
         if (getFrequencyTickType() == FrequencyTickType::ActiveSimulatedBodiesEvent)
         {
@@ -82,16 +81,13 @@ namespace ROS2
 
     void ROS2SensorComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
-        AZ_Printf("ROS2SensorComponent", "OnTick1");
         Visualise(); // each frame
         if (getFrequencyTickType() == FrequencyTickType::TickBus)
         {
-            AZ_Printf("ROS2SensorComponent", "OnTick2");
             const AZStd::chrono::duration<float, AZStd::chrono::seconds::period> expectedLoopTime =
                 ROS2Interface::Get()->GetSimulationClock().GetExpectedSimulationLoopTime();
             if (IsPublicationDeadline(deltaTime, expectedLoopTime.count()))
             {
-                AZ_Printf("ROS2SensorComponent", "OnTick3");
                 FrequencyTick(deltaTime);
             }
         }

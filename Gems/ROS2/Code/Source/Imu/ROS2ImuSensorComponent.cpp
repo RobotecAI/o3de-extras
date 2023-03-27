@@ -49,7 +49,6 @@ namespace ROS2
 
     ROS2ImuSensorComponent::ROS2ImuSensorComponent()
     {
-        AZ_Printf("ROS2ImuSensorComponent", "Konstruktor");
         const AZStd::string msgType = Internal::kImuMsgType;
         TopicConfiguration pc(msgType, "imu");
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(msgType, pc));
@@ -63,7 +62,6 @@ namespace ROS2
 
     void ROS2ImuSensorComponent::Activate()
     {
-        AZ_Printf("ROS2ImuSensorComponent", "Activate");
         auto ts = ROS2Interface::Get()->GetROSTimestamp();
         m_time = ts.sec + ts.nanosec / 1e9;
         auto ros2Node = ROS2Interface::Get()->GetNode();
@@ -79,10 +77,8 @@ namespace ROS2
 
     void ROS2ImuSensorComponent::FrequencyTick(float deltaTime)
     {
-        AZ_Printf("ROS2ImuSensorComponent", "FrequencyTick");
         if (m_bodyHandle == AzPhysics::InvalidSimulatedBodyHandle)
         {
-            AZ_Printf("ROS2ImuSensorComponent", "getting rigidbody");
             AzPhysics::RigidBody* rigidBody = nullptr;
             Physics::RigidBodyRequestBus::EventResult(rigidBody, m_entity->GetId(), &Physics::RigidBodyRequests::GetRigidBody);
             m_bodyHandle = rigidBody->m_bodyHandle;
