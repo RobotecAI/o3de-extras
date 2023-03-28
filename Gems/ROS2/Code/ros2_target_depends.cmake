@@ -20,3 +20,7 @@ function(target_depends_on_ros2_packages TARGET_NAME)
         target_depends_on_ros2_package(${TARGET_NAME} ${_package} REQUIRED)
     endforeach ()
 endfunction()
+
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+link_libraries(  ${OpenCV_LIBS} )

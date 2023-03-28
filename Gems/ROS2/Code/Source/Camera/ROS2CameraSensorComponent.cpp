@@ -16,7 +16,7 @@
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-
+#include <Camera/CameraSensorPostprocessor.h>
 #include <sensor_msgs/distortion_models.hpp>
 
 namespace ROS2

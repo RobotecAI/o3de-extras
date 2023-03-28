@@ -20,6 +20,7 @@
 #include <AzCore/std/smart_ptr/shared_ptr.h>
 #include <AzToolsFramework/Prefab/PrefabPublicInterface.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <AzCore/std/containers/map.h>
 
 namespace ROS2
 {
