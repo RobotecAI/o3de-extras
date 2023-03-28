@@ -15,6 +15,8 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <std_msgs/msg/header.hpp>
 
+#include "CameraSensorPostprocessor.h"
+
 namespace ROS2
 {
 
