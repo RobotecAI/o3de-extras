@@ -285,8 +285,10 @@ namespace ROS2
     {
         AZ_Assert(publishers.size()==2, "RequestMessagePublication for CameraRGBDSensor should be called with exactly two publishers");
         const auto publisherDepth = publishers.back();
+
+        AZStd::shared_ptr<DepthLimitCameraSensorPostprocessor> postProcessor = AZStd::make_shared<DepthLimitCameraSensorPostprocessor>();
         ReadBackDepth(
-            [header, publisherDepth](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
+            [header, publisherDepth, postProcessor](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
                 if (result.m_state == AZ::RPI::AttachmentReadback::ReadbackState::Success)
                 {
@@ -298,7 +300,12 @@ namespace ROS2
                     message.width = descriptor.m_size.m_width;
                     message.height = descriptor.m_size.m_height;
                     message.step = message.width * Internal::BitDepth.at(format);
-                    message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
+                    if (postProcessor)
+                    {
+                        message.data = postProcessor->postProcess(result);
+                    }else{
+                        message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
+                    }
                     message.header = header;
                     publisherDepth->publish(message);
                 }
