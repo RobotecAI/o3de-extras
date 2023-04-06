@@ -195,6 +195,33 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
             ly_add_googletest(
                 NAME Gem::${gem_name}.Editor.Tests
             )
+
+            # integration test for URDF importer
+            ly_add_target(
+                NAME ROS2.URDF.importer.Tests ${PAL_TRAIT_TEST_TARGET_TYPE}
+                    NAMESPACE Gem
+                FILES_CMAKE
+                    urdf_importer_physics_tests_supported_files.cmake
+                INCLUDE_DIRECTORIES
+                    PRIVATE
+                        Source
+                        Tests
+                BUILD_DEPENDENCIES
+                    PRIVATE
+                        AZ::AzTestShared
+                        AZ::AzToolsFramework
+                        Legacy::CryCommon
+                        Legacy::EditorCommon
+                        Legacy::Editor.Headers
+                        AZ::AzManipulatorTestFramework.Static
+                        Gem::ROS2.Editor.Static
+                    RUNTIME_DEPENDENCIES
+                        Gem::PhysX.Editor
+            )
+
+            ly_add_googletest(
+                    NAME Gem::ROS2.URDF.importer.Tests
+            )
         endif()
     endif()
 endif()
