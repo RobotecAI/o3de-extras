@@ -6,7 +6,7 @@ The example ROS2 navigation stack launchfile is bundled with the template.
 
 ## Requirements
 
-Due to ROS2 dependency, this project was prepared and tested on Linux operating system. It is recomended to use Ubuntu [20.04](https://releases.ubuntu.com/focal) or [22.10](https://releases.ubuntu.com/kinetic), however any distribution meeting following requirements may be used.
+Due to ROS2 dependency, this project was prepared and tested on Linux operating system. It is recommended to use Ubuntu [20.04](https://releases.ubuntu.com/focal) or [22.10](https://releases.ubuntu.com/kinetic), however any distribution meeting following requirements may be used.
 
 Refer to the [O3DE System Requirements](https://www.o3de.org/docs/welcome-guide/requirements/) documentation to make sure that the system/hardware requirements are met. 
 This project has the following dependencies:
@@ -46,36 +46,35 @@ sudo apt install ros-${ROS_DISTRO}-ackermann-msgs ros-${ROS_DISTRO}-gazebo-msgs 
 
 ### 2. Download the template and asset gems
 
-For convenienience, we'll define a shell variables with o3de folders:
+It is assumed that the o3de repository is located in `/home/${USER}/o3de_ws/o3de`. 
+
+For convenience, we'll define a shell variables with o3de folders:
 
 ```shell
-export O3DE_HOME=/home/${USER}/O3DE
-export O3DE_ENGINE=${O3DE_HOME}/Engines/Development
+export O3DE_HOME=/home/${USER}/o3de_ws/o3de
 ```
 
 Clone the `o3de-extras` repository containing the template and asset gems
 
 ```shell
-mkdir -p ${O3DE_HOME}/Projects
-cd ${O3DE_HOME}/Projects
+cd ${O3DE_HOME}
 git clone git@github.com:o3de/o3de-extras.git
 ```
 
-Copy gems to the O3DE home.
+The `o3de-extras` repository should be located in the same folder as the `o3de` repository. The `ls` command should show the following:
 
 ```shell
-mkdir -p ${O3DE_HOME}/Gems
-cp -r o3de-extras/Gems/ROS2 ${O3DE_HOME}/Gems
-cp -r o3de-extras/Gems/WarehouseSample ${O3DE_HOME}/Gems
-cp -r o3de-extras/Gems/RosRobotSample ${O3DE_HOME}/Gems
+~/o3de_ws$ ls
+o3de o3de-extras
 ```
 
 Register these gems.
 
 ```shell
-${O3DE_HOME}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/ROS2
-${O3DE_HOME}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/WarehouseSample
-${O3DE_HOME}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/RosRobotSample
+${O3DE_HOME}/o3de/scripts/o3de.sh register --gem-path ${O3DE_HOME}/o3de-extras/Gems/ROS2
+${O3DE_HOME}/o3de/scripts/o3de.sh register --gem-path ${O3DE_HOME}/o3de-extras/Gems/WarehouseSample
+${O3DE_HOME}/o3de/scripts/o3de.sh register --gem-path ${O3DE_HOME}/o3de-extras/Gems/RosRobotSample
+${O3DE_HOME}/o3de/scripts/o3de.sh register --gem-path ${O3DE_HOME}/o3de-extras/Gems/WarehouseAssets
 ```
 
 ### 3. Create a ROS2 project from the template
@@ -83,17 +82,19 @@ ${O3DE_HOME}/scripts/o3de.sh register --gem-path ${O3DE_HOME}/Gems/RosRobotSampl
 Assign a name for the new project. In this example, it is assumed that it will be: `WarehouseTest`, and it will be located in `$DEMO_BASE/WarehouseTest` folder. 
 
 ```shell
+mkdir -p ${O3DE_HOME}/o3de/Projects
 export PROJECT_NAME=WarehouseTest
-export PROJECT_PATH=${O3DE_HOME}/Projects/${PROJECT_NAME}
+export PROJECT_PATH=${O3DE_HOME}/o3de/Projects/${PROJECT_NAME}
 ${O3DE_HOME}/scripts/o3de.sh create-project --project-path $PROJECT_PATH --template-path ${O3DE_HOME}/Projects/o3de-extras/Templates/Ros2ProjectTemplate/ -f 
 ```
 
 Enable gems.
 
 ```shell
-${O3DE_HOME}/scripts/o3de.sh enable-gem --gem-name ROS2 --project-path $PROJECT_PATH
-${O3DE_HOME}/scripts/o3de.sh enable-gem --gem-name WarehouseSample --project-path $PROJECT_PATH
-${O3DE_HOME}/scripts/o3de.sh enable-gem --gem-name RosRobotSample --project-path $PROJECT_PATH
+${O3DE_HOME}/o3de/scripts/o3de.sh enable-gem --gem-name ROS2 --project-path $PROJECT_PATH
+${O3DE_HOME}/o3de/scripts/o3de.sh enable-gem --gem-name WarehouseSample --project-path $PROJECT_PATH
+${O3DE_HOME}/o3de/scripts/o3de.sh enable-gem --gem-name RosRobotSample --project-path $PROJECT_PATH
+${O3DE_HOME}/o3de/scripts/o3de.sh enable-gem --gem-name WarehouseAssets --project-path $PROJECT_PATH
 ```
 
 ### 4. Build the project
@@ -118,3 +119,41 @@ $PROJECT_PATH/build/linux/bin/profile/Editor
 ## Running ROS example
 
 Refer to `$PROJECT_PATH/Examples/slam_navigation/README.md` for instructions.
+
+## Troubleshooting
+
+In case of an errors building the project, check the file `${O3DE_HOME}/o3de/engine.json` this should be unchanged (`git diff engine.json` should not show any changes). If it was changed, revert it to the original state. 
+
+Secondly, check the file `/home/${USER}/.o3de/o3de_manifest.json`. The minimal content of this file should be (replace `user` with your username):
+
+```json
+{
+    "o3de_manifest_name": "user",
+    "origin": "/home/user/.o3de",
+    "default_engines_folder": "/home/user/O3DE/Engines",
+    "default_projects_folder": "/home/user/O3DE/Projects",
+    "default_gems_folder": "/home/user/O3DE/Gems",
+    "default_templates_folder": "/home/user/O3DE/Templates",
+    "default_restricted_folder": "/home/user/O3DE/Restricted",
+    "default_third_party_folder": "/home/user/.o3de/3rdParty",
+    "projects": [
+        "/home/user/o3de_ws/o3de/Projects/WarehouseTest"
+    ],
+    "external_subdirectories": [
+        "/home/user/o3de_ws/o3de-extras/Gems/RosRobotSample",
+        "/home/user/o3de_ws/o3de-extras/Gems/WarehouseAssets",
+        "/home/user/o3de_ws/o3de-extras/Gems/WarehouseSample",
+        "/home/user/o3de_ws/o3de-extras/Gems/ROS2"
+    ],
+    "templates": [],
+    "restricted": [],
+    "repos": [],
+    "engines": [
+        "/home/user/o3de_ws/o3de"
+    ],
+    "engines_path": {
+        "o3de": "/home/user/o3de_ws/o3de"
+    }
+}
+
+```
