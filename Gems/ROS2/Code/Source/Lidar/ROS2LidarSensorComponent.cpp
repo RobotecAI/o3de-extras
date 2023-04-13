@@ -264,7 +264,7 @@ namespace ROS2
         m_pointCloudPublisher.reset();
     }
 
-    void ROS2LidarSensorComponent::FrequencyTick(float deltaTime)
+    void ROS2LidarSensorComponent::FrequencyTick()
     {
         auto entityTransform = GetEntity()->FindComponent<AzFramework::TransformComponent>();
 

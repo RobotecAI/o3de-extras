@@ -23,5 +23,6 @@ set(FILES
         Include/ROS2/Utilities/Controllers/PidConfiguration.h
         Include/ROS2/Utilities/ROS2Conversions.h
         Include/ROS2/Utilities/ROS2Names.h
+        Include/ROS2/Utilities/ROS2Tickers.h
         Include/ROS2/VehicleDynamics/VehicleInputControlBus.h
         )

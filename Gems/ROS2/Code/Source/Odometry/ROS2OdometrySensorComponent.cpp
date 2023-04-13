@@ -48,7 +48,7 @@ namespace ROS2
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, tc));
     }
 
-    void ROS2OdometrySensorComponent::FrequencyTick(float deltaTime)
+    void ROS2OdometrySensorComponent::FrequencyTick()
     {
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         AZ_Assert(ros2Frame, "ROS2Frame must be present for ROS2OdometrySensorComponent");

@@ -40,7 +40,7 @@ namespace ROS2
     private:
         //////////////////////////////////////////////////////////////////////////
         // ROS2SensorComponent overrides
-        void FrequencyTick(float deltaTime) override;
+        void FrequencyTick() override;
         void Visualise() override;
 
         bool IsConfigurationVisible() const;

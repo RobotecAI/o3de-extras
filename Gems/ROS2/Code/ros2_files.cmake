@@ -66,6 +66,7 @@ set(FILES
         Source/Utilities/Controllers/PidConfiguration.cpp
         Source/Utilities/ROS2Conversions.cpp
         Source/Utilities/ROS2Names.cpp
+        Source/Utilities/ROS2Tickers.cpp
         Source/VehicleDynamics/AxleConfiguration.cpp
         Source/VehicleDynamics/AxleConfiguration.h
         Source/VehicleDynamics/DriveModel.cpp

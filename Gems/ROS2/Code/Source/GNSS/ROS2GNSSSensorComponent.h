@@ -39,7 +39,7 @@ namespace ROS2
 
         //////////////////////////////////////////////////////////////////////////
         // ROS2SensorComponent overrides
-        void FrequencyTick(float deltaTime) override;
+        void FrequencyTick() override;
         //////////////////////////////////////////////////////////////////////////
 
         AZ::Transform GetCurrentPose() const;

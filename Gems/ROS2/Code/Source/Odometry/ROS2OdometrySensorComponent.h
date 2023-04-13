@@ -36,7 +36,7 @@ namespace ROS2
     private:
         //////////////////////////////////////////////////////////////////////////
         // ROS2SensorComponent overrides
-        void FrequencyTick(float deltaTime) override;
+        void FrequencyTick() override;
         //////////////////////////////////////////////////////////////////////////
 
         std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> m_odometryPublisher;

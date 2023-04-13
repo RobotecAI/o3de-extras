@@ -95,7 +95,7 @@ namespace ROS2
         ROS2SensorComponent::Deactivate();
     }
 
-    void ROS2CameraSensorComponent::FrequencyTick(float deltaTime)
+    void ROS2CameraSensorComponent::FrequencyTick()
     {
         const AZ::Transform transform = GetEntity()->GetTransform()->GetWorldTM();
         const auto timestamp = ROS2Interface::Get()->GetROSTimestamp();

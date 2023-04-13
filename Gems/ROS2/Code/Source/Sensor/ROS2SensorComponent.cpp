@@ -21,19 +21,6 @@ namespace ROS2
     void ROS2SensorComponent::Activate()
     {
         AZ::TickBus::Handler::BusConnect();
-        if (getFrequencyTickType() == FrequencyTickType::ActiveSimulatedBodiesEvent)
-        {
-            auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
-            AzPhysics::SceneHandle sceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
-
-            m_simulatedBodiesEventHandler = AzPhysics::SceneEvents::OnSceneActiveSimulatedBodiesEvent::Handler(
-                [this](AzPhysics::SceneHandle sceneHandle, const AzPhysics::SimulatedBodyHandleList& activeBodyList, float deltaTime)
-                {
-                    FrequencyTick(deltaTime);
-                });
-
-            sceneInterface->RegisterSceneActiveSimulatedBodiesHandler(sceneHandle, m_simulatedBodiesEventHandler);
-        }
     }
 
     void ROS2SensorComponent::Deactivate()
@@ -79,21 +66,20 @@ namespace ROS2
         required.push_back(AZ_CRC_CE("ROS2Frame"));
     }
 
-    void ROS2SensorComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void ROS2SensorComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         Visualise(); // each frame
-        if (getFrequencyTickType() == FrequencyTickType::TickBus)
+
+        const AZStd::chrono::duration<float, AZStd::chrono::seconds::period> expectedLoopTime =
+            ROS2Interface::Get()->GetSimulationClock().GetExpectedSimulationLoopTime();
+
+        if (IsPublicationDeadline(expectedLoopTime.count()))
         {
-            const AZStd::chrono::duration<float, AZStd::chrono::seconds::period> expectedLoopTime =
-                ROS2Interface::Get()->GetSimulationClock().GetExpectedSimulationLoopTime();
-            if (IsPublicationDeadline(deltaTime, expectedLoopTime.count()))
-            {
-                FrequencyTick(deltaTime);
-            }
+            FrequencyTick();
         }
     }
 
-    bool ROS2SensorComponent::IsPublicationDeadline(float deltaTime, float expectedLoopTime)
+    bool ROS2SensorComponent::IsPublicationDeadline(float expectedLoopTime)
     {
         if (!m_sensorConfiguration.m_publishingEnabled)
         {
@@ -103,7 +89,7 @@ namespace ROS2
         if (m_tickCountDown <= 0)
         {
             const auto frequency = m_sensorConfiguration.m_frequency;
-            const auto frameTime = frequency == 0.f ? 1.f : 1.f / frequency;
+            const auto frameTime = (frequency == 0.f) ? 1.f : (1.f / frequency);
             const float numberOfFrames = frameTime / expectedLoopTime;
             m_tickCountDown = AZStd::round(numberOfFrames);
             return true;

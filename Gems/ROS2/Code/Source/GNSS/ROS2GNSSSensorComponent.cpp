@@ -89,7 +89,7 @@ namespace ROS2
         m_gnssPublisher.reset();
     }
 
-    void ROS2GNSSSensorComponent::FrequencyTick(float deltaTime)
+    void ROS2GNSSSensorComponent::FrequencyTick()
     {
         const AZ::Vector3 currentPosition = GetCurrentPose().GetTranslation();
         const AZ::Vector3 currentPositionECEF =

@@ -12,6 +12,7 @@
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 #include <ROS2/Sensor/ROS2SensorComponent.h>
+#include <ROS2/Utilities/ROS2Tickers.h>
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 
@@ -21,7 +22,7 @@ namespace ROS2
     //! An IMU (Inertial Measurement Unit) sensor Component.
     //! IMUs typically include gyroscopes, accelerometers and magnetometers. This component encapsulates data
     //! acquisition and its publishing to ROS2 ecosystem. IMU Component requires ROS2FrameComponent.
-    class ROS2ImuSensorComponent : public ROS2SensorComponent
+    class ROS2ImuSensorComponent : public ROS2SensorComponent, public Tickers::SimulatedBodyEventTicker
     {
     public:
         AZ_COMPONENT(ROS2ImuSensorComponent, "{502A955E-7742-4E23-AD77-5E4063739DCA}", ROS2SensorComponent);
@@ -38,9 +39,8 @@ namespace ROS2
 
     private:
         //////////////////////////////////////////////////////////////////////////
-        // ROS2SensorComponent overrides
-        void FrequencyTick(float deltaTime) override;
-        const FrequencyTickType getFrequencyTickType() const override { return FrequencyTickType::ActiveSimulatedBodiesEvent; };
+        // SimulatedBodyEventTicker overrides
+        void OnEventTick(float deltaTime) override;
         //////////////////////////////////////////////////////////////////////////
 
         AZ::Vector3 m_previousLinearVelocity = AZ::Vector3::CreateZero();

@@ -75,7 +75,7 @@ namespace ROS2
         ROS2SensorComponent::Activate();
     }
 
-    void ROS2ImuSensorComponent::FrequencyTick(float deltaTime)
+    void ROS2ImuSensorComponent::OnEventTick(float deltaTime)
     {
         if (m_bodyHandle == AzPhysics::InvalidSimulatedBodyHandle)
         {
@@ -102,7 +102,7 @@ namespace ROS2
 
         const AZ::Vector3 linearVelocityFilter = AZStd::accumulate(m_filter.begin(), m_filter.end(), AZ::Vector3::CreateZero()) / m_filter.size();
 
-        if (IsPublicationDeadline(deltaTime, deltaTime))
+        if (IsPublicationDeadline(deltaTime))
         {
             auto acc = (linearVelocityFilter - m_previousLinearVelocity) / deltaTime;
             auto angularVelocity = inv.TransformVector(rigidBody->GetAngularVelocity());
