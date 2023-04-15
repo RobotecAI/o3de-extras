@@ -296,14 +296,14 @@ namespace ROS2
                     const auto format = descriptor.m_format;
                     AZ_Assert(Internal::FormatMappings.contains(format), "Unknown format in result %u", static_cast<uint32_t>(format));
                     sensor_msgs::msg::Image message;
-                    message.encoding = Internal::FormatMappings.at(format);
-                    message.width = descriptor.m_size.m_width;
-                    message.height = descriptor.m_size.m_height;
-                    message.step = message.width * Internal::BitDepth.at(format);
                     if (postProcessor)
                     {
-                        message.data = postProcessor->postProcess(result);
+                        message = postProcessor->postProcess(result);
                     }else{
+                        message.encoding = Internal::FormatMappings.at(format);
+                        message.width = descriptor.m_size.m_width;
+                        message.height = descriptor.m_size.m_height;
+                        message.step = message.width * Internal::BitDepth.at(format);
                         message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
                     }
                     message.header = header;

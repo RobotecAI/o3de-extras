@@ -35,19 +35,21 @@ namespace ROS2
         return outMat;
     }
 
-    std::vector<uint8_t> CVHelpers::cvMatToVector(cv::Mat image)
+    std::vector<uint8_t> CVHelpers::cvMatToVector(const cv::Mat& image)
     {
-        return std::vector<uint8_t>(image.data, image.data + image.total() * image.elemSize());
+        return std::vector<uint8_t>(image.data, image.data + image.rows * image.step);
     }
 
-    std::vector<uint8_t> DepthLimitCameraSensorPostprocessor::postProcess(const AZ::RPI::AttachmentReadback::ReadbackResult& result)
+    sensor_msgs::msg::Image DepthLimitCameraSensorPostprocessor::postProcess(const AZ::RPI::AttachmentReadback::ReadbackResult& result)
     {
         static std::random_device rd{};
         std::mt19937 gen{rd()};
 
         // values near the mean are the most likely
         // standard deviation affects the dispersion of generated values from the mean
-        std::normal_distribution<float> d{0, 0.1};
+        std::uniform_int_distribution<uint16_t> d0{0, 300};
+        std::uniform_int_distribution<uint16_t> d1{150,250};
+
 
         const float maxDepth= 5.f;
         const float minDepth= 0.3f;
@@ -59,13 +61,23 @@ namespace ROS2
         AZ_Assert(result.m_imageDescriptor.m_format == AZ::RHI::Format::R32_FLOAT, "DepthLimitCameraSensorPostprocessor works only with  R32_FLOAT");
         AZ_TracePrintf("CameraSensorPostprocessor", "postProcess");
         cv::Mat image = CVHelpers::cvMatFromReadbackResult(result);
+        cv::Mat image_uc16(image.rows,image.cols,CV_16UC1);
         for( int j = 0; j < image.cols; ++j) {
             for( int i = 0; i < image.rows; ++i) {
-                float &depth = image.at<float>(i,j) ;
-                depth = clamp(clamp(depth)*(1.f+d(gen)));
+                const float depth = image.at<float>(i,j);
+                const float newdepth = clamp(depth);
+                image_uc16.at<unsigned short>(i,j) = 1000*newdepth + d0(gen) + d1(gen);
             }
         }
-        return CVHelpers::cvMatToVector(image);
+        sensor_msgs::msg::Image msg;
+        msg.data = CVHelpers::cvMatToVector(image_uc16);
+        msg.encoding = "16UC1";
+        msg.height = image_uc16.rows;
+        msg.width = image_uc16.cols;
+        msg.step = image_uc16.step;
+        AZ_Printf("PostProcess", "Image size check height : %d, width %d, step %d, size: %d", msg.height,msg.width, msg.step, msg.data.size());
+        AZ_Assert(msg.height*msg.step == msg.data.size(),"Image size check height : %d, width %d, step %d, size: %d", msg.height,msg.width, msg.step, msg.data.size());
+        return msg;
     }
 
 } // namespace ROS2

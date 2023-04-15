@@ -20,13 +20,13 @@ namespace ROS2
     namespace CVHelpers
     {
         cv::Mat cvMatFromReadbackResult(const AZ::RPI::AttachmentReadback::ReadbackResult& result);
-        std::vector<uint8_t> cvMatToVector(cv::Mat image);
+        std::vector<uint8_t> cvMatToVector(const cv::Mat& image);
     } // namespace CVHelpers
 
 
     class DepthLimitCameraSensorPostprocessor
     {
     public:
-        std::vector<uint8_t> postProcess(const AZ::RPI::AttachmentReadback::ReadbackResult& result);
+        sensor_msgs::msg::Image postProcess(const AZ::RPI::AttachmentReadback::ReadbackResult& result);
     };
 } // namespace ROS2
