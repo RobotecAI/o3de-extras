@@ -49,6 +49,9 @@ namespace ROS2
         ~ROS2CameraSensorComponent() override = default;
         AZ_COMPONENT(ROS2CameraSensorComponent, "{3C6B8AE6-9721-4639-B8F9-D8D28FD7A071}", ROS2SensorComponent);
         static void Reflect(AZ::ReflectContext* context);
+        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
+        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
+        static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
 
         void Activate() override;
         void Deactivate() override;
