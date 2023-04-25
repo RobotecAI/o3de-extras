@@ -68,11 +68,6 @@ namespace ROS2
 
     void CameraSensorDescription::ValidateParameters() const
     {
-        AZ_Assert(
-            m_cameraConfiguration.m_verticalFieldOfViewDeg > 0.0f && m_cameraConfiguration.m_verticalFieldOfViewDeg < 180.0f,
-            "Vertical fov should be in range 0.0 < FoV < 180.0 degrees");
-        // AZ_Assert(m_cameraConfiguration.m_horizontalFieldOfViewDeg > 0.0f && m_cameraConfiguration.m_horizontalFieldOfViewDeg < 360.0f,
-        //     "Horizontal fov should be in range 0.0 < FoV < 360.0 degrees");
         AZ_Assert(!m_cameraName.empty(), "Camera name cannot be empty");
     }
 

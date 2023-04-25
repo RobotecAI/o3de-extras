@@ -33,11 +33,15 @@ namespace ROS2
                         &CameraSensorConfiguration::m_verticalFieldOfViewDeg,
                         "Vertical field of view",
                         "Camera's vertical (y axis) field of view in degrees.")
+                    ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                    ->Attribute(AZ::Edit::Attributes::Max, 360.0f)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &CameraSensorConfiguration::m_horizontalFieldOfViewDeg,
                         "Horizontal field of view",
                         "Camera's horizontal (x axis) field of view in degrees.")
+                    ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                    ->Attribute(AZ::Edit::Attributes::Max, 180.0f)
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_width, "Image width", "Image width")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_height, "Image height", "Image height")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_colorCamera, "Color Camera", "Color Camera")
