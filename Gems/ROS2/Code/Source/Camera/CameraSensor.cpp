@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#include "CameraSensor.h"
+#include "ROS2/Camera/CameraSensor.h"
 #include <ROS2/Camera/CameraPostProcessingRequestBus.h>
 
 #include <Atom/RPI.Public/Base.h>
@@ -71,6 +71,8 @@ namespace ROS2
         AZ_Assert(
             m_cameraConfiguration.m_verticalFieldOfViewDeg > 0.0f && m_cameraConfiguration.m_verticalFieldOfViewDeg < 180.0f,
             "Vertical fov should be in range 0.0 < FoV < 180.0 degrees");
+        // AZ_Assert(m_cameraConfiguration.m_horizontalFieldOfViewDeg > 0.0f && m_cameraConfiguration.m_horizontalFieldOfViewDeg < 360.0f,
+        //     "Horizontal fov should be in range 0.0 < FoV < 360.0 degrees");
         AZ_Assert(!m_cameraName.empty(), "Camera name cannot be empty");
     }
 

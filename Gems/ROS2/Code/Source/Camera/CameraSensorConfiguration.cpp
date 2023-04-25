@@ -19,6 +19,7 @@ namespace ROS2
             serializeContext->Class<CameraSensorConfiguration>()
                 ->Version(1)
                 ->Field("VerticalFieldOfViewDeg", &CameraSensorConfiguration::m_verticalFieldOfViewDeg)
+                ->Field("HorizontalFieldOfViewDeg", &CameraSensorConfiguration::m_horizontalFieldOfViewDeg)
                 ->Field("Width", &CameraSensorConfiguration::m_width)
                 ->Field("Height", &CameraSensorConfiguration::m_height)
                 ->Field("Depth", &CameraSensorConfiguration::m_depthCamera)
@@ -32,6 +33,10 @@ namespace ROS2
                         &CameraSensorConfiguration::m_verticalFieldOfViewDeg,
                         "Vertical field of view",
                         "Camera's vertical (y axis) field of view in degrees.")
+                    ->DataElement(AZ::Edit::UIHandlers::Default,
+                        &CameraSensorConfiguration::m_horizontalFieldOfViewDeg, 
+                        "Horizontal field of view",
+                        "Camera's horizontal (x axis) field of view in degrees.")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_width, "Image width", "Image width")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_height, "Image height", "Image height")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &CameraSensorConfiguration::m_colorCamera, "Color Camera", "Color Camera")

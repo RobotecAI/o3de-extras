@@ -13,7 +13,7 @@
 
 #include <AzCore/Component/Component.h>
 
-#include "CameraSensor.h"
+#include "ROS2/Camera/CameraSensor.h"
 #include "CameraSensorConfiguration.h"
 #include <ROS2/Frame/NamespaceConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>
@@ -95,7 +95,8 @@ namespace ROS2
         template<typename CameraType>
         void AddImageSource()
         {
-            CameraConfiguration cameraConfiguration = { m_cameraConfiguration.m_verticalFieldOfViewDeg,
+            CameraConfiguration cameraConfiguration = { m_cameraConfiguration.m_horizontalFieldOfViewDeg,
+                                                        m_cameraConfiguration.m_verticalFieldOfViewDeg,
                                                         m_cameraConfiguration.m_width,
                                                         m_cameraConfiguration.m_height };
             const CameraSensorDescription description{ GetCameraNameFromFrame(GetEntity()), cameraConfiguration };

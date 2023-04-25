@@ -19,7 +19,8 @@ namespace ROS2
 {
     struct CameraConfiguration
     {
-        float m_verticalFieldOfViewDeg = 90.0f; //!< Vertical field of view of camera sensor.
+        float m_horizontalFieldOfViewDeg = 86.0f; //!< Horizontal field of view of camera sensor.
+        float m_verticalFieldOfViewDeg = 57.0f; //!< Vertical field of view of camera sensor.
         int m_width = 640; //!< Camera image width in pixels.
         int m_height = 480; //!< Camera image height in pixels.
     };
@@ -119,6 +120,7 @@ namespace ROS2
     class CameraDepthSensor : public CameraSensor
     {
     public:
+        AZ_TYPE_INFO(CameraDepthSensor, "{ADD4F0E4-F0ED-4770-9FF3-12AA4050953B}");
         CameraDepthSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
 
     private:
@@ -141,6 +143,7 @@ namespace ROS2
     class CameraRGBDSensor : public CameraColorSensor
     {
     public:
+        AZ_TYPE_INFO(CameraRGBDSensor, "{724D6C9F-EC61-4644-9EC9-C162AE5F26AF}");
         CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
 
         // CameraSensor overrides
