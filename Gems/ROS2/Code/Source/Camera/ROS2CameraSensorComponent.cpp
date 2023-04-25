@@ -40,14 +40,6 @@ namespace ROS2
     {
         ROS2SensorComponent::Activate();
 
-        const auto cameraInfoPublisherConfig = m_sensorConfiguration.m_publishersConfigurations[CameraConstants::InfoConfig];
-        AZStd::string cameraInfoFullTopic = ROS2Names::GetNamespacedName(GetNamespace(), cameraInfoPublisherConfig.m_topic);
-        AZ_TracePrintf("ROS2", "Creating publisher for camera info on topic %s\n", cameraInfoFullTopic.data());
-
-        auto ros2Node = ROS2Interface::Get()->GetNode();
-        m_cameraInfoPublisher =
-            ros2Node->create_publisher<sensor_msgs::msg::CameraInfo>(cameraInfoFullTopic.data(), cameraInfoPublisherConfig.GetQoS());
-
         if (m_cameraConfiguration.m_colorCamera && m_cameraConfiguration.m_depthCamera)
         {
             AddImageSource<CameraRGBDSensor>();
