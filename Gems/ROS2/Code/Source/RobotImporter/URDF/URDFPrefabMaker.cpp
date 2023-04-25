@@ -46,7 +46,7 @@ namespace ROS2
         // Request the build of collider meshes by constructing .assetinfo files.
         BuildAssetsForLink(m_model->root_link_);
 
-        // Spins thread that waits for all collider meshes to be ready. 
+        // Spins thread that waits for all collider meshes to be ready.
         m_collidersMaker.ProcessMeshes(buildReadyCb);
     }
 
@@ -211,7 +211,6 @@ namespace ROS2
                     AZ_Assert(component, "ROS2 Frame Component does not exist for %s", childEntity.GetValue().ToString().c_str());
                     component->SetJointName(AZStd::string(jointName.c_str()));
                 }
-
             }
             else
             {

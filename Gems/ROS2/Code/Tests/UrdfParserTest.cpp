@@ -227,7 +227,6 @@ namespace UnitTest
 
     TEST_F(UrdfParserTest, ParseUrdfWithOneLink)
     {
-
         const auto xmlStr = GetUrdfWithOneLink();
         const auto urdf = ROS2::UrdfParser::Parse(xmlStr);
 
@@ -263,7 +262,6 @@ namespace UnitTest
 
     TEST_F(UrdfParserTest, ParseUrdfWithTwoLinksAndJoint)
     {
-
         const auto xmlStr = GetUrdfWithTwoLinksAndJoint();
         const auto urdf = ROS2::UrdfParser::Parse(xmlStr);
 

@@ -71,7 +71,6 @@ namespace ROS2::PrefabMakerUtils
             return createEntityResult;
         }
 
-
         // Verify that a valid entity is created.
         AZ::EntityId entityId = createEntityResult.GetValue();
         if (!entityId.IsValid())

@@ -1,12 +1,12 @@
-#include <ROS2/Manipulation/JointPublisherComponent.h>
-#include <AzCore/Component/TransformBus.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
+#include <AzCore/Component/TransformBus.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <rclcpp/qos.hpp>
 #include <PhysX/Joint/PhysXJointRequestsBus.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Manipulation/JointPublisherComponent.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/Utilities/ROS2Names.h>
+#include <rclcpp/qos.hpp>
 
 namespace ROS2
 {
@@ -16,7 +16,8 @@ namespace ROS2
         auto ros2Node = ROS2::ROS2Interface::Get()->GetNode();
         auto ros2Frame = GetEntity()->FindComponent<ROS2FrameComponent>();
         AZStd::string namespacedTopic = ROS2Names::GetNamespacedName(ros2Frame->GetNamespace(), "joint_states");
-        m_jointstatePublisher = ros2Node->create_publisher<sensor_msgs::msg::JointState>(namespacedTopic.data(), rclcpp::SystemDefaultsQoS());        // TODO: add QoS instead of "1"
+        m_jointstatePublisher = ros2Node->create_publisher<sensor_msgs::msg::JointState>(
+            namespacedTopic.data(), rclcpp::SystemDefaultsQoS()); // TODO: add QoS instead of "1"
     }
 
     void JointPublisherComponent::Deactivate()
@@ -39,9 +40,8 @@ namespace ROS2
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serialize->Class<JointPublisherComponent, AZ::Component>()
-                ->Version(0)
-                ->Field("Frequency (HZ)", &JointPublisherComponent::m_frequency);
+            serialize->Class<JointPublisherComponent, AZ::Component>()->Version(0)->Field(
+                "Frequency (HZ)", &JointPublisherComponent::m_frequency);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -79,7 +79,7 @@ namespace ROS2
         }
     }
 
-    AZStd::unordered_map<AZ::Name, PhysX::HingeJointComponent>  &JointPublisherComponent::GetHierarchyMap()
+    AZStd::unordered_map<AZ::Name, PhysX::HingeJointComponent>& JointPublisherComponent::GetHierarchyMap()
     {
         return m_hierarchyMap;
     }
@@ -101,10 +101,10 @@ namespace ROS2
 
     float JointPublisherComponent::GetJointPosition(const AZ::Component& hingeComponent) const
     {
-        float position{0};
+        float position{ 0 };
         auto componentId = hingeComponent.GetId();
         auto entityId = hingeComponent.GetEntityId();
-        const AZ::EntityComponentIdPair id(entityId,componentId);
+        const AZ::EntityComponentIdPair id(entityId, componentId);
         PhysX::JointRequestBus::EventResult(position, id, &PhysX::JointRequests::GetPosition);
         return position;
     }

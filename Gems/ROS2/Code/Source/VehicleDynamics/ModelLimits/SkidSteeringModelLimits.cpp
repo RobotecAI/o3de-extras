@@ -97,5 +97,4 @@ namespace ROS2::VehicleDynamics
         return m_angularLimit;
     }
 
-
 } // namespace ROS2::VehicleDynamics

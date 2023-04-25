@@ -37,6 +37,6 @@ namespace ROS2
 
     private:
         Utils::xacro::Params m_defaultParams;
-        QTableWidget* m_table {};
+        QTableWidget* m_table{};
     };
 } // namespace ROS2

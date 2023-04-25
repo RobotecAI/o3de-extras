@@ -32,11 +32,9 @@ namespace ROS2
         /// ROS image encodings lives in `sensor_msgs/image_encodings.hpp`
         /// We are not including `image_encodings.hpp` since it uses exceptions.
         AZStd::unordered_map<AZ::RHI::Format, const char*> FormatMappings{
-            { AZ::RHI::Format::R8G8B8A8_UNORM, "rgba8" },     
-            { AZ::RHI::Format::R16G16B16A16_UNORM, "rgba16" },
+            { AZ::RHI::Format::R8G8B8A8_UNORM, "rgba8" },     { AZ::RHI::Format::R16G16B16A16_UNORM, "rgba16" },
             { AZ::RHI::Format::R32G32B32A32_FLOAT, "32FC4" }, // Unsuported by RVIZ2
-            { AZ::RHI::Format::R8_UNORM, "mono8" },           
-            { AZ::RHI::Format::R16_UNORM, "mono16" },
+            { AZ::RHI::Format::R8_UNORM, "mono8" },           { AZ::RHI::Format::R16_UNORM, "mono16" },
             { AZ::RHI::Format::R32_FLOAT, "32FC1" },
         };
 
@@ -52,7 +50,8 @@ namespace ROS2
         };
 
     } // namespace Internal
-    CameraSensorDescription::CameraSensorDescription(const AZStd::string& cameraName, float verticalFov, int width, int height, AZ::EntityId entityId)
+    CameraSensorDescription::CameraSensorDescription(
+        const AZStd::string& cameraName, float verticalFov, int width, int height, AZ::EntityId entityId)
         : m_verticalFieldOfViewDeg(verticalFov)
         , m_width(width)
         , m_height(height)
@@ -92,7 +91,7 @@ namespace ROS2
             [ 0  0  1]
            Projects 3D points in the camera coordinate frame to 2D pixel
            coordinates using the focal lengths (fx, fy) and principal point
-           (cx, cy).  
+           (cx, cy).
        */
         const auto w = static_cast<double>(m_width);
         const auto h = static_cast<double>(m_height);
@@ -117,8 +116,11 @@ namespace ROS2
         m_view->SetViewToClipMatrix(m_cameraSensorDescription.m_viewToClipMatrix);
         m_scene = AZ::RPI::RPISystemInterface::Get()->GetSceneByName(AZ::Name("Main"));
 
-        m_pipelineName = AZStd::string::format("%sPipeline%s%s",m_cameraSensorDescription.m_cameraName.c_str(), GetPipelineTypeName().c_str(),
-                                               m_cameraSensorDescription.m_entityId.ToString().c_str() );
+        m_pipelineName = AZStd::string::format(
+            "%sPipeline%s%s",
+            m_cameraSensorDescription.m_cameraName.c_str(),
+            GetPipelineTypeName().c_str(),
+            m_cameraSensorDescription.m_entityId.ToString().c_str());
         AZ::RPI::RenderPipelineDescriptor pipelineDesc;
         pipelineDesc.m_mainViewTagName = "MainCamera";
         pipelineDesc.m_name = m_pipelineName;
@@ -180,7 +182,9 @@ namespace ROS2
             AZStd::string("Output"),
             AZ::RPI::PassAttachmentReadbackOption::Output);
 
-        AZ_Error("CameraSensor", captureOutcome.IsSuccess(),
+        AZ_Error(
+            "CameraSensor",
+            captureOutcome.IsSuccess(),
             "Frame capture initialization failed. %s",
             captureOutcome.GetError().m_errorMessage.c_str());
     }
@@ -209,7 +213,8 @@ namespace ROS2
                     message.width = descriptor.m_size.m_width;
                     message.height = descriptor.m_size.m_height;
                     message.step = message.width * Internal::BitDepth.at(format);
-                    message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
+                    message.data =
+                        std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
                     message.header = header;
                     publisher->publish(message);
                 }
@@ -264,18 +269,17 @@ namespace ROS2
     {
     }
 
-    void CameraRGBDSensor::ReadBackDepth(
-        AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback)
+    void CameraRGBDSensor::ReadBackDepth(AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback)
     {
-            AZ::Render::FrameCaptureOutcome captureOutcome;
-            AZStd::vector<AZStd::string> passHierarchy{m_pipelineName,"DepthPrePass"};
-            AZ::Render::FrameCaptureRequestBus::BroadcastResult(
-                captureOutcome,
-                &AZ::Render::FrameCaptureRequestBus::Events::CapturePassAttachmentWithCallback,
-                callback,
-                passHierarchy,
-                AZStd::string("DepthLinear"),
-                AZ::RPI::PassAttachmentReadbackOption::Output);
+        AZ::Render::FrameCaptureOutcome captureOutcome;
+        AZStd::vector<AZStd::string> passHierarchy{ m_pipelineName, "DepthPrePass" };
+        AZ::Render::FrameCaptureRequestBus::BroadcastResult(
+            captureOutcome,
+            &AZ::Render::FrameCaptureRequestBus::Events::CapturePassAttachmentWithCallback,
+            callback,
+            passHierarchy,
+            AZStd::string("DepthLinear"),
+            AZ::RPI::PassAttachmentReadbackOption::Output);
     }
 
     void CameraRGBDSensor::RequestMessagePublication(
@@ -283,7 +287,7 @@ namespace ROS2
         const AZ::Transform& cameraPose,
         const std_msgs::msg::Header& header)
     {
-        AZ_Assert(publishers.size()==2, "RequestMessagePublication for CameraRGBDSensor should be called with exactly two publishers");
+        AZ_Assert(publishers.size() == 2, "RequestMessagePublication for CameraRGBDSensor should be called with exactly two publishers");
         const auto publisherDepth = publishers.back();
         ReadBackDepth(
             [header, publisherDepth](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
@@ -298,12 +302,13 @@ namespace ROS2
                     message.width = descriptor.m_size.m_width;
                     message.height = descriptor.m_size.m_height;
                     message.step = message.width * Internal::BitDepth.at(format);
-                    message.data = std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
+                    message.data =
+                        std::vector<uint8_t>(result.m_dataBuffer->data(), result.m_dataBuffer->data() + result.m_dataBuffer->size());
                     message.header = header;
                     publisherDepth->publish(message);
                 }
             });
-        CameraSensor::RequestMessagePublication(publishers,cameraPose,header);
+        CameraSensor::RequestMessagePublication(publishers, cameraPose, header);
     }
 
 } // namespace ROS2

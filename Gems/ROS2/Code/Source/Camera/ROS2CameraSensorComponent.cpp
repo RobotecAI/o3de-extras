@@ -132,7 +132,7 @@ namespace ROS2
             cameraInfo.p = { cameraInfo.k[0], cameraInfo.k[1], cameraInfo.k[2], 0, cameraInfo.k[3], cameraInfo.k[4], cameraInfo.k[5], 0,
                              cameraInfo.k[6], cameraInfo.k[7], cameraInfo.k[8], 0 };
             m_cameraInfoPublisher->publish(cameraInfo);
-            m_cameraSensor->RequestMessagePublication(m_imagePublishers, transform, ros_header );
+            m_cameraSensor->RequestMessagePublication(m_imagePublishers, transform, ros_header);
         }
     }
 

@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <RobotImporter/URDF/UrdfParser.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzCore/std/string/string.h>
+#include <RobotImporter/URDF/UrdfParser.h>
 
 namespace ROS2::Utils::xacro
 {
@@ -42,6 +42,5 @@ namespace ROS2::Utils::xacro
     AZStd::unordered_map<AZStd::string, AZStd::string> GetParameterFromXacroFile(const AZStd::string& filename);
 
     ExecutionOutcome ParseXacro(const AZStd::string& filename, const Params& params);
-
 
 } // namespace ROS2::Utils::xacro

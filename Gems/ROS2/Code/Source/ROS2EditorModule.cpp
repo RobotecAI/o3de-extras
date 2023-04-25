@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+#include <Camera/ROS2CameraSensorEditorComponent.h>
 #include <Lidar/LidarRegistrarEditorSystemComponent.h>
 #include <ROS2EditorSystemComponent.h>
 #include <ROS2ModuleInterface.h>
-#include <Camera/ROS2CameraSensorEditorComponent.h>
 #include <RobotImporter/ROS2RobotImporterEditorSystemComponent.h>
 
 namespace ROS2

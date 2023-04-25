@@ -1,11 +1,11 @@
 #pragma once
 
-#include <AzCore/std/string/string.h>
 #include <AzCore/std/functional.h>
-#include <rclcpp_action/server.hpp>
-#include <rclcpp_action/rclcpp_action.hpp>
-#include <control_msgs/action/follow_joint_trajectory.hpp>
+#include <AzCore/std/string/string.h>
 #include <ROS2/ROS2Bus.h>
+#include <control_msgs/action/follow_joint_trajectory.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <rclcpp_action/server.hpp>
 
 namespace ROS2
 {
@@ -34,12 +34,9 @@ namespace ROS2
     protected:
         // callbacks for action_server_
         rclcpp_action::GoalResponse goal_received_callback(
-            const rclcpp_action::GoalUUID & uuid, 
-            std::shared_ptr<const FollowJointTrajectory::Goal> goal);
-        rclcpp_action::CancelResponse goal_cancelled_callback(
-            const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle);
-        void goal_accepted_callback(
-            std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle);
+            const rclcpp_action::GoalUUID& uuid, std::shared_ptr<const FollowJointTrajectory::Goal> goal);
+        rclcpp_action::CancelResponse goal_cancelled_callback(const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle);
+        void goal_accepted_callback(std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle);
     };
 
     void FollowJointTrajectoryActionServer::CreateServer(AZStd::string ROS2ControllerName)
@@ -55,8 +52,7 @@ namespace ROS2
     }
 
     rclcpp_action::GoalResponse FollowJointTrajectoryActionServer::goal_received_callback(
-            [[maybe_unused]] const rclcpp_action::GoalUUID & uuid,
-            [[maybe_unused]] std::shared_ptr<const FollowJointTrajectory::Goal> goal)
+        [[maybe_unused]] const rclcpp_action::GoalUUID& uuid, [[maybe_unused]] std::shared_ptr<const FollowJointTrajectory::Goal> goal)
     {
         // Dummy implementation
         AZ_TracePrintf("ManipulatorControllerComponent", "FollowJointTrajectory manipulator Goal received");
@@ -64,18 +60,17 @@ namespace ROS2
     }
 
     rclcpp_action::CancelResponse FollowJointTrajectoryActionServer::goal_cancelled_callback(
-            [[maybe_unused]] const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle)
+        [[maybe_unused]] const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle)
     {
         // Dummy implementation
         AZ_TracePrintf("ManipulatorControllerComponent", "FollowJointTrajectory manipulator Goal canceled");
         return rclcpp_action::CancelResponse::ACCEPT;
     }
 
-    void FollowJointTrajectoryActionServer::goal_accepted_callback(
-            const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle)
+    void FollowJointTrajectoryActionServer::goal_accepted_callback(const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle)
     {
         AZ_TracePrintf("ManipulatorControllerComponent", "FollowJointTrajectory manipulator Goal accepted");
         this->m_goalHandle = goal_handle;
-        this->m_goalStatus = GoalStatus::Active;     
+        this->m_goalStatus = GoalStatus::Active;
     }
-}
+} // namespace ROS2

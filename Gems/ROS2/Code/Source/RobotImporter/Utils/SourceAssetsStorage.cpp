@@ -34,7 +34,7 @@ namespace ROS2::Utils
     AZStd::unordered_map<AZ::Crc32, AvailableAsset> GetInterestingSourceAssetsCRC()
     {
         const AZStd::unordered_set<AZStd::string> kInterestingExtensions{ ".dae", ".stl", ".obj", ".fbx" };
-        constexpr char AzModelExtension[] {".azmodel"} ;
+        constexpr char AzModelExtension[]{ ".azmodel" };
         AZStd::unordered_map<AZ::Crc32, AvailableAsset> availableAssets;
 
         // take all meshes in catalog
@@ -91,7 +91,7 @@ namespace ROS2::Utils
                 }
                 else
                 {
-                    availableAssets.insert({crc, foundAsset});
+                    availableAssets.insert({ crc, foundAsset });
                 }
             }
         };

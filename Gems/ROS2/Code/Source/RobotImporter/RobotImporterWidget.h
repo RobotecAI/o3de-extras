@@ -16,7 +16,6 @@
 #include "Pages/PrefabMakerPage.h"
 #include "Pages/XacroParamsPage.h"
 
-
 #include "URDF/URDFPrefabMaker.h"
 #include "URDF/UrdfParser.h"
 #include <AzCore/Asset/AssetCommon.h>

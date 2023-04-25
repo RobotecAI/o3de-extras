@@ -177,7 +177,7 @@ namespace ROS2
 namespace AZStd
 {
     // hash specialization
-    template <>
+    template<>
     struct hash<ROS2::LidarId>
     {
         constexpr size_t operator()(const ROS2::LidarId& id) const
@@ -185,4 +185,4 @@ namespace AZStd
             return id.GetHash();
         }
     };
-}
+} // namespace AZStd

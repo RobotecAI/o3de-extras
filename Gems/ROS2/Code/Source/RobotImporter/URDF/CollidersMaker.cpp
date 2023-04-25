@@ -13,6 +13,8 @@
 #include <AzCore/StringFunc/StringFunc.h>
 #include <AzToolsFramework/API/EditorAssetSystemAPI.h>
 #include <AzToolsFramework/Entity/EditorEntityHelpers.h>
+#include <PhysX/EditorColliderComponentRequestBus.h>
+#include <PhysX/MeshColliderComponentBus.h>
 #include <RobotImporter/Utils/RobotImporterUtils.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
 #include <RobotImporter/Utils/TypeConversions.h>
@@ -24,9 +26,6 @@
 #include <SceneAPI/SceneCore/Utilities/SceneGraphSelector.h>
 #include <Source/EditorColliderComponent.h>
 #include <Source/EditorMeshColliderComponent.h>
-#include <PhysX/MeshColliderComponentBus.h>
-#include <PhysX/EditorColliderComponentRequestBus.h>
-
 
 namespace ROS2
 {
@@ -390,7 +389,11 @@ namespace ROS2
             AZ::Data::AssetType assetType = AZ::AzTypeInfo<PhysX::Pipeline::MeshAsset>::Uuid();
             AZ::Data::AssetCatalogRequestBus::BroadcastResult(
                 assetId, &AZ::Data::AssetCatalogRequests::GetAssetIdByPath, pxmodelPath->c_str(), assetType, false);
-            AZ_Printf(Internal::CollidersMakerLoggingTag, "Collider %s has assetId %s\n", entityId.ToString().c_str(), assetId.ToString<AZStd::string>().c_str());
+            AZ_Printf(
+                Internal::CollidersMakerLoggingTag,
+                "Collider %s has assetId %s\n",
+                entityId.ToString().c_str(),
+                assetId.ToString<AZStd::string>().c_str());
 
             Physics::PhysicsAssetShapeConfiguration shapeConfiguration;
             shapeConfiguration.m_useMaterialsFromAsset = false;
