@@ -10,6 +10,7 @@ set(FILES
         Include/ROS2/Frame/NamespaceConfiguration.h
         Include/ROS2/Frame/ROS2FrameComponent.h
         Include/ROS2/Frame/ROS2Transform.h
+        Include/ROS2/Imu/NoiseConfiguration.h
         Include/ROS2/Manipulation/JointMotorControllerComponent.h
         Include/ROS2/Manipulation/JointMotorControllerConfiguration.h
         Include/ROS2/Manipulation/JointPublisherComponent.h

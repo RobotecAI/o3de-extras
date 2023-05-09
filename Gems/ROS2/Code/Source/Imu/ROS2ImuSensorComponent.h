@@ -11,6 +11,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
+#include <ROS2/Imu/NoiseConfiguration.h>
 #include <ROS2/Sensor/ROS2SensorComponent.h>
 #include <Utilities/PhysicsCallbackHandler.h>
 #include <rclcpp/publisher.hpp>
@@ -28,6 +29,7 @@ namespace ROS2
     public:
         AZ_COMPONENT(ROS2ImuSensorComponent, "{502A955E-7742-4E23-AD77-5E4063739DCA}", ROS2SensorComponent);
         ROS2ImuSensorComponent();
+        ROS2ImuSensorComponent(const SensorConfiguration& sensorConfiguration);
         ~ROS2ImuSensorComponent() = default;
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void Reflect(AZ::ReflectContext* context);
@@ -54,6 +56,8 @@ namespace ROS2
         AZ::Vector3 m_acceleration{ 0 };
         AZStd::deque<AZ::Vector3> m_filterAcceleration;
         AZStd::deque<AZ::Vector3> m_filterAngularVelocity;
+        
+        NoiseConfiguration m_imuNoiseConfiguration;
 
     private:
         // ROS2SensorComponent overrides ...

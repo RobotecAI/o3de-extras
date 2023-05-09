@@ -35,6 +35,7 @@ namespace ROS2
         {
             serialize->Class<ROS2ImuSensorComponent, ROS2SensorComponent>()
                 ->Version(1)
+                ->Field("NoiseConfiguration", &ROS2ImuSensorComponent::m_imuNoiseConfiguration)
                 ->Field("FilterSize", &ROS2ImuSensorComponent::m_filterSize)
                 ->Field("IncludeGravity", &ROS2ImuSensorComponent::m_includeGravity)
                 ->Field("AbsoluteRotation", &ROS2ImuSensorComponent::m_absoluteRotation);
@@ -45,6 +46,11 @@ namespace ROS2
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_imuNoiseConfiguration,
+                        "Noise Configuration",
+                        "Noise configuration for the sensor")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2ImuSensorComponent::m_filterSize,
@@ -72,6 +78,11 @@ namespace ROS2
         pc.m_topic = "imu";
         m_sensorConfiguration.m_frequency = 50;
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, pc));
+    }
+
+    ROS2ImuSensorComponent::ROS2ImuSensorComponent(const SensorConfiguration& sensorConfiguration)
+    {
+        m_sensorConfiguration = sensorConfiguration;
     }
 
     void ROS2ImuSensorComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
