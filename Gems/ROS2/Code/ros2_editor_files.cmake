@@ -10,6 +10,7 @@ set(FILES
     Source/Camera/ROS2CameraSensorEditorComponent.h
     Source/Lidar/LidarRegistrarEditorSystemComponent.cpp
     Source/Lidar/LidarRegistrarEditorSystemComponent.h
+    Source/RobotImporter/Bus/RobotImporterBus.h
     Source/RobotImporter/Pages/CheckAssetPage.cpp
     Source/RobotImporter/Pages/CheckAssetPage.h
     Source/RobotImporter/Pages/CheckUrdfPage.cpp
@@ -51,6 +52,8 @@ set(FILES
     Source/RobotImporter/Utils/SourceAssetsStorage.h
     Source/RobotImporter/Utils/TypeConversions.cpp
     Source/RobotImporter/Utils/TypeConversions.h
+    Source/RobotImporter/Utils/FilePath.cpp
+    Source/RobotImporter/Utils/FilePath.h
     Source/ROS2EditorSystemComponent.cpp
     Source/ROS2EditorSystemComponent.h
     Source/ROS2GemUtilities.cpp

@@ -6,17 +6,17 @@
  *
  */
 
-#include <AzCore/IO/FileIO.h>
-#include <AzCore/IO/Path/Path.h>
-#include <AzCore/Utils/Utils.h>
-
 #include "RobotImporterWidget.h"
 #include "URDF/URDFPrefabMaker.h"
 #include "URDF/UrdfParser.h"
 #include "Utils/RobotImporterUtils.h"
+#include <AzCore/IO/FileIO.h>
+#include <AzCore/IO/Path/Path.h>
+#include <AzCore/Utils/Utils.h>
 #include <QApplication>
 #include <QScreen>
 #include <QTranslator>
+#include <qwizard.h>
 
 namespace ROS2
 {
@@ -374,6 +374,7 @@ namespace ROS2
     void RobotImporterWidget::onCreateButtonPressed()
     {
         CreatePrefab(m_prefabMakerPage->getPrefabName());
+        // RobotImporterAPI::generatePrefabFromFile(m_urdfPath, false, false);
     }
 
     bool RobotImporterWidget::CheckCyclicalDependency(AZ::IO::Path importedPrefabPath)
