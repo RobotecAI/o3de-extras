@@ -7,7 +7,8 @@
  */
 
 #include <AzCore/Serialization/EditContext.h>
-#include <ROS2/Imu/NoiseConfiguration.h>
+#include <AzCore/Serialization/EditContextConstants.inl>
+#include "NoiseConfiguration.h"
 
 namespace ROS2
 {
@@ -15,17 +16,17 @@ namespace ROS2
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            // serializeContext->RegisterGenericType<AZStd::vector<NoiseConfiguration>>();
             serializeContext->Class<NoiseConfiguration>()
                 ->Version(1)
-                ->Field("ApplyNoise", &NoiseConfiguration::m_applyNoise)
-                ->Field("AccelerationVariance", &NoiseConfiguration::m_accelerationVariance)
-                ->Field("AngularVelocityVariance", &NoiseConfiguration::m_angularVelocityVariance)
-                ->Field("AngleVariance", &NoiseConfiguration::m_angleVariance);
+                ->Field("Apply Noise", &NoiseConfiguration::m_applyNoise)
+                ->Field("Acceleration Variance", &NoiseConfiguration::m_accelerationVariance)
+                ->Field("Angular Velocity Variance", &NoiseConfiguration::m_angularVelocityVariance)
+                ->Field("Angle Variance", &NoiseConfiguration::m_angleVariance);
 
             if (AZ::EditContext* ec = serializeContext->GetEditContext())
             {
                 ec->Class<NoiseConfiguration>("Noise Configuration", "Configuration of IMU noise.")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &NoiseConfiguration::m_applyNoise, "Apply Noise",
                         "Apply noise to IMU data.")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &NoiseConfiguration::m_accelerationVariance, "Acceleration Variance",

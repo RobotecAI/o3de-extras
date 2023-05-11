@@ -8,7 +8,6 @@
 #pragma once
 
 #include <AzCore/Math/Vector3.h>
-#include <AzCore/Component/Entity.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <AzCore/Serialization/SerializeContext.h>
 
@@ -18,12 +17,12 @@ namespace ROS2
     struct NoiseConfiguration
     {
     public:
-        AZ_TYPE_INFO(NoiseConfiguration, "{E0B0F6A0-0F28-46D5-95F1-956550BA97B9}");
+        AZ_TYPE_INFO(NoiseConfiguration, "{4B119856-6DD6-449D-9D42-4319FFDC8808}");
         static void Reflect(AZ::ReflectContext* context);
 
-        bool m_applyNoise;
-        AZ::Vector3 m_accelerationVariance; // Variance of acceleration x, y, z
-        AZ::Vector3 m_angularVelocityVariance; // Variance of angular velocity x, y, z
-        AZ::Vector3 m_angleVariance; // Variance of angle x, y, z
+        bool m_applyNoise = false;
+        AZ::Vector3 m_accelerationVariance;
+        AZ::Vector3 m_angularVelocityVariance;
+        AZ::Vector3 m_angleVariance;
     };
 } // namespace ROS2

@@ -6,6 +6,8 @@
  *
  */
 
+#include <random>
+#include <cmath>
 #include "ROS2ImuSensorComponent.h"
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/ROS2Bus.h>
@@ -35,10 +37,14 @@ namespace ROS2
         {
             serialize->Class<ROS2ImuSensorComponent, ROS2SensorComponent>()
                 ->Version(1)
-                ->Field("NoiseConfiguration", &ROS2ImuSensorComponent::m_imuNoiseConfiguration)
                 ->Field("FilterSize", &ROS2ImuSensorComponent::m_filterSize)
                 ->Field("IncludeGravity", &ROS2ImuSensorComponent::m_includeGravity)
-                ->Field("AbsoluteRotation", &ROS2ImuSensorComponent::m_absoluteRotation);
+                ->Field("AbsoluteRotation", &ROS2ImuSensorComponent::m_absoluteRotation)
+                ->Field("ApplyNoise", &ROS2ImuSensorComponent::m_applyNoise)
+                ->Field("AccelerationVariance", &ROS2ImuSensorComponent::m_accelerationVariance)
+                ->Field("AngularVelocityVariance", &ROS2ImuSensorComponent::m_angularVelocityVariance)
+                ->Field("AngleVariance", &ROS2ImuSensorComponent::m_angleVariance)
+                ->Field("NoiseConfiguration", &ROS2ImuSensorComponent::m_noiseConfiguration);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -46,11 +52,6 @@ namespace ROS2
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default,
-                        &ROS2ImuSensorComponent::m_imuNoiseConfiguration,
-                        "Noise Configuration",
-                        "Noise configuration for the sensor")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2ImuSensorComponent::m_filterSize,
@@ -65,7 +66,32 @@ namespace ROS2
                         AZ::Edit::UIHandlers::Default,
                         &ROS2ImuSensorComponent::m_absoluteRotation,
                         "Absolute Rotation",
-                        "Include Absolute rotation in message.");
+                        "Include Absolute rotation in message.")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_applyNoise,
+                        "Apply Noise",
+                        "Apply Noise")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_accelerationVariance,
+                        "Acceleration Variance",
+                        "Acceleration Variance")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_angularVelocityVariance,
+                        "Angular Velocity Variance",
+                        "Angular Velocity Variance")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_angleVariance,
+                        "Angle Variance",
+                        "Angle Variance")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2ImuSensorComponent::m_noiseConfiguration,
+                        "Noise Configuration",
+                        "Noise Configuration");
             }
         }
     }
@@ -108,6 +134,8 @@ namespace ROS2
         m_filterAcceleration.push_back(linearVelocity);
         const auto angularVelocity = inv.TransformVector(rigidbody->GetAngularVelocity());
         m_filterAngularVelocity.push_back(angularVelocity);
+        sensor_msgs::msg::Imu m_imuMsg;
+        m_imuMsg.header.frame_id = m_imuFrameID;
         if (m_filterAcceleration.size() > m_filterSize)
         {
             m_filterAcceleration.pop_front();
@@ -136,16 +164,54 @@ namespace ROS2
             {
                 m_imuMsg.orientation = ROS2Conversions::ToROS2Quaternion(rigidbody->GetTransform().GetRotation());
             }
+
+            if (m_applyNoise)
+            {
+                applyNoise(m_imuMsg);
+            }
+
             m_imuMsg.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
             this->m_imuPublisher->publish(m_imuMsg);
         }
     };
 
+    void ROS2ImuSensorComponent::applyNoise(sensor_msgs::msg::Imu& msg)
+    {
+        msg.linear_acceleration.x += noiseGenerator(m_accelerationVariance.GetX(), 0);
+        msg.linear_acceleration.y += noiseGenerator(m_accelerationVariance.GetY(), 0);
+        msg.linear_acceleration.z += noiseGenerator(m_accelerationVariance.GetZ(), 0);
+
+        msg.angular_velocity.x += noiseGenerator(m_angularVelocityVariance.GetX(), 0);
+        msg.angular_velocity.y += noiseGenerator(m_angularVelocityVariance.GetY(), 0);
+        msg.angular_velocity.z += noiseGenerator(m_angularVelocityVariance.GetZ(), 0);
+
+        msg.orientation.x += noiseGenerator(m_angleVariance, 0);
+        msg.orientation.y += noiseGenerator(m_angleVariance, 0);
+        msg.orientation.z += noiseGenerator(m_angleVariance, 0);
+        msg.orientation.w += noiseGenerator(m_angleVariance, 0);
+    }
+
+    // Gaussian noise generator using the Box-Muller transform
+    float ROS2ImuSensorComponent::noiseGenerator(float variance, float mean)
+    {
+        float std_dev = std::sqrt(variance);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::normal_distribution<float> dist(mean, std_dev);
+
+        float z1 = dist(gen);
+        float z2 = dist(gen);
+
+        float x = std::sqrt(-2 * std::log(z1)) * std::cos(2 * M_PI * z2);
+        x = x * std_dev + mean;
+        return x;
+    }
+
     void ROS2ImuSensorComponent::Activate()
     {
         auto ros2Node = ROS2Interface::Get()->GetNode();
         AZ_Assert(m_sensorConfiguration.m_publishersConfigurations.size() == 1, "Invalid configuration of publishers for IMU sensor");
-        m_imuMsg.header.frame_id = GetFrameID().c_str();
+        m_imuFrameID = GetFrameID().c_str();
         const auto publisherConfig = m_sensorConfiguration.m_publishersConfigurations[Internal::kImuMsgType];
         const auto fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
         m_imuPublisher = ros2Node->create_publisher<sensor_msgs::msg::Imu>(fullTopic.data(), publisherConfig.GetQoS());

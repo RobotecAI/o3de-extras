@@ -11,7 +11,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
-#include <ROS2/Imu/NoiseConfiguration.h>
+#include "NoiseConfiguration.h"
 #include <ROS2/Sensor/ROS2SensorComponent.h>
 #include <Utilities/PhysicsCallbackHandler.h>
 #include <rclcpp/publisher.hpp>
@@ -50,14 +50,19 @@ namespace ROS2
         bool m_absoluteRotation{ true };
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Imu>> m_imuPublisher;
-        sensor_msgs::msg::Imu m_imuMsg;
+        std::string m_imuFrameID;
         AZ::Vector3 m_previousLinearVelocity = AZ::Vector3::CreateZero();
 
         AZ::Vector3 m_acceleration{ 0 };
         AZStd::deque<AZ::Vector3> m_filterAcceleration;
         AZStd::deque<AZ::Vector3> m_filterAngularVelocity;
         
-        NoiseConfiguration m_imuNoiseConfiguration;
+        NoiseConfiguration m_noiseConfiguration;
+
+        bool m_applyNoise{ false };
+        AZ::Vector3 m_accelerationVariance = AZ::Vector3::CreateZero();
+        AZ::Vector3 m_angularVelocityVariance = AZ::Vector3::CreateZero();
+        float m_angleVariance = 0.0f;
 
     private:
         // ROS2SensorComponent overrides ...
@@ -65,5 +70,9 @@ namespace ROS2
 
         // ROS2::Utils::PhysicsCallbackHandler overrides ...
         void OnPhysicsSimulationFinished(AzPhysics::SceneHandle sceneHandle, float deltaTime) override;
+
+        void applyNoise(sensor_msgs::msg::Imu &imuMsg);
+
+        float noiseGenerator(float variance, float mean = 0.0f);
     };
 } // namespace ROS2

@@ -41,27 +41,27 @@ namespace ROS2
             serialize->Class<ROS2ImuSensorEditorComponent, AzToolsFramework::Components::EditorComponentBase>()
                 ->Version(1)
                 ->Field("SensorConfig", &ROS2ImuSensorEditorComponent::m_sensorConfiguration)
-                ->Field("ImuNoiseConfig", &ROS2ImuSensorEditorComponent::m_imuNoiseConfiguration);
+                ->Field("ImuNoiseConfig", &ROS2ImuSensorEditorComponent::m_noiseConfiguration);
         }
         if (AZ::EditContext* ec = serialize->GetEditContext())
         {
             ec ->Class<ROS2ImuSensorEditorComponent>("ROS2ImuSensorEditorComponent", "The ROS2ImuSensorEditorComponent is used to create a ROS2ImuSensorComponent on an entity.")
                 ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                 ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2ImuSensorEditorComponent::m_sensorConfiguration, "Sensor Configuration", "Configuration for the sensor")
-                ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2ImuSensorEditorComponent::m_imuNoiseConfiguration, "IMU Noise Configuration", "Configuration for the IMU noise");
+                ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2ImuSensorEditorComponent::m_noiseConfiguration, "IMU Noise Configuration", "Configuration for the IMU noise");
         }
     }
 
     void ROS2ImuSensorEditorComponent::Activate()
     {
-        AzFramework::EntityDebugDisplayEventBus::Handler::BusConnect(this->GetEntityId());
-        AzToolsFramework::Components::EditorComponentBase::Activate();
+        // AzFramework::EntityDebugDisplayEventBus::Handler::BusConnect(this->GetEntityId());
+        // AzToolsFramework::Components::EditorComponentBase::Activate();
     }
 
     void ROS2ImuSensorEditorComponent::Deactivate()
     {
-        AzToolsFramework::Components::EditorComponentBase::Deactivate();
-        AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();
+        // AzToolsFramework::Components::EditorComponentBase::Deactivate();
+        // AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();
     }
 
     void ROS2ImuSensorEditorComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)

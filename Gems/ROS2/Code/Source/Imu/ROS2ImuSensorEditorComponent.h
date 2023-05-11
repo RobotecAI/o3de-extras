@@ -15,21 +15,20 @@
 #include <ROS2/Frame/NamespaceConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>
 #include <ROS2/Sensor/SensorConfiguration.h>
-#include <ROS2/Imu/NoiseConfiguration.h>
+#include "NoiseConfiguration.h"
 
 namespace ROS2
 {
     //! ROS2 Camera Editor sensor component class
     //! Allows turning an entity into a camera sensor in Editor
     //! Component draws camera frustrum in the Editor
-    class ROS2ImuSensorEditorComponent
-        : public AzToolsFramework::Components::EditorComponentBase
-        , protected AzFramework::EntityDebugDisplayEventBus::Handler
+    class ROS2ImuSensorEditorComponent : public AzToolsFramework::Components::EditorComponentBase
     {
     public:
         ROS2ImuSensorEditorComponent();
         ~ROS2ImuSensorEditorComponent() override = default;
         AZ_EDITOR_COMPONENT(ROS2ImuSensorEditorComponent, "{FCD3A871-2C8A-423B-8424-141D1488015C}");
+
         static void Reflect(AZ::ReflectContext* context);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
@@ -43,6 +42,6 @@ namespace ROS2
 
     private:
         SensorConfiguration m_sensorConfiguration;
-        NoiseConfiguration m_imuNoiseConfiguration;
+        NoiseConfiguration m_noiseConfiguration;
     };
 } // namespace ROS2
