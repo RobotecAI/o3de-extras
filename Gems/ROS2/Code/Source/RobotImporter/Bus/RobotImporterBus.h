@@ -27,63 +27,9 @@ namespace ROS2
         //! @param filePath The path of the urdf file
         //! @param importAssetWithUrdf If true, the assets referenced in the urdf file will be imported
         //! @param useArticulation If true, the prefab will be generated with articulation
-        virtual void GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) = 0;
-
-        //! Check if the prefab generation is done.
-        virtual bool IsDone() = 0;
-
-        //! Check if the prefab generation is successful.
-        virtual bool IsSuccessful() = 0;
+        virtual bool GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) = 0;
     };
 
     using RobotImporterRequestBus = AZ::EBus<RobotImporterRequest>;
 
-    class RobotImporterRequestHandler
-        : public RobotImporterRequestBus::Handler
-        , public AZ::BehaviorEBusHandler
-    {
-    public:
-        AZ_EBUS_BEHAVIOR_BINDER(
-            RobotImporterRequestHandler,
-            "{f99cf3b1-650f-4f72-b3e8-9cf137e0d264}",
-            AZ::SystemAllocator,
-            GeneratePrefabFromFile,
-            IsDone,
-            IsSuccessful);
-
-        static void Reflect(AZ::ReflectContext* context)
-        {
-            if (AZ::BehaviorContext* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
-            {
-                behaviorContext->EBus<RobotImporterRequestBus>("RobotImporterBus")
-                    ->Attribute(AZ::Script::Attributes::Category, "Robotics")
-                    ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
-                    ->Attribute(AZ::Script::Attributes::Module, "ros2")
-                    ->Handler<RobotImporterRequestHandler>()
-                    ->Event("ImportURDF", &RobotImporterRequestBus::Events::GeneratePrefabFromFile)
-                    ->Event("IsDone", &RobotImporterRequestBus::Events::IsDone)
-                    ->Event("IsSuccessful",&RobotImporterRequestBus::Events::IsSuccessful)
-                    ;
-            }
-        }
-
-        void GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) override
-        {
-            Call(FN_GeneratePrefabFromFile, filePath, importAssetWithUrdf, useArticulation);
-        }
-
-        bool IsDone() override
-        {
-            bool result = false;
-            CallResult(result, FN_IsDone);
-            return result;
-        }
-
-        bool IsSuccessful() override
-        {
-            bool result = false;
-            CallResult(result, FN_IsSuccessful);
-            return result;
-        }
-    };
 } // namespace ROS2

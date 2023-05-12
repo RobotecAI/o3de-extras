@@ -33,7 +33,6 @@ namespace ROS2
     class ROS2RobotImporterEditorSystemComponent
         : public ROS2RobotImporterSystemComponent
         , private AzToolsFramework::EditorEvents::Bus::Handler
-        , private AZ::TickBus::Handler
         , private RobotImporterRequestBus::Handler
     {
     public:
@@ -45,8 +44,7 @@ namespace ROS2
 
         ROS2RobotImporterEditorSystemComponent() = default;
         ~ROS2RobotImporterEditorSystemComponent() = default;
-        // AZ::TickBus overrides ...
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+
     private:
         //////////////////////////////////////////////////////////////////////////
         // Component overrides
@@ -61,11 +59,10 @@ namespace ROS2
 
         //////////////////////////////////////////////////////////////////////////
         // RobotImporterRequestsBus::Handler overrides
-        void GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) override;
-        bool IsDone() override;
-        bool IsSuccessful() override;
+        bool GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) override;
         //////////////////////////////////////////////////////////////////////////
 
+        bool SynchonousGeneratePrefabFromFile();
         AZStd::string m_importedPath;
         bool m_importAssetWithUrdf = false;
         bool m_useArticulation = false;

@@ -79,6 +79,8 @@ namespace ROS2
     {
         AZ_Printf("ROS2", "Test loading with API %s \n", m_textEdit->text().toUtf8().data());
         AZStd::string prefabPath(m_textEdit->text().toUtf8().data());
-        RobotImporterRequestBus::Broadcast(&RobotImporterRequestBus::Events::GeneratePrefabFromFile, prefabPath, m_copyFiles->isChecked(), false);
+        bool IsSuccess;
+        RobotImporterRequestBus::BroadcastResult(
+            IsSuccess, &RobotImporterRequestBus::Events::GeneratePrefabFromFile, prefabPath, m_copyFiles->isChecked(), false);
     }
 } // namespace ROS2
