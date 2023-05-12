@@ -11,7 +11,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileInfo>
-#include <RobotImporter/Bus/RobotImporterBus.h>
 
 namespace ROS2
 {
@@ -24,7 +23,6 @@ namespace ROS2
         m_button = new QPushButton("...", this);
         m_textEdit = new QLineEdit("", this);
         m_copyFiles = new QCheckBox(tr("Import meshes during URDF load"), this);
-        m_testButton = new QPushButton(tr("Test"), this);
         m_copyFiles->setCheckState(Qt::CheckState::Checked);
         setTitle(tr("Load URDF file"));
         QVBoxLayout* layout = new QVBoxLayout;
@@ -35,13 +33,11 @@ namespace ROS2
         layout_in->addWidget(m_textEdit);
         layout->addLayout(layout_in);
         layout->addWidget(m_copyFiles);
-        layout->addWidget(m_testButton);
         layout->addStretch();
         this->setLayout(layout);
         connect(m_button, &QPushButton::pressed, this, &FileSelectionPage::onLoadButtonPressed);
         connect(m_fileDialog, &QFileDialog::fileSelected, this, &FileSelectionPage::onFileSelected);
         connect(m_textEdit, &QLineEdit::editingFinished, this, &FileSelectionPage::onEditingFinished);
-        connect(m_testButton, &QPushButton::pressed, this, &FileSelectionPage::onTestButtonPressed);
         FileSelectionPage::onEditingFinished();
     }
 
@@ -73,14 +69,5 @@ namespace ROS2
     bool FileSelectionPage::getIfCopyAssetsDuringUrdfImport() const
     {
         return m_copyFiles->isChecked();
-    }
-
-    void FileSelectionPage::onTestButtonPressed()
-    {
-        AZ_Printf("ROS2", "Test loading with API %s \n", m_textEdit->text().toUtf8().data());
-        AZStd::string prefabPath(m_textEdit->text().toUtf8().data());
-        bool IsSuccess;
-        RobotImporterRequestBus::BroadcastResult(
-            IsSuccess, &RobotImporterRequestBus::Events::GeneratePrefabFromFile, prefabPath, m_copyFiles->isChecked(), false);
     }
 } // namespace ROS2
