@@ -19,11 +19,10 @@ namespace ROS2
     class RobotImporterRequest : public AZ::EBusTraits
     {
     public:
-
         static constexpr AZ::EBusHandlerPolicy HandlerPolicy = AZ::EBusHandlerPolicy::Single;
         static constexpr AZ::EBusAddressPolicy AddressPolicy = AZ::EBusAddressPolicy::Single;
 
-        //! Generate prefab from urdf file, it is asynchronous call.
+        //! Generate prefab from the urdf file.
         //! @param filePath The path of the urdf file
         //! @param importAssetWithUrdf If true, the assets referenced in the urdf file will be imported
         //! @param useArticulation If true, the prefab will be generated with articulation

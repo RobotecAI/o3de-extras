@@ -34,20 +34,14 @@ namespace ROS2
         ~ROS2RobotImporterEditorSystemComponent() = default;
 
     private:
-        //////////////////////////////////////////////////////////////////////////
-        // Component overrides
+        // Component overrides ...
         void Activate() override;
         void Deactivate() override;
-        //////////////////////////////////////////////////////////////////////////
 
-        //////////////////////////////////////////////////////////////////////////
-        // AzToolsFramework::EditorEvents::Bus::Handler overrides
+        // AzToolsFramework::EditorEvents::Bus::Handler overrides ...
         void NotifyRegisterViews() override;
-        //////////////////////////////////////////////////////////////////////////
 
-        //////////////////////////////////////////////////////////////////////////
-        // RobotImporterRequestsBus::Handler overrides
+        // RobotImporterRequestsBus::Handler overrides ..
         bool GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) override;
-        //////////////////////////////////////////////////////////////////////////
     };
 } // namespace ROS2

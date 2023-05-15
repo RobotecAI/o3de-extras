@@ -8,9 +8,9 @@
 
 #include "FileSelectionPage.h"
 #include <AzCore/Utils/Utils.h>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QFileInfo>
 
 namespace ROS2
 {

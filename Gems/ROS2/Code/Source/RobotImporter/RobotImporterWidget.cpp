@@ -417,6 +417,4 @@ namespace ROS2
         AZ_Error("RobotImporterWidget", false, "%s", errorMessage.toUtf8().constData());
     }
 
-
-
 } // namespace ROS2

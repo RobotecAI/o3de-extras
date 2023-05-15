@@ -117,7 +117,7 @@ namespace ROS2
                 auto sourceAssetFullPath = asset.m_availableAssetInfo.m_sourceAssetGlobalPath;
                 if (sourceAssetFullPath.empty())
                 {
-                    AZ_Printf("FooTest", "asset %s is has no sourceAssetFullPath", name.c_str());
+                    AZ_Warning("ROS2EditorSystemComponent", false, "asset %s is has no sourceAssetFullPath", name.c_str());
                     continue;
                 }
                 using namespace AzToolsFramework;

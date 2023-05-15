@@ -46,14 +46,14 @@ set(FILES
     Source/RobotImporter/xacro/XacroUtils.cpp
     Source/RobotImporter/xacro/XacroUtils.h
     Source/RobotImporter/Utils/DefaultSolverConfiguration.h
+    Source/RobotImporter/Utils/FilePath.cpp
+    Source/RobotImporter/Utils/FilePath.h
     Source/RobotImporter/Utils/RobotImporterUtils.cpp
     Source/RobotImporter/Utils/RobotImporterUtils.h
     Source/RobotImporter/Utils/SourceAssetsStorage.cpp
     Source/RobotImporter/Utils/SourceAssetsStorage.h
     Source/RobotImporter/Utils/TypeConversions.cpp
     Source/RobotImporter/Utils/TypeConversions.h
-    Source/RobotImporter/Utils/FilePath.cpp
-    Source/RobotImporter/Utils/FilePath.h
     Source/ROS2EditorSystemComponent.cpp
     Source/ROS2EditorSystemComponent.h
     Source/ROS2GemUtilities.cpp
