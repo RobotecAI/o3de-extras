@@ -9,6 +9,7 @@ set(FILES
         Include/ROS2/Clock/SimulationClock.h
         Include/ROS2/Frame/NamespaceConfiguration.h
         Include/ROS2/Frame/ROS2FrameComponent.h
+        Include/ROS2/Frame/ROS2FrameGtComponent.h
         Include/ROS2/Frame/ROS2Transform.h
         Include/ROS2/Manipulation/JointMotorControllerComponent.h
         Include/ROS2/Manipulation/JointMotorControllerConfiguration.h

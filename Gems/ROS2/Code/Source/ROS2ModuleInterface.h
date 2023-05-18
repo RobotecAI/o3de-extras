@@ -19,6 +19,7 @@
 #include <Odometry/ROS2OdometrySensorComponent.h>
 #include <Odometry/ROS2WheelOdometry.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameGtComponent.h>
 #include <ROS2/Manipulation/JointMotorControllerComponent.h>
 #include <ROS2/Manipulation/JointPublisherComponent.h>
 #include <ROS2/Manipulation/ManipulatorControllerComponent.h>
@@ -65,6 +66,7 @@ namespace ROS2
                     ROS2OdometrySensorComponent::CreateDescriptor(),
                     ROS2WheelOdometryComponent::CreateDescriptor(),
                     ROS2FrameComponent::CreateDescriptor(),
+                    ROS2FrameGtComponent::CreateDescriptor(),
                     ROS2RobotControlComponent::CreateDescriptor(),
                     ROS2CameraSensorComponent::CreateDescriptor(),
                     AckermannControlComponent::CreateDescriptor(),

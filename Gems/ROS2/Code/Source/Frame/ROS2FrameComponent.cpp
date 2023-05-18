@@ -6,6 +6,8 @@
  *
  */
 
+#include "ROS2FrameUtils.h"
+
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
 #include <AzCore/Serialization/EditContext.h>
@@ -15,23 +17,11 @@
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2GemUtilities.h>
 #include <ROS2/Utilities/ROS2Names.h>
+
 namespace ROS2
 {
     namespace Internal
     {
-        AZ::TransformInterface* GetEntityTransformInterface(const AZ::Entity* entity)
-        {
-            if (!entity)
-            {
-                AZ_Error("GetEntityTransformInterface", false, "Invalid entity!");
-                return nullptr;
-            }
-
-            auto* interface = Utils::GetGameOrEditorComponent<AzFramework::TransformComponent>(entity);
-
-            return interface;
-        }
-
         const ROS2FrameComponent* GetFirstROS2FrameAncestor(const AZ::Entity* entity)
         {
             auto* entityTransformInterface = GetEntityTransformInterface(entity);
@@ -211,7 +201,6 @@ namespace ROS2
 
     void ROS2FrameComponent::Reflect(AZ::ReflectContext* context)
     {
-        NamespaceConfiguration::Reflect(context);
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<ROS2FrameComponent, AZ::Component>()

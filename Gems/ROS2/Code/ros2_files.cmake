@@ -26,6 +26,8 @@ set(FILES
         Source/Communication/TopicConfiguration.cpp
         Source/Frame/NamespaceConfiguration.cpp
         Source/Frame/ROS2FrameComponent.cpp
+        Source/Frame/ROS2FrameGtComponent.cpp
+        Source/Frame/ROS2FrameUtils.cpp
         Source/Frame/ROS2Transform.cpp
         Source/GNSS/GNSSFormatConversions.cpp
         Source/GNSS/GNSSFormatConversions.h
