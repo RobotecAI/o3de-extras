@@ -86,7 +86,7 @@ namespace ROS2
         }
         if (Utils::IsFileXacro(filePath))
         {
-            AZ_Warning("ROS2EditorSystemComponent", false, "XACRO is not supported");
+            AZ_Warning("ROS2EditorSystemComponent", false, "XACRO formatted files are not supported");
             return false;
         }
 
