@@ -12,8 +12,14 @@ namespace ROS2
 {
     namespace Utils
     {
+        //! @returns the capitalized extention of provided file.
+        //! In the case that the file does not have an extension an empty string will be returned.
         AZStd::string GetCapitalizedExtension(const AZ::IO::Path& filename)
         {
+            if (!filename.HasExtension())
+            {
+                return "";
+            }
             AZStd::string extension{ filename.Extension().Native() };
             AZStd::to_upper(extension.begin(), extension.end());
             return extension;
