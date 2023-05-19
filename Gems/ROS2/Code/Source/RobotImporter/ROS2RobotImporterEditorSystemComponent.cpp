@@ -7,11 +7,11 @@
  */
 
 #include "ROS2RobotImporterEditorSystemComponent.h"
-#include <AzCore/std/string/string.h>
-#include "Bus/RobotImporterBus.h"
+#include "AzCore/Utils/Utils.h"
 #include "RobotImporter/URDF/UrdfParser.h"
 #include "RobotImporterWidget.h"
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/std/string/string.h>
 #include <AzToolsFramework/API/ViewPaneOptions.h>
 #if !defined(Q_MOC_RUN)
 #include <QWindow>

@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "Bus/RobotImporterBus.h"
 #include "ROS2RobotImporterSystemComponent.h"
 #include <AzCore/std/string/string.h>
 #include <AzToolsFramework/Entity/EditorEntityContextBus.h>
+#include <ROS2/RobotImporter/RobotImporterBus.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
 #include <urdf_parser/urdf_parser.h>
 namespace ROS2
