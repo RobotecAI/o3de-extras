@@ -26,7 +26,7 @@ namespace ROS2
 
         bool IsFileUrdf(const AZ::IO::Path& filename)
         {
-            return filename.HasExtension() && GetCapitalizedExtension(filename) == ".URDF";
+            return GetCapitalizedExtension(filename) == ".URDF";
         }
     } // namespace Utils
 } // namespace ROS2
