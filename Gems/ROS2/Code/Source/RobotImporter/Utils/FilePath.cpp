@@ -21,7 +21,7 @@ namespace ROS2
 
         bool IsFileXacro(const AZ::IO::Path& filename)
         {
-            return filename.HasExtension() && GetCapitalizedExtension(filename) == ".XACRO";
+            return GetCapitalizedExtension(filename) == ".XACRO";
         }
 
         bool IsFileUrdf(const AZ::IO::Path& filename)

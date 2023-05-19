@@ -7,7 +7,7 @@
  */
 
 #include "ROS2RobotImporterEditorSystemComponent.h"
-#include "AzCore/std/string/string.h"
+#include <AzCore/std/string/string.h>
 #include "Bus/RobotImporterBus.h"
 #include "RobotImporter/URDF/UrdfParser.h"
 #include "RobotImporterWidget.h"
@@ -31,7 +31,7 @@ namespace ROS2
             behaviorContext->EBus<RobotImporterRequestBus>("RobotImporterBus")
                 ->Attribute(AZ::Script::Attributes::Category, "Robotics")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
-                ->Attribute(AZ::Script::Attributes::Module, "ros2")
+                ->Attribute(AZ::Script::Attributes::Module, "ROS2")
                 ->Event("ImportURDF", &RobotImporterRequestBus::Events::GeneratePrefabFromFile);
         }
     }
@@ -81,7 +81,7 @@ namespace ROS2
     {
         if (filePath.empty())
         {
-            AZ_Warning("ROS2EditorSystemComponent", false, "Empty file path");
+            AZ_Warning("ROS2EditorSystemComponent", false, "Path provided for prefab is empty");
             return false;
         }
         if (Utils::IsFileXacro(filePath))
@@ -93,9 +93,8 @@ namespace ROS2
         urdf::ModelInterfaceSharedPtr parsedUrdf = UrdfParser::ParseFromFile(filePath);
         if (!parsedUrdf)
         {
-            AZ_Warning("ROS2EditorSystemComponent", false, "URDF parsing failed");
             const auto log = UrdfParser::GetUrdfParsingLog();
-            AZ_Warning("ROS2EditorSystemComponent", false, "%s", log.c_str());
+            AZ_Warning("ROS2EditorSystemComponent", false, "URDF parsing failed. Refer to %s", log.c_str());
             return false;
         }
 
@@ -117,7 +116,7 @@ namespace ROS2
                 auto sourceAssetFullPath = asset.m_availableAssetInfo.m_sourceAssetGlobalPath;
                 if (sourceAssetFullPath.empty())
                 {
-                    AZ_Warning("ROS2EditorSystemComponent", false, "asset %s is has no sourceAssetFullPath", name.c_str());
+                    AZ_Warning("ROS2EditorSystemComponent", false, "Asset %s missing `sourceAssetFullPath`", name.c_str());
                     continue;
                 }
                 using namespace AzToolsFramework;
@@ -157,6 +156,7 @@ namespace ROS2
 
         if (!prefabOutcome.IsSuccess())
         {
+            AZ_Error("ROS2EditorSystemComponent", false, "Unable to create Prefab from URDF file %s", filePath.data());
             return false;
         }
         AZ_Printf("ROS2EditorSystemComponent", "ROS2EditorSystemComponent::SynchonousGeneratePrefabFromFile done");
