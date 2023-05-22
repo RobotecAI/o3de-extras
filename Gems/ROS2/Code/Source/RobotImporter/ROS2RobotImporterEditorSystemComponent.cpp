@@ -7,16 +7,17 @@
  */
 
 #include "ROS2RobotImporterEditorSystemComponent.h"
-#include <AzCore/std/string/string.h>
-#include "Bus/RobotImporterBus.h"
+#include "AzCore/Utils/Utils.h"
 #include "RobotImporter/URDF/UrdfParser.h"
+#include "RobotImporter/Utils/FilePath.h"
 #include "RobotImporterWidget.h"
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/std/string/string.h>
 #include <AzToolsFramework/API/ViewPaneOptions.h>
 #if !defined(Q_MOC_RUN)
 #include <QWindow>
 #endif
-#include "RobotImporter/Utils/FilePath.h"
+
 namespace ROS2
 {
     void ROS2RobotImporterEditorSystemComponent::Reflect(AZ::ReflectContext* context)
@@ -108,6 +109,7 @@ namespace ROS2
                 Utils::CopyAssetForURDFAndCreateAssetMap(meshNames, filePath, collidersNames, visualNames));
         }
         bool allAssetProcessed = false;
+        bool assetProcessorFailed = false;
         do
         {
             allAssetProcessed = true;
@@ -124,6 +126,14 @@ namespace ROS2
                 AZ::Outcome<AssetSystem::JobInfoContainer> result = AZ::Failure();
                 AssetSystemJobRequestBus::BroadcastResult(
                     result, &AssetSystemJobRequestBus::Events::GetAssetJobsInfo, sourceAssetFullPath, true);
+
+                if (!result.IsSuccess())
+                {
+                    assetProcessorFailed = true;
+                    AZ_Error("ROS2EditorSystemComponent", false, "Asset System failed to reply with jobs infos");
+                    break;
+                }
+
                 JobInfoContainer& allJobs = result.GetValue();
                 for (const JobInfo& job : allJobs)
                 {
@@ -139,11 +149,11 @@ namespace ROS2
                 }
             }
 
-            if (allAssetProcessed)
+            if (allAssetProcessed && !assetProcessorFailed)
             {
                 AZ_Printf("ROS2EditorSystemComponent", "All assets processed");
             }
-        } while (!allAssetProcessed);
+        } while (!allAssetProcessed && !assetProcessorFailed);
 
         AZStd::string prefabName = AZStd::string(parsedUrdf->getName().c_str(), parsedUrdf->getName().size()) + ".prefab";
 
@@ -159,7 +169,7 @@ namespace ROS2
             AZ_Error("ROS2EditorSystemComponent", false, "Unable to create Prefab from URDF file %s", filePath.data());
             return false;
         }
-        AZ_Printf("ROS2EditorSystemComponent", "ROS2EditorSystemComponent::SynchonousGeneratePrefabFromFile done");
+
         return true;
     }
 
