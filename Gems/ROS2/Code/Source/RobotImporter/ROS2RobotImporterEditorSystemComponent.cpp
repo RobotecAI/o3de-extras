@@ -8,12 +8,14 @@
 
 #include "ROS2RobotImporterEditorSystemComponent.h"
 #include "AzCore/Utils/Utils.h"
+#include "AzCore/std/chrono/chrono.h"
 #include "RobotImporter/URDF/UrdfParser.h"
 #include "RobotImporter/Utils/FilePath.h"
 #include "RobotImporterWidget.h"
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/std/string/string.h>
 #include <AzToolsFramework/API/ViewPaneOptions.h>
+#include <ctime>
 #if !defined(Q_MOC_RUN)
 #include <QWindow>
 #endif
@@ -110,8 +112,19 @@ namespace ROS2
         }
         bool allAssetProcessed = false;
         bool assetProcessorFailed = false;
+
+        auto loopStartTime = AZStd::chrono::system_clock::now();
+
         do
         {
+            auto loopTime = AZStd::chrono::system_clock::now();
+
+            if (loopTime - loopStartTime > assetLoopTimeout)
+            {
+                AZ_Warning("ROS2EditorSystemComponent", false, "Loop waiting for assets timed out");
+                break;
+            }
+
             allAssetProcessed = true;
             for (const auto& [name, asset] : *urdfAssetsMapping)
             {

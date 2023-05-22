@@ -43,5 +43,8 @@ namespace ROS2
 
         // RobotImporterRequestsBus::Handler overrides ..
         bool GeneratePrefabFromFile(const AZStd::string_view filePath, bool importAssetWithUrdf, bool useArticulation) override;
+
+        // Timeout for loop waiting for assets to be built
+        static constexpr AZStd::chrono::seconds assetLoopTimeout = AZStd::chrono::seconds(30);
     };
 } // namespace ROS2
