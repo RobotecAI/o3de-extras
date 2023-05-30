@@ -115,10 +115,11 @@ namespace ROS2
             auto acc = (linearVelocityFilter - m_previousLinearVelocity) / m_deltaTimeFromLastPublish;
 
             m_previousLinearVelocity = linearVelocityFilter;
-            m_acceleration = -acc + angularRateFiltered.Cross(linearVelocityFilter);
+            m_acceleration = acc + angularRateFiltered.Cross(linearVelocityFilter);
             if (m_includeGravity)
             {
-                m_acceleration += inv.TransformVector(gravity);
+                // at rest vector represents velocity solely due to gravity. It the body z axis points upwards its z axis should indicate +g
+                m_acceleration -= inv.TransformVector(gravity);
             }
             m_imuMsg.linear_acceleration = ROS2Conversions::ToROS2Vector3(m_acceleration);
             m_imuMsg.angular_velocity = ROS2Conversions::ToROS2Vector3(angularRateFiltered);
