@@ -54,6 +54,7 @@ namespace ROS2
         AZ::Vector3 m_acceleration{ 0 };
         AZStd::deque<AZ::Vector3> m_filterAcceleration;
         AZStd::deque<AZ::Vector3> m_filterAngularVelocity;
+        double m_deltaTimeFromLastPublish { 0 };
 
     private:
         // ROS2SensorComponent overrides ...

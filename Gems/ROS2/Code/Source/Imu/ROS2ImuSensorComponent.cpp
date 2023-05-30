@@ -87,6 +87,7 @@ namespace ROS2
 
     void ROS2ImuSensorComponent::OnPhysicsSimulationFinished(AzPhysics::SceneHandle sceneHandle, float deltaTime)
     {
+        m_deltaTimeFromLastPublish += deltaTime;
         auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
         const auto gravity = sceneInterface->GetGravity(sceneHandle);
         auto* body = sceneInterface->GetSimulatedBodyFromHandle(sceneHandle, m_bodyHandle);
@@ -111,7 +112,7 @@ namespace ROS2
                 AZStd::accumulate(m_filterAngularVelocity.begin(), m_filterAngularVelocity.end(), AZ::Vector3{ 0 }) /
                 m_filterAngularVelocity.size();
 
-            auto acc = (linearVelocityFilter - m_previousLinearVelocity) / deltaTime;
+            auto acc = (linearVelocityFilter - m_previousLinearVelocity) / m_deltaTimeFromLastPublish;
 
             m_previousLinearVelocity = linearVelocityFilter;
             m_acceleration = -acc + angularRateFiltered.Cross(linearVelocityFilter);
@@ -127,6 +128,7 @@ namespace ROS2
             }
             m_imuMsg.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
             this->m_imuPublisher->publish(m_imuMsg);
+            m_deltaTimeFromLastPublish = 0;
         }
     };
 
@@ -138,6 +140,10 @@ namespace ROS2
         const auto publisherConfig = m_sensorConfiguration.m_publishersConfigurations[Internal::kImuMsgType];
         const auto fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
         m_imuPublisher = ros2Node->create_publisher<sensor_msgs::msg::Imu>(fullTopic.data(), publisherConfig.GetQoS());
+        m_deltaTimeFromLastPublish = 0;
+        m_previousLinearVelocity = AZ::Vector3::CreateZero();
+        m_filterAcceleration.clear();
+        m_filterAngularVelocity.clear();
         ROS2SensorComponent::Activate();
     }
 
