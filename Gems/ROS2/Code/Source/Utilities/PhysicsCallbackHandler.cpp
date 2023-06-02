@@ -6,6 +6,8 @@
  *
  */
 #include <ROS2/Utilities/PhysicsCallbackHandler.h>
+#include "AzFramework/Physics/RigidBodyBus.h"
+#include "AzFramework/Physics/SimulatedBodies/RigidBody.h"
 
 namespace ROS2::Utils
 {

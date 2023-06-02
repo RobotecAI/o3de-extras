@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "ROS2OdometryCovariance.h"
+#include <ROS2/Utilities/ROS2OdometryCovariance.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
