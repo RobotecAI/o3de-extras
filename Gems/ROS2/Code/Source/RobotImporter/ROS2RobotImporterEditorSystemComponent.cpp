@@ -7,15 +7,14 @@
  */
 
 #include "ROS2RobotImporterEditorSystemComponent.h"
-#include "AzCore/Utils/Utils.h"
-#include "AzCore/std/chrono/chrono.h"
 #include "RobotImporter/URDF/UrdfParser.h"
 #include "RobotImporter/Utils/FilePath.h"
 #include "RobotImporterWidget.h"
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Utils/Utils.h>
+#include <AzCore/std/chrono/chrono.h>
 #include <AzCore/std/string/string.h>
 #include <AzToolsFramework/API/ViewPaneOptions.h>
-#include <ctime>
 #if !defined(Q_MOC_RUN)
 #include <QWindow>
 #endif
@@ -115,7 +114,13 @@ namespace ROS2
 
         auto loopStartTime = AZStd::chrono::system_clock::now();
 
-        do
+        /* This loop waits until all of the assets are processed.
+           The urdf prefab cannot be created before all assets are processed.
+           There are three stop conditions: allAssetProcessed, assetProcessorFailed and a timeout.
+           After all asset are processed the allAssetProcessed will be set to true.
+           assetProcessorFailed will be set to true if the asset processor does not respond.
+           The time out will break the loop if assetLoopTimeout is exceed. */
+        while (!allAssetProcessed && !assetProcessorFailed)
         {
             auto loopTime = AZStd::chrono::system_clock::now();
 
@@ -166,7 +171,7 @@ namespace ROS2
             {
                 AZ_Printf("ROS2EditorSystemComponent", "All assets processed");
             }
-        } while (!allAssetProcessed && !assetProcessorFailed);
+        };
 
         AZStd::string prefabName = AZStd::string(parsedUrdf->getName().c_str(), parsedUrdf->getName().size()) + ".prefab";
 
