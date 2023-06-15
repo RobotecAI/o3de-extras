@@ -11,7 +11,7 @@ if cmake --build build/linux --config profile --target WarehouseTest.GameLaunche
     VALUE="\"RESULT: ALL TESTS PASSED"\" # expected result
     echo "Build succeeded"
 else
-    VALUE=""\RESULT: Build failed"\"
+    VALUE="\"RESULT: Build failed"\"
 fi
 
 # Print the value, needed for the action to get the result
