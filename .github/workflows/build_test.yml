@@ -20,4 +20,4 @@ jobs:
         uses: RobotecAI/setup-o3de-extras@0.1
         with:
           script-path: Test/test_build.sh # path to the test script inside tested repository
-          container: robotecai/o3de-2305-extras-2305:latest # container image to use
+          container: robotecai/o3de-dev-extras-dev:latest # container image to use
