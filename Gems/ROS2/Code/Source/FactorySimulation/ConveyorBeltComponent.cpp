@@ -77,16 +77,19 @@ namespace ROS2
                     if (count <= 0)
                     {
                         m_entitiesOnBelt.erase(boxId);
+                        m_entitiesOnBeltVel.erase(boxId);
                     }
                 }
             });
 
         Physics::RigidBodyNotificationBus::Handler::BusConnect(GetEntityId());
         AZ::TickBus::Handler::BusConnect();
+        AzFramework::EntityDebugDisplayEventBus::Handler::BusConnect(GetEntityId());
     }
 
     void ConveyorBeltComponent::Deactivate()
     {
+        AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();
         m_onTriggerEnterHandler.Disconnect();
         m_onTriggerExitHandler.Disconnect();
         AZ::TickBus::Handler::BusDisconnect();
@@ -148,25 +151,56 @@ namespace ROS2
 
             AZ::Transform splineTransform = AZ::Transform::Identity();
             AZ::TransformBus::EventResult(splineTransform, m_entity->GetId(), &AZ::TransformBus::Events::GetWorldTM);
-            splineTransform.Invert();
+            AZ::Transform splineTransformIn =  splineTransform.GetInverse();
 
-            const AZ::Vector3 conveyeredEntityPositionLocal = splineTransform.TransformPoint(conveyeredEntityPositionWorld);
-            const AZ::Quaternion conveyeredEntityRotationLocal = splineTransform.GetRotation() * conveyeredEntityRotationWorld;
+            const AZ::Vector3 conveyeredEntityPositionLocal = splineTransformIn.TransformPoint(conveyeredEntityPositionWorld);
 
-            const AZ::Vector3 boxDirection = conveyeredEntityRotationLocal.TransformVector(AZ::Vector3::CreateAxisX());
             AZ::PositionSplineQueryResult r = splinePtr->GetNearestAddressPosition(conveyeredEntityPositionLocal);
 
             AZ::Vector3 tangent = splinePtr->GetTangent(r.m_splineAddress);
-
+            tangent = splineTransform.TransformVector(tangent);
             Physics::RigidBodyRequestBus::Event(m_TempConveyorEntityId, &Physics::RigidBodyRequests::SetLinearVelocity, tangent * m_speed);
 
-            AZ::Vector3 rot = tangent.Cross(boxDirection);
-            Physics::RigidBodyRequestBus::Event(m_TempConveyorEntityId, &Physics::RigidBodyRequests::SetAngularVelocity, -rot * m_speed);
+//            const AZ::Quaternion conveyeredEntityRotationLocal = splineTransformIn.GetRotation() * conveyeredEntityRotationWorld;
+//            const AZ::Vector3 boxDirection = conveyeredEntityRotationLocal.TransformVector(AZ::Vector3::CreateAxisX());
+//            AZ::Vector3 rot = tangent.Cross(boxDirection);
+//            Physics::RigidBodyRequestBus::Event(m_TempConveyorEntityId, &Physics::RigidBodyRequests::SetAngularVelocity, -rot * m_speed);
+            m_entitiesOnBeltVel[m_TempConveyorEntityId] = tangent * m_speed;
         }
     }
     void ConveyorBeltComponent::OnTick(float deltaTime, AZ::ScriptTimePoint time)
     {
 
     }
+
+
+    void ConveyorBeltComponent::DisplayEntityViewport([[maybe_unused]] const AzFramework::ViewportInfo& viewportInfo
+                                                     , AzFramework::DebugDisplayRequests& debugDisplayRequests)
+    {
+        debugDisplayRequests.SetColor(AZ::Colors::Black);
+        AZ::Vector3 conveyeredEntityPositionWorld{ 0 };
+        for (auto& [m_TempConveyorEntityId, vel] : m_entitiesOnBeltVel)
+        {
+            AZ::TransformBus::EventResult(
+                conveyeredEntityPositionWorld, m_TempConveyorEntityId, &AZ::TransformBus::Events::GetWorldTranslation);
+            debugDisplayRequests.DrawArrow(conveyeredEntityPositionWorld, conveyeredEntityPositionWorld + vel, 1.5f);
+        }
+
+        AZ::ConstSplinePtr splinePtr{ nullptr };
+        LmbrCentral::SplineComponentRequestBus::EventResult(splinePtr, m_entity->GetId(), &LmbrCentral::SplineComponentRequests::GetSpline);
+        AZ_Assert(splinePtr, "Spline pointer is null");
+
+        AZ::Transform splineTransform = AZ::Transform::Identity();
+        AZ::TransformBus::EventResult(splineTransform, m_entity->GetId(), &AZ::TransformBus::Events::GetWorldTM);
+        for (float f = 0.0;f < 1.0f; f+=0.01)
+        {
+            AZ::SplineAddress address = splinePtr->GetAddressByFraction(f);
+            AZ::Vector3 pos = splinePtr->GetPosition(address);
+            pos = splineTransform.TransformPoint(pos);
+            debugDisplayRequests.SetColor(AZ::Colors::Red);
+            debugDisplayRequests.DrawPoint(pos, 2);
+        }
+    }
+
 
 } // namespace ROS2

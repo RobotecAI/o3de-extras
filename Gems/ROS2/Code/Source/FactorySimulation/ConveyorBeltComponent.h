@@ -20,6 +20,7 @@
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBodyEvents.h>
 #include <AzFramework/Physics/RigidBodyBus.h>
+#include <AzFramework/Entity/EntityDebugDisplayBus.h>
 
 namespace ROS2
 {
@@ -28,6 +29,7 @@ namespace ROS2
         : public AZ::Component
         , public AZ::TickBus::Handler
         , protected Physics::RigidBodyNotificationBus::Handler
+        , private AzFramework::EntityDebugDisplayEventBus::Handler
    {
    public:
        AZ_COMPONENT(ConveyorBeltComponent, "{61ECBDD3-94B4-4982-96CA-284FA27A8378}");
@@ -42,6 +44,9 @@ namespace ROS2
        //////////////////////////////////////////////////////////////////////////
 
    private:
+       // EntityDebugDisplayEventBus
+       void DisplayEntityViewport(const AzFramework::ViewportInfo& viewportInfo
+                                  , AzFramework::DebugDisplayRequests& debugDisplayRequests) override;
 
        // Physics::RigidBodyNotifications overrides...
        void OnPhysicsEnabled(const AZ::EntityId& entityId) override;
@@ -60,7 +65,7 @@ namespace ROS2
 
 
        AZStd::unordered_map<AZ::EntityId, int> m_entitiesOnBelt;
-
+       AZStd::unordered_map<AZ::EntityId, AZ::Vector3> m_entitiesOnBeltVel;
        AzPhysics::SimulatedBodyEvents::OnTriggerEnter::Handler m_onTriggerEnterHandler;
        AzPhysics::SimulatedBodyEvents::OnTriggerExit::Handler m_onTriggerExitHandler;
        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneFinishSimHandler;
