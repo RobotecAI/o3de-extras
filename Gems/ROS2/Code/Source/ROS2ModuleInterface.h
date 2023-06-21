@@ -36,6 +36,8 @@
 #include <VehicleDynamics/VehicleModelComponent.h>
 #include <VehicleDynamics/WheelControllerComponent.h>
 #include <FactorySimulation/ConveyorBeltComponent.h>
+#include <Gripper/GripperActionServer.h>
+#include <Gripper/VacuumGripper.h>
 
 namespace ROS2
 {
@@ -82,6 +84,8 @@ namespace ROS2
                     ManipulatorControllerComponent::CreateDescriptor(),
                     PidMotorControllerComponent::CreateDescriptor(),
                     ConveyorBeltComponent::CreateDescriptor(),
+                    GripperActionServer::CreateDescriptor(),
+                    VacuumGripper::CreateDescriptor(),
                 });
         }
 
