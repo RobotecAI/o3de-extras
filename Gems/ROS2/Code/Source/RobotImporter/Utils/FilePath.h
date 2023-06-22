@@ -19,5 +19,7 @@ namespace ROS2
         bool IsFileXacro(const AZ::IO::Path& filename);
 
         bool IsFileUrdf(const AZ::IO::Path& filename);
+
+        bool IsFileSdf(const AZ::IO::Path& filename);
     } // namespace Utils
 } // namespace ROS2

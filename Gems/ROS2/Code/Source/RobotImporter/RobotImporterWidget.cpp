@@ -10,6 +10,8 @@
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/Utils/Utils.h>
 
+#include <sdf/sdf.hh>
+
 #include "RobotImporterWidget.h"
 #include "URDF/URDFPrefabMaker.h"
 #include "URDF/UrdfParser.h"
@@ -130,6 +132,25 @@ namespace ROS2
             {
                 // standard URDF
                 m_parsedUrdf = UrdfParser::ParseFromFile(m_urdfPath.Native());
+            }
+            else if (Utils::IsFileSdf(m_urdfPath))
+            {
+                // test code
+                sdf::SDFPtr sdfElement(new sdf::SDF());
+                sdf::init(sdfElement);
+                const std::string sdfPath(m_urdfPath.c_str());
+                if (!sdf::readFile(sdfPath, sdfElement))
+                {
+                    AZ_Assert(false, "%s is not a valid SDF file!\n", m_urdfPath.c_str());
+                }
+
+                const sdf::ElementPtr rootElement = sdfElement->Root();
+                if (!rootElement->HasElement("model"))
+                {
+                    AZ_Assert(false, "%s is not a model SDF file!\n", m_urdfPath.c_str());
+                }
+
+                AZ_Assert(false, "It happened what should have happened\n");
             }
             else
             {
@@ -421,4 +442,20 @@ namespace ROS2
         AZ_Error("RobotImporterWidget", false, "%s", errorMessage.toUtf8().constData());
     }
 
+    AZStd::string RobotImporterWidget::GetCapitalizedExtension(const AZ::IO::Path& filename) const
+    {
+        AZStd::string extension{ filename.Extension().Native() };
+        AZStd::to_upper(extension.begin(), extension.end());
+        return extension;
+    }
+
+    bool RobotImporterWidget::IsFileXacro(const AZ::IO::Path& filename) const
+    {
+        return filename.HasExtension() && GetCapitalizedExtension(filename) == ".XACRO";
+    }
+
+    bool RobotImporterWidget::IsFileUrdf(const AZ::IO::Path& filename) const
+    {
+        return filename.HasExtension() && GetCapitalizedExtension(filename) == ".URDF";
+    }
 } // namespace ROS2

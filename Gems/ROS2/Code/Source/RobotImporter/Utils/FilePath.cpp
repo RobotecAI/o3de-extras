@@ -34,5 +34,11 @@ namespace ROS2
         {
             return GetCapitalizedExtension(filename) == ".URDF";
         }
+
+        bool IsFileSdf(const AZ::IO::Path& filename)
+        {
+            return GetCapitalizedExtension(filename) == ".SDF";
+        }
+
     } // namespace Utils
 } // namespace ROS2
