@@ -6,6 +6,7 @@
  *
  */
 #include "ConveyorBeltComponentKinematic.h"
+#include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
 #include <AzCore/Math/Matrix3x3.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Serialization/EditContext.h>
@@ -66,7 +67,7 @@ namespace ROS2
         AzPhysics::SceneHandle sceneHandle, AzPhysics::SimulatedBodyHandle handle)
     {
         AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
-        // AZ_Assert(sceneInterface, "No scene intreface");
+        // AZ_Assert(sceneInterface, "No scene interface");
         auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(sceneHandle, handle));
         // AZ_Assert(body, "No valid body found");
         if (body)
@@ -104,7 +105,7 @@ namespace ROS2
         return AZStd::make_pair(normalizedLocation, handle);
     }
 
-    void ConveyorBeltComponentKinematic::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void ConveyorBeltComponentKinematic::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
         // AZ_Assert(physicsSystem, "No physics system");
@@ -113,7 +114,7 @@ namespace ROS2
         AzPhysics::SceneHandle defaultSceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
         // AZ_Assert(defaultSceneHandle != AzPhysics::InvalidSceneHandle, "Invalid default physics scene handle");
 
-        // Initiliazation. Create segments and add to scene, attach post-simulation event, cache pointers,transform etc.
+        // Initialization. Create segments and add to scene, attach post-simulation event, cache pointers,transform etc.
         // Strong assumption is that conveyor belt is not transformed after initialization.
         if (!m_initilized)
         {
@@ -183,6 +184,38 @@ namespace ROS2
                     return c.second == AzPhysics::InvalidSimulatedBodyHandle;
                 }),
             m_ConveyorSegments.end());
+
+        // move texture
+        const auto entity = GetEntity();
+        const auto id = entity->GetId();
+
+        if (id.IsValid())
+        {
+            AZ::Render::MaterialAssignmentId materialId;
+            AZ::Render::MaterialComponentRequestBus::EventResult(
+                materialId, id, &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId, -1, "Belt");
+
+            m_textureOffset += deltaTime * m_speed;
+
+            AZ::Render::MaterialComponentRequestBus::Event(
+                id, &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>, materialId, "uv.offsetV", m_textureOffset);
+
+            // debug only
+            float currentTextureOffset = 0.0f;
+            AZ::Render::MaterialComponentRequestBus::EventResult(
+                currentTextureOffset,
+                id,
+                &AZ::Render::MaterialComponentRequestBus::Events::GetPropertyValueT<float>,
+                materialId,
+                "uv.offsetV");
+
+            AZ_Printf(
+                "ConveyorBeltComponentKinematic",
+                "ConveyorBeltComponentKinematic::OnTick id %s offset requested %f offset read %f",
+                materialId.ToString().c_str(),
+                m_textureOffset,
+                currentTextureOffset);
+        }
     }
     AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
     {

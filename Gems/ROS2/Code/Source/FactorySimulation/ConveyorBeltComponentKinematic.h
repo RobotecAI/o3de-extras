@@ -95,6 +95,8 @@ namespace ROS2
         AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_ConveyorSegments;
         //! Heigh of belt
         static constexpr float m_segmentWidth = 0.1f;
+        //! Offset of the texture
+        float m_textureOffset = 0.0f;
         //! Pointer to the spline
         AZ::ConstSplinePtr m_splineConsPtr{ nullptr };
         //! Real spline length
