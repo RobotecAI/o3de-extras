@@ -1,11 +1,9 @@
 # SDFormat URDF
 
-This package contains a C++ library and `urdf_parser_plugin` for converting SDFormat XML into URDF C++ structures.
+This package contains a C++ code for converting SDFormat XML into URDF C++ structures.
 Installing it allows one to use SDFormat XML instead of URDF XML as a robot description.
 
-## Supported platforms
-
-The package has been tested with ROS Rolling Ridley on Ubuntu Focal.
+The code is based on [sdformat_urdf](https://github.com/ros/sdformat_urdf) ROS package.
 
 ## Limitations and Considerations
 
@@ -14,7 +12,7 @@ SDFormat XML used with this plugin must be constructed with the following limita
 
 ### Limitations that result in Errors
 
-This package will error and refuse to convert any SDFormat XML that violates these constraints.
+This implementation will error and refuse to convert any SDFormat XML that violates these constraints.
 
 #### Model limitations
 * The XML file must contain a single `<model>` not in a `<world>`
@@ -36,7 +34,7 @@ This package will error and refuse to convert any SDFormat XML that violates the
 
 ### Limitations that may result in Warnings
 
-If any of these constraints are violated then the library may issue a console warning, but the model is still converted to URDF c++ structures.
+If any of these constraints are violated then the library may issue a warning, but the model is still converted to URDF C++ structures.
 The warning is issued using an `rcutils` logger with the name `sdformat_urdf`.
 
 #### Joint limitations
