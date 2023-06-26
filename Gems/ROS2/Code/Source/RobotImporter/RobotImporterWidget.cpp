@@ -13,6 +13,7 @@
 #include <sdf/sdf.hh>
 
 #include "RobotImporterWidget.h"
+#include "SDF_URDF/SDFormatURDF.h"
 #include "URDF/URDFPrefabMaker.h"
 #include "URDF/UrdfParser.h"
 #include "Utils/FilePath.h"
@@ -136,21 +137,15 @@ namespace ROS2
             else if (Utils::IsFileSdf(m_urdfPath))
             {
                 // test code
-                sdf::SDFPtr sdfElement(new sdf::SDF());
-                sdf::init(sdfElement);
-                const std::string sdfPath(m_urdfPath.c_str());
-                if (!sdf::readFile(sdfPath, sdfElement))
-                {
-                    AZ_Assert(false, "%s is not a valid SDF file!\n", m_urdfPath.c_str());
-                }
+                std::ifstream istream(m_urdfPath.Native().c_str());
+                std::string xmlStr((std::istreambuf_iterator<char>(istream)), std::istreambuf_iterator<char>());
+                sdf::Errors errors;
+                m_parsedUrdf = sdformat_urdf::parse(xmlStr, errors);
 
-                const sdf::ElementPtr rootElement = sdfElement->Root();
-                if (!rootElement->HasElement("model"))
+                for (const auto& err : errors)
                 {
-                    AZ_Assert(false, "%s is not a model SDF file!\n", m_urdfPath.c_str());
+                    report += QString::fromStdString(err.Message()) + "\n";
                 }
-
-                AZ_Assert(false, "It happened what should have happened\n");
             }
             else
             {
