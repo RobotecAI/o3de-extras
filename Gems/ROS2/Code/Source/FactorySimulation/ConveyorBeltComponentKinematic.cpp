@@ -24,6 +24,7 @@ namespace ROS2
         {
             serialize->Class<ConveyorBeltComponentKinematic>()
                 ->Version(1)
+                ->Field("m_ConveyorEntityId", &ConveyorBeltComponentKinematic::m_ConveyorEntityId)
                 ->Field("Speed", &ConveyorBeltComponentKinematic::m_speed)
                 ->Field("BeltWidth", &ConveyorBeltComponentKinematic::m_beltWidth)
                 ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength);
@@ -33,6 +34,11 @@ namespace ROS2
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::EntityId,
+                        &ConveyorBeltComponentKinematic::m_ConveyorEntityId,
+                        "Conveyor Belt Entity",
+                        "Entity of the conveyor belt")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default, &ConveyorBeltComponentKinematic::m_speed, "Speed", "Speed of the conveyor belt")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &ConveyorBeltComponentKinematic::m_beltWidth, "Width", "Belt width")
@@ -186,17 +192,20 @@ namespace ROS2
             m_ConveyorSegments.end());
 
         // move texture
-        const auto id = GetEntity()->GetId();
-        if (id.IsValid())
+        if (m_ConveyorEntityId.IsValid())
         {
             AZ::Render::MaterialAssignmentId materialId;
             AZ::Render::MaterialComponentRequestBus::EventResult(
-                materialId, id, &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId, -1, "Belt");
+                materialId, m_ConveyorEntityId, &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId, -1, "Belt");
 
             m_textureOffset += deltaTime * m_speed;
 
             AZ::Render::MaterialComponentRequestBus::Event(
-                id, &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>, materialId, "uv.offsetV", m_textureOffset);
+                m_ConveyorEntityId,
+                &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>,
+                materialId,
+                "uv.offsetU",
+                m_textureOffset);
         }
     }
     AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)

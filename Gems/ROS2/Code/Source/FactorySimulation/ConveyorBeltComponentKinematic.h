@@ -107,6 +107,9 @@ namespace ROS2
         AZ::Vector3 m_startPoint;
         AZ::Vector3 m_endPoint;
 
+        //! Conveyor belt entity (used for texture movement)
+        AZ::EntityId m_ConveyorEntityId;
+
         bool m_initilized{ false };
     };
 } // namespace ROS2
