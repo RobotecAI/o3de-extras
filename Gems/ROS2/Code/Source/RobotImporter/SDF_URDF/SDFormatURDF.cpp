@@ -598,6 +598,17 @@ urdf::Pose sdformat_urdf::convert_pose(const ignition::math::Pose3d& sdf_pose)
     return pose;
 }
 
+bool uri_replace(std::string& str, const std::string& from, const std::string& to)
+{
+    size_t start_pos = str.find(from);
+    if (start_pos == std::string::npos)
+    {
+        return false;
+    }
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
 urdf::GeometrySharedPtr sdformat_urdf::convert_geometry(const sdf::Geometry& sdf_geometry, sdf::Errors& errors)
 {
     if (sdf_geometry.BoxShape())
@@ -626,13 +637,14 @@ urdf::GeometrySharedPtr sdformat_urdf::convert_geometry(const sdf::Geometry& sdf
     }
     else if (sdf_geometry.MeshShape())
     {
-        const std::string& uri = sdf_geometry.MeshShape()->Uri();
+        std::string uri = sdf_geometry.MeshShape()->Uri();
         auto urdf_mesh = std::make_shared<urdf::Mesh>();
-        // The only example in ROS that I've found using urdf_mesh->filename is
-        // the RobotModel plugin in RViz. This plugin uses resource retriever to
-        // resolve the filename - which may be a URI - to the mesh resource.
-        // Pass it here unmodified, ignoring that SDFormat relative paths may not
-        // be resolvable this way.
+
+        // quick fix: substitute URI path; try to remove "model" and "file" (for meshes and materials respectively)
+        if (!uri_replace(uri, "model://", "../"))
+        {
+            uri_replace(uri, "file://", "../");
+        }
         urdf_mesh->filename = uri;
 
         urdf_mesh->scale.x = sdf_geometry.MeshShape()->Scale().X();
