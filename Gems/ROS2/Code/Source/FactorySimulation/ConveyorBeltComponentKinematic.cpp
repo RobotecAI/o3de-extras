@@ -7,17 +7,35 @@
  */
 #include "ConveyorBeltComponentKinematic.h"
 #include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
+#include <AzCore/Asset/AssetSerializer.h>
 #include <AzCore/Math/Matrix3x3.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBody.h>
 #include <AzFramework/Physics/Components/SimulatedBodyComponentBus.h>
+#include <AzFramework/Physics/Material/PhysicsMaterialManager.h>
+#include <AzFramework/Physics/Material/PhysicsMaterialSlots.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 #include <AzFramework/Physics/RigidBodyBus.h>
 #include <LmbrCentral/Shape/SplineComponentBus.h>
 #include <Source/RigidBodyComponent.h>
 namespace ROS2
 {
+    static AZ::Data::AssetId GetDefaultPhysicsMaterialAssetId()
+    {
+        // Used for Edit Context.
+        // When the physics material asset property doesn't have an asset assigned it
+        // will show "(default)" to indicate that the default material will be used.
+        if (auto* materialManager = AZ::Interface<Physics::MaterialManager>::Get())
+        {
+            if (AZStd::shared_ptr<Physics::Material> defaultMaterial = materialManager->GetDefaultMaterial())
+            {
+                return defaultMaterial->GetMaterialAsset().GetId();
+            }
+        }
+        return {};
+    }
+
     void ConveyorBeltComponentKinematic::Reflect(AZ::ReflectContext* context)
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
@@ -27,7 +45,8 @@ namespace ROS2
                 ->Field("m_ConveyorEntityId", &ConveyorBeltComponentKinematic::m_ConveyorEntityId)
                 ->Field("Speed", &ConveyorBeltComponentKinematic::m_speed)
                 ->Field("BeltWidth", &ConveyorBeltComponentKinematic::m_beltWidth)
-                ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength);
+                ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength)
+                ->Field("MaterialAsset", &ConveyorBeltComponentKinematic::m_materialAsset);
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
                 ec->Class<ConveyorBeltComponentKinematic>("Conveyor Belt Component Kinematic", "Conveyor Belt Component")
@@ -47,7 +66,16 @@ namespace ROS2
                         &ConveyorBeltComponentKinematic::m_segmentLength,
                         "Segment Length",
                         "Length of simulated segments. Short segments causes larger number individual bodies to simulate and challenges "
-                        "physics engine.");
+                        "physics engine.")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ConveyorBeltComponentKinematic::m_materialAsset,
+                        "Material",
+                        "Material asset of the conveyor belt")
+                    ->Attribute(AZ::Edit::Attributes::DefaultAsset, &GetDefaultPhysicsMaterialAssetId)
+                    ->Attribute(AZ_CRC_CE("EditButton"), "")
+                    ->Attribute(AZ_CRC_CE("EditDescription"), "Open in Asset Editor")
+                    ->Attribute(AZ_CRC_CE("DisableEditButtonWhenNoAssetSelected"), true);
             }
         }
     }
@@ -90,6 +118,8 @@ namespace ROS2
         AzPhysics::SceneHandle sceneHandle,
         float normalizedLocation)
     {
+        auto colliderConfiguration = AZStd::make_shared<Physics::ColliderConfiguration>();
+        colliderConfiguration->m_materialSlots.SetMaterialAsset(0, m_materialAsset);
         auto shapeConfiguration =
             AZStd::make_shared<Physics::BoxShapeConfiguration>(AZ::Vector3(m_segmentLength, m_beltWidth, m_segmentWidth));
         const auto transform = GetTransformFromSpline(m_splineConsPtr, normalizedLocation);
@@ -97,8 +127,7 @@ namespace ROS2
         conveyorSegmentRigidBodyConfig.m_kinematic = true;
         conveyorSegmentRigidBodyConfig.m_position = transform.GetTranslation();
         conveyorSegmentRigidBodyConfig.m_orientation = transform.GetRotation();
-        conveyorSegmentRigidBodyConfig.m_colliderAndShapeData =
-            AzPhysics::ShapeColliderPair(AZStd::make_shared<Physics::ColliderConfiguration>(), shapeConfiguration);
+        conveyorSegmentRigidBodyConfig.m_colliderAndShapeData = AzPhysics::ShapeColliderPair(colliderConfiguration, shapeConfiguration);
         conveyorSegmentRigidBodyConfig.m_computeCenterOfMass = true;
         conveyorSegmentRigidBodyConfig.m_computeInertiaTensor = true;
         conveyorSegmentRigidBodyConfig.m_startSimulationEnabled = true;

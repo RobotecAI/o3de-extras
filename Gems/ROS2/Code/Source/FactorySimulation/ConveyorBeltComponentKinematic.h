@@ -21,6 +21,7 @@
 #include <AzCore/std/containers/deque.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBodyEvents.h>
+#include <AzFramework/Physics/Material/PhysicsMaterialAsset.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 
 namespace ROS2
@@ -91,6 +92,8 @@ namespace ROS2
         float m_beltWidth = 1.0f;
         //! Length of individual segments of the conveyor belt
         float m_segmentLength = 1.0f;
+        //! Material of individual segments of the conveyor belt
+        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset;
         //! Cache of created segments
         AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_ConveyorSegments;
         //! Heigh of belt
