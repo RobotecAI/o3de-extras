@@ -100,10 +100,12 @@ namespace ROS2
         static constexpr float m_segmentWidth = 0.1f;
         //! Offset of the texture
         float m_textureOffset = 0.0f;
+        //! Scaling factor of the texture
+        float m_textureScale = 1.0f;
         //! Pointer to the spline
         AZ::ConstSplinePtr m_splineConsPtr{ nullptr };
         //! Real spline length
-        float m_splineLength{ -1.f };
+        float m_splineLength = -1.0f;
         //! Transform from spline's local frame to world frame
         AZ::Transform m_splineTransform;
         //! Start and end point of the belt
@@ -113,6 +115,6 @@ namespace ROS2
         //! Conveyor belt entity (used for texture movement)
         AZ::EntityId m_ConveyorEntityId;
 
-        bool m_initilized{ false };
+        bool m_initialized{ false };
     };
 } // namespace ROS2

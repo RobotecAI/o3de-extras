@@ -42,10 +42,11 @@ namespace ROS2
         {
             serialize->Class<ConveyorBeltComponentKinematic>()
                 ->Version(1)
-                ->Field("m_ConveyorEntityId", &ConveyorBeltComponentKinematic::m_ConveyorEntityId)
+                ->Field("BeltEntityId", &ConveyorBeltComponentKinematic::m_ConveyorEntityId)
                 ->Field("Speed", &ConveyorBeltComponentKinematic::m_speed)
                 ->Field("BeltWidth", &ConveyorBeltComponentKinematic::m_beltWidth)
                 ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength)
+                ->Field("TextureScale", &ConveyorBeltComponentKinematic::m_textureScale)
                 ->Field("MaterialAsset", &ConveyorBeltComponentKinematic::m_materialAsset);
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -69,6 +70,11 @@ namespace ROS2
                         "physics engine.")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
+                        &ConveyorBeltComponentKinematic::m_textureScale,
+                        "Texture scale",
+                        "Scale of the texture on conveyor belt.")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
                         &ConveyorBeltComponentKinematic::m_materialAsset,
                         "Material",
                         "Material asset of the conveyor belt")
@@ -87,7 +93,7 @@ namespace ROS2
 
     void ConveyorBeltComponentKinematic::Activate()
     {
-        m_initilized = false;
+        m_initialized = false;
         AZ::TickBus::Handler::BusConnect();
     }
 
@@ -151,7 +157,7 @@ namespace ROS2
 
         // Initialization. Create segments and add to scene, attach post-simulation event, cache pointers,transform etc.
         // Strong assumption is that conveyor belt is not transformed after initialization.
-        if (!m_initilized)
+        if (!m_initialized)
         {
             m_splineTransform = AZ::Transform::CreateIdentity();
             AZ::TransformBus::EventResult(m_splineTransform, m_entity->GetId(), &AZ::TransformBus::Events::GetWorldTM);
@@ -184,7 +190,7 @@ namespace ROS2
                 }
                 AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_ConveyorSegments.size());
 
-                m_initilized = true;
+                m_initialized = true;
             }
         }
 
@@ -227,7 +233,7 @@ namespace ROS2
             AZ::Render::MaterialComponentRequestBus::EventResult(
                 materialId, m_ConveyorEntityId, &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId, -1, "Belt");
 
-            m_textureOffset += deltaTime * m_speed;
+            m_textureOffset += deltaTime * m_speed * m_textureScale;
 
             AZ::Render::MaterialComponentRequestBus::Event(
                 m_ConveyorEntityId,
