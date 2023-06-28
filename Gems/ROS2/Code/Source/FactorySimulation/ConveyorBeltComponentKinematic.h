@@ -21,6 +21,7 @@
 #include <AzCore/std/containers/deque.h>
 #include <AzFramework/Physics/Common/PhysicsEvents.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBodyEvents.h>
+#include <AzFramework/Physics/Material/PhysicsMaterialAsset.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 
 namespace ROS2
@@ -91,20 +92,29 @@ namespace ROS2
         float m_beltWidth = 1.0f;
         //! Length of individual segments of the conveyor belt
         float m_segmentLength = 1.0f;
+        //! Material of individual segments of the conveyor belt
+        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset;
         //! Cache of created segments
         AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_ConveyorSegments;
         //! Heigh of belt
         static constexpr float m_segmentWidth = 0.1f;
+        //! Offset of the texture
+        float m_textureOffset = 0.0f;
+        //! Scaling factor of the texture
+        float m_textureScale = 1.0f;
         //! Pointer to the spline
         AZ::ConstSplinePtr m_splineConsPtr{ nullptr };
         //! Real spline length
-        float m_splineLength{ -1.f };
+        float m_splineLength = -1.0f;
         //! Transform from spline's local frame to world frame
         AZ::Transform m_splineTransform;
         //! Start and end point of the belt
         AZ::Vector3 m_startPoint;
         AZ::Vector3 m_endPoint;
 
-        bool m_initilized{ false };
+        //! Conveyor belt entity (used for texture movement)
+        AZ::EntityId m_ConveyorEntityId;
+
+        bool m_initialized{ false };
     };
 } // namespace ROS2
