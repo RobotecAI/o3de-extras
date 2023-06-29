@@ -23,6 +23,7 @@
 #include <AzFramework/Physics/Common/PhysicsSimulatedBodyEvents.h>
 #include <AzFramework/Physics/Material/PhysicsMaterialAsset.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
+#include <AzCore/Component/EntityBus.h>
 
 namespace ROS2
 {
@@ -33,7 +34,9 @@ namespace ROS2
     class ConveyorBeltComponentKinematic
         : public AZ::Component
         , public AZ::TickBus::Handler
+        , public AZ::EntityBus::Handler
     {
+        static constexpr float SegmentWidth = 0.1f; //!< The width of the segment of the belt
     public:
         AZ_COMPONENT(ConveyorBeltComponentKinematic, "{B7F56411-01D4-48B0-8874-230C58A578BD}");
         ConveyorBeltComponentKinematic() = default;
@@ -46,6 +49,9 @@ namespace ROS2
         void Deactivate() override;
 
     private:
+        // EntityBus::Handler overrides
+        void OnEntityActivated(const AZ::EntityId& entityId) override;
+
         //! Obtains the start and end point of the simulated conveyor belt
         //! @param splinePtr the spline to obtain the start and end point from
         //! @return a pair of vectors, the first being the start point and the second being the end point
@@ -56,10 +62,9 @@ namespace ROS2
         float GetSplineLength(AZ::ConstSplinePtr splinePtr);
 
         //! Obtains location of the segment of the belt.
-        //! @param sceneHandle the scene handle of the scene the belt is in
         //! @param handle the handle of the simulated body of the segment
         //! @return the location of the segment in world space
-        AZ::Vector3 GetLocationOfSegment(AzPhysics::SceneHandle sceneHandle, AzPhysics::SimulatedBodyHandle handle);
+        AZ::Vector3 GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle);
 
         //! Obtains the transform of of the pose on the spline at the given distance
         //! @param splinePtr the spline to obtain the transform from
@@ -69,52 +74,43 @@ namespace ROS2
 
         //! Spawn rigid body at the given location
         //! @param splinePtr the spline to spawn the rigid body on
-        //! @param physicsSystem the physics system to spawn the rigid body in
-        //! @param sceneHandle the scene handle of the scene to spawn the rigid body in
         //! @param location the location to spawn the rigid body at (normalized)
         //! @return a pair of the normalized location and the handle of the simulated body
-        AZStd::pair<float, AzPhysics::SimulatedBodyHandle> CreateSegment(
-            AZ::ConstSplinePtr splinePtr,
-            AzPhysics::SystemInterface* physicsSystem,
-            AzPhysics::SceneHandle sceneHandle,
-            float normalizedLocation);
+        AZStd::pair<float, AzPhysics::SimulatedBodyHandle> CreateSegment(AZ::ConstSplinePtr splinePtr, float normalizedLocation);
 
         // AZ::TickBus::Handler overrides...
         void OnTick(float delta, AZ::ScriptTimePoint timePoint) override;
 
-        //! Every physic update
-        void PostPhysicsSubTick(float fixedDeltaTime);
-        //! Every physic update - scene event handler
-        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneFinishSimHandler;
-        //! Speed of the conveyor belt
-        float m_speed = 1.0f;
-        //! Width of the conveyor belt
-        float m_beltWidth = 1.0f;
-        //! Length of individual segments of the conveyor belt
-        float m_segmentLength = 1.0f;
-        //! Material of individual segments of the conveyor belt
-        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset;
-        //! Cache of created segments
-        AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_ConveyorSegments;
-        //! Heigh of belt
-        static constexpr float m_segmentWidth = 0.1f;
-        //! Offset of the texture
-        float m_textureOffset = 0.0f;
-        //! Scaling factor of the texture
-        float m_textureScale = 1.0f;
-        //! Pointer to the spline
-        AZ::ConstSplinePtr m_splineConsPtr{ nullptr };
-        //! Real spline length
-        float m_splineLength = -1.0f;
-        //! Transform from spline's local frame to world frame
-        AZ::Transform m_splineTransform;
-        //! Start and end point of the belt
-        AZ::Vector3 m_startPoint;
-        AZ::Vector3 m_endPoint;
+        //! Update texture offset of the conveyor belt
+        //! @param deltaTime the time since the last update
+        void MoveSegmentsGraphically(float deltaTime);
 
-        //! Conveyor belt entity (used for texture movement)
-        AZ::EntityId m_ConveyorEntityId;
+        //! Update location of segments in physics scene
+        //! @param deltaTime the time since the last update
+        void MoveSegmentsPhysically(float deltaTime);
 
-        bool m_initialized{ false };
+        //! Despawn segments that are at the end of the spline
+        void DespawnSegments();
+
+        //! Spawn segments if there is a free space at the begging of the spline
+        void SpawnSegments();
+
+        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneFinishSimHandler; //!< Handler called after every physics sub-step
+        AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_ConveyorSegments; //!< Cache of created segments
+        float m_textureOffset = 0.0f; //!< Current offset of the texture during animation
+        AZ::ConstSplinePtr m_splineConsPtr{ nullptr }; //!< Pointer to the spline
+        float m_splineLength = -1.0f; //!< Non-normalized spline length
+        AZ::Transform m_splineTransform; //!< Transform from spline's local frame to world frame
+        AZ::Vector3 m_startPoint;//!< Start point of the belt
+        AZ::Vector3 m_endPoint;//!< End point of the belt
+        AzPhysics::SceneHandle m_sceneHandle; //!< Scene handle of the scene the belt is in
+        AZStd::string m_graphicalMaterialSlot {"Belt"}; //!< Name of the material slot to change UVs of
+
+        float m_speed = 1.0f; //!< Speed of the conveyor belt.
+        float m_beltWidth = 1.0f; //!< Width of the conveyor belt.
+        float m_segmentLength = 1.0f; //!< Length of individual segments of the conveyor belt
+        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset; //!<Material of individual segments of the conveyor belt
+        AZ::EntityId m_ConveyorEntityId; //!< Conveyor belt entity (used for texture movement)
+        float m_textureScale = 1.0f; //!< Scaling factor of the texture
     };
 } // namespace ROS2
