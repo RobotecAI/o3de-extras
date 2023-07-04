@@ -5,12 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#include <AzFramework/Entity/EntityDebugDisplayBus.h>
+
 #include <AzCore/Serialization/EditContext.h>
+#include <AzFramework/Entity/EntityDebugDisplayBus.h>
 #include <HingeJointComponent.h>
 #include <PhysX/Joint/PhysXJointRequestsBus.h>
 #include <PrismaticJointComponent.h>
-#include <ROS2/Manipulation/JointMotorControllerComponent.h>
+#include <ROS2/Manipulation/MotorizedJoints/JointMotorControllerComponent.h>
 #include <imgui/imgui.h>
 
 namespace ROS2
