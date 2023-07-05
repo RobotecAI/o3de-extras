@@ -84,11 +84,11 @@ namespace ROS2
     void RobotImporterWidget::OpenUrdf()
     {
         QString report;
-        if (!m_urdfPath.empty())
+        if (!m_filePath.empty())
         {
-            if (Utils::IsFileXacro(m_urdfPath))
+            if (Utils::IsFileXacro(m_filePath))
             {
-                Utils::xacro::ExecutionOutcome outcome = Utils::xacro::ParseXacro(m_urdfPath.String(), m_params);
+                Utils::xacro::ExecutionOutcome outcome = Utils::xacro::ParseXacro(m_filePath.String(), m_params);
                 if (outcome)
                 {
                     m_parsedUrdf = outcome.m_urdfHandle;
@@ -129,15 +129,15 @@ namespace ROS2
                     return;
                 }
             }
-            else if (Utils::IsFileUrdf(m_urdfPath))
+            else if (Utils::IsFileUrdf(m_filePath))
             {
                 // standard URDF
-                m_parsedUrdf = UrdfParser::ParseFromFile(m_urdfPath.Native());
+                m_parsedUrdf = UrdfParser::ParseFromFile(m_filePath.Native());
             }
-            else if (Utils::IsFileSdf(m_urdfPath))
+            else if (Utils::IsFileSdf(m_filePath))
             {
                 // test code
-                std::ifstream istream(m_urdfPath.Native().c_str());
+                std::ifstream istream(m_filePath.Native().c_str());
                 std::string xmlStr((std::istreambuf_iterator<char>(istream)), std::istreambuf_iterator<char>());
                 sdf::Errors errors;
                 m_parsedUrdf = sdformat_urdf::parse(xmlStr, errors);
@@ -149,7 +149,7 @@ namespace ROS2
             }
             else
             {
-                AZ_Assert(false, "Unknown file extension : %s \n", m_urdfPath.c_str());
+                AZ_Assert(false, "Unknown file extension : %s \n", m_filePath.c_str());
             }
             const auto log = UrdfParser::GetUrdfParsingLog();
             if (m_parsedUrdf)
@@ -200,11 +200,11 @@ namespace ROS2
             if (m_importAssetWithUrdf)
             {
                 m_urdfAssetsMapping = AZStd::make_shared<Utils::UrdfAssetMap>(
-                    Utils::CopyAssetForURDFAndCreateAssetMap(m_meshNames, m_urdfPath.String(), collidersNames, visualNames));
+                    Utils::CopyAssetForURDFAndCreateAssetMap(m_meshNames, m_filePath.String(), collidersNames, visualNames));
             }
             else
             {
-                m_urdfAssetsMapping = AZStd::make_shared<Utils::UrdfAssetMap>(Utils::FindAssetsForUrdf(m_meshNames, m_urdfPath.String()));
+                m_urdfAssetsMapping = AZStd::make_shared<Utils::UrdfAssetMap>(Utils::FindAssetsForUrdf(m_meshNames, m_filePath.String()));
                 for (const AZStd::string& meshPath : m_meshNames)
                 {
                     if (m_urdfAssetsMapping->contains(meshPath))
@@ -281,10 +281,10 @@ namespace ROS2
         if (currentPage() == m_fileSelectPage)
         {
             m_params.clear();
-            m_urdfPath = AZStd::string(m_fileSelectPage->getFileName().toUtf8().constData());
-            if (Utils::IsFileXacro(m_urdfPath))
+            m_filePath = AZStd::string(m_fileSelectPage->getFileName().toUtf8().constData());
+            if (Utils::IsFileXacro(m_filePath))
             {
-                m_params = Utils::xacro::GetParameterFromXacroFile(m_urdfPath.String());
+                m_params = Utils::xacro::GetParameterFromXacroFile(m_filePath.String());
                 AZ_Printf("RobotImporterWidget", "Xacro has %d arguments\n", m_params.size());
                 m_xacroParamsPage->SetXacroParameters(m_params);
             }
@@ -373,7 +373,7 @@ namespace ROS2
         }
         const bool useArticulation = m_prefabMakerPage->IsUseArticulations();
         m_prefabMaker = AZStd::make_unique<URDFPrefabMaker>(
-            m_urdfPath.String(), m_parsedUrdf, prefabPath.String(), m_urdfAssetsMapping, useArticulation);
+            m_filePath.String(), m_parsedUrdf, prefabPath.String(), m_urdfAssetsMapping, useArticulation);
 
         auto prefabOutcome = m_prefabMaker->CreatePrefabFromURDF();
         if (prefabOutcome.IsSuccess())
@@ -442,15 +442,5 @@ namespace ROS2
         AZStd::string extension{ filename.Extension().Native() };
         AZStd::to_upper(extension.begin(), extension.end());
         return extension;
-    }
-
-    bool RobotImporterWidget::IsFileXacro(const AZ::IO::Path& filename) const
-    {
-        return filename.HasExtension() && GetCapitalizedExtension(filename) == ".XACRO";
-    }
-
-    bool RobotImporterWidget::IsFileUrdf(const AZ::IO::Path& filename) const
-    {
-        return filename.HasExtension() && GetCapitalizedExtension(filename) == ".URDF";
     }
 } // namespace ROS2

@@ -6,8 +6,8 @@
  *
  */
 
-#include "RobotImporter/URDF/VisualsMaker.h"
-#include "RobotImporter/URDF/PrefabMakerUtils.h"
+#include "RobotImporter/SDFormat/VisualsMaker.h"
+#include "RobotImporter/SDFormat/PrefabMakerUtils.h"
 #include "RobotImporter/Utils/TypeConversions.h"
 
 #include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
@@ -23,7 +23,7 @@
 #include <LmbrCentral/Shape/EditorShapeComponentBus.h>
 #include <LmbrCentral/Shape/SphereShapeComponentBus.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     VisualsMaker::VisualsMaker(
         const std::map<std::string, urdf::MaterialSharedPtr>& materials, const AZStd::shared_ptr<Utils::UrdfAssetMap>& urdfAssetsMapping)
@@ -223,4 +223,4 @@ namespace ROS2
             AZStd::any(materialColor));
         entity->Deactivate();
     }
-} // namespace ROS2
+} // namespace ROS2::SDFormat

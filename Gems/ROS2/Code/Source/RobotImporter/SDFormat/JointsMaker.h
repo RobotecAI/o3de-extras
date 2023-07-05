@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Outcome/Outcome.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     //! Populates a given entity with all the contents of the <joint> tag in robot description.
     //! In URDF, joints are specified between two given links, but in PhysX they are between two Bodies / Colliders.
@@ -30,4 +30,4 @@ namespace ROS2
         JointsMakerResult AddJointComponent(
             urdf::JointSharedPtr joint, AZ::EntityId followColliderEntityId, AZ::EntityId leadColliderEntityId) const;
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat

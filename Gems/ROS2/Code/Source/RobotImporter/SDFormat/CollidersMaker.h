@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/std/containers/unordered_map.h>
@@ -21,8 +20,9 @@
 #include <AzFramework/Physics/Material/PhysicsMaterialId.h>
 #include <AzFramework/Physics/Material/PhysicsMaterialManager.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     using BuildReadyCallback = AZStd::function<void()>;
 
@@ -62,4 +62,4 @@ namespace ROS2
         AZ::Data::Asset<Physics::MaterialAsset> m_wheelMaterial;
         AZStd::shared_ptr<Utils::UrdfAssetMap> m_urdfAssetsMapping;
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat

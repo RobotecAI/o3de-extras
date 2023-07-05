@@ -16,7 +16,7 @@
 #include <Source/EditorPrismaticJointComponent.h>
 #include <Source/EditorRigidBodyComponent.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
 
     JointsMaker::JointsMakerResult JointsMaker::AddJointComponent(
@@ -129,4 +129,4 @@ namespace ROS2
         followColliderEntity->Deactivate();
         return AZ::Success(jointComponent->GetId());
     }
-} // namespace ROS2
+} // namespace ROS2::SDFormat

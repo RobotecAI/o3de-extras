@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <PhysX/ArticulationTypes.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     //! Populates the entity with contents of the <inertial> and <joint> tag in the robot description.
     class ArticulationsMaker
@@ -24,4 +24,4 @@ namespace ROS2
         //! @param entityId A non-active entity which will be populated according to inertial content.
         void AddArticulationLink(urdf::LinkSharedPtr link, AZ::EntityId entityId) const;
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat

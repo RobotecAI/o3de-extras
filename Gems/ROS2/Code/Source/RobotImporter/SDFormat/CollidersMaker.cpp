@@ -27,7 +27,7 @@
 #include <Source/EditorColliderComponent.h>
 #include <Source/EditorMeshColliderComponent.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     namespace Internal
     {
@@ -367,4 +367,4 @@ namespace ROS2
             break;
         }
     }
-} // namespace ROS2
+} // namespace ROS2::SDFormat

@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/std/containers/unordered_map.h>
 #include <AzCore/std/smart_ptr/shared_ptr.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     //! Populates a given entity with all the contents of the <visual> tag in robot description
     class VisualsMaker
@@ -39,4 +39,4 @@ namespace ROS2
         AZStd::unordered_map<AZStd::string, urdf::MaterialSharedPtr> m_materials;
         AZStd::shared_ptr<Utils::UrdfAssetMap> m_urdfAssetsMapping;
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat

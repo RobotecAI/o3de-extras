@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/IO/Path/Path.h>
 #include <AzCore/std/optional.h>
 #include <AzCore/std/string/string.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <urdf_parser/urdf_parser.h>
 
 #include <AzToolsFramework/Prefab/PrefabPublicInterface.h>
 
 //! Common utils for Prefab Maker classes
-namespace ROS2::PrefabMakerUtils
+namespace ROS2::SDFormat::PrefabMakerUtils
 {
     //! Add required components to the entity.
     //! Calling this will ensure all the required (default) components are added.
@@ -58,4 +58,4 @@ namespace ROS2::PrefabMakerUtils
     //! Get Asset from path. Version for std::string.
     //! @see GetAssetFromPath.
     AZStd::optional<Utils::AvailableAsset> GetAssetFromPath(const Utils::UrdfAssetMap& urdfAssetsMapping, const std::string& urdfMeshPath);
-} // namespace ROS2::PrefabMakerUtils
+} // namespace ROS2::SDFormat::PrefabMakerUtils

@@ -68,7 +68,7 @@ namespace ROS2
         CheckAssetPage* m_assetPage;
         PrefabMakerPage* m_prefabMakerPage;
         XacroParamsPage* m_xacroParamsPage;
-        AZ::IO::Path m_urdfPath;
+        AZ::IO::Path m_filePath;
         urdf::ModelInterfaceSharedPtr m_parsedUrdf;
 
         //! User's choice to copy meshes during urdf import

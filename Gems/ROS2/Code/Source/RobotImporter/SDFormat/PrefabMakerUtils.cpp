@@ -6,7 +6,7 @@
  *
  */
 
-#include "RobotImporter/URDF/PrefabMakerUtils.h"
+#include "RobotImporter/SDFormat/PrefabMakerUtils.h"
 #include "RobotImporter/Utils/TypeConversions.h"
 #include <AzCore/Math/Quaternion.h>
 #include <AzCore/Utils/Utils.h>
@@ -17,7 +17,7 @@
 #include <Source/EditorColliderComponent.h>
 #include <Source/EditorShapeColliderComponent.h>
 
-namespace ROS2::PrefabMakerUtils
+namespace ROS2::SDFormat::PrefabMakerUtils
 {
     AZ::IO::Path GetAzModelAssetPathFromModelPath(const AZ::IO::Path& modelPath)
     {
@@ -71,7 +71,6 @@ namespace ROS2::PrefabMakerUtils
             return createEntityResult;
         }
 
-
         // Verify that a valid entity is created.
         AZ::EntityId entityId = createEntityResult.GetValue();
         if (!entityId.IsValid())
@@ -117,4 +116,4 @@ namespace ROS2::PrefabMakerUtils
         return GetAssetFromPath(urdfAssetsMapping, AZStd::string(urdfMeshPath.c_str(), urdfMeshPath.size()));
     }
 
-} // namespace ROS2::PrefabMakerUtils
+} // namespace ROS2::SDFormat::PrefabMakerUtils

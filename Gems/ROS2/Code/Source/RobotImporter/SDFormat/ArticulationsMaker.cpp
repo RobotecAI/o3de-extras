@@ -13,7 +13,7 @@
 #include <RobotImporter/Utils/TypeConversions.h>
 #include <Source/EditorArticulationLinkComponent.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
 
     namespace
@@ -108,4 +108,4 @@ namespace ROS2
 
         entity->CreateComponent<PhysX::EditorArticulationLinkComponent>(articulationLinkConfiguration);
     }
-} // namespace ROS2
+} // namespace ROS2::SDFormat

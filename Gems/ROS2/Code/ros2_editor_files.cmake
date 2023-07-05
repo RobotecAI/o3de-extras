@@ -28,6 +28,22 @@ set(FILES
     Source/RobotImporter/RobotImporterWidget.h
     Source/RobotImporter/ROS2RobotImporterEditorSystemComponent.cpp
     Source/RobotImporter/ROS2RobotImporterEditorSystemComponent.h
+    Source/RobotImporter/SDFormat/ArticulationsMaker.cpp
+    Source/RobotImporter/SDFormat/ArticulationsMaker.h
+    Source/RobotImporter/SDFormat/CollidersMaker.cpp
+    Source/RobotImporter/SDFormat/CollidersMaker.h
+    Source/RobotImporter/SDFormat/InertialsMaker.cpp
+    Source/RobotImporter/SDFormat/InertialsMaker.h
+    Source/RobotImporter/SDFormat/JointsMaker.cpp
+    Source/RobotImporter/SDFormat/JointsMaker.h
+    Source/RobotImporter/SDFormat/PrefabMakerUtils.cpp
+    Source/RobotImporter/SDFormat/PrefabMakerUtils.h
+    Source/RobotImporter/SDFormat/SDFormatParser.cpp
+    Source/RobotImporter/SDFormat/SDFormatParser.h
+    Source/RobotImporter/SDFormat/URDFPrefabMaker.cpp
+    Source/RobotImporter/SDFormat/URDFPrefabMaker.h
+    Source/RobotImporter/SDFormat/VisualsMaker.cpp
+    Source/RobotImporter/SDFormat/VisualsMaker.h
     Source/RobotImporter/SDF_URDF/SDFormatURDF.cpp
     Source/RobotImporter/SDF_URDF/SDFormatURDF.h
     Source/RobotImporter/URDF/ArticulationsMaker.cpp

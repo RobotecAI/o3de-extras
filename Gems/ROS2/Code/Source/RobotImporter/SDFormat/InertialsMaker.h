@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "UrdfParser.h"
 #include <AzCore/Component/EntityId.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     //! Populates the entity with contents of the <inertial> tag in robot description.
     class InertialsMaker
@@ -22,4 +22,4 @@ namespace ROS2
         //! @param entityId A non-active entity which will be populated according to inertial content.
         void AddInertial(urdf::InertialSharedPtr inertial, AZ::EntityId entityId) const;
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat

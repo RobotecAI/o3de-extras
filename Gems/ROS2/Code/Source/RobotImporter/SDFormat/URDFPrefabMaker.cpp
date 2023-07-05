@@ -23,7 +23,7 @@
 #include <RobotControl/ROS2RobotControlComponent.h>
 #include <RobotImporter/Utils/RobotImporterUtils.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     URDFPrefabMaker::URDFPrefabMaker(
         const AZStd::string& modelFilePath,
@@ -345,4 +345,4 @@ namespace ROS2
         }
         return str;
     }
-} // namespace ROS2
+} // namespace ROS2::SDFormat

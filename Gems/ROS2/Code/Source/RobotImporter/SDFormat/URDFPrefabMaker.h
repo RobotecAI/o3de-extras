@@ -12,7 +12,6 @@
 #include "CollidersMaker.h"
 #include "InertialsMaker.h"
 #include "JointsMaker.h"
-#include "UrdfParser.h"
 #include "VisualsMaker.h"
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/std/containers/map.h>
@@ -21,8 +20,9 @@
 #include <AzCore/std/string/string.h>
 #include <AzToolsFramework/Prefab/PrefabPublicInterface.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <urdf_parser/urdf_parser.h>
 
-namespace ROS2
+namespace ROS2::SDFormat
 {
     //! Encapsulates constructive mapping of URDF elements to a complete prefab with entities and components
     class URDFPrefabMaker
@@ -75,4 +75,4 @@ namespace ROS2
         AZStd::shared_ptr<Utils::UrdfAssetMap> m_urdfAssetsMapping;
         bool m_useArticulations{ false };
     };
-} // namespace ROS2
+} // namespace ROS2::SDFormat
