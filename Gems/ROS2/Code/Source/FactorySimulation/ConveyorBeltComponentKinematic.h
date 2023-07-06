@@ -15,6 +15,7 @@
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/TickBus.h>
 
+#include <AzCore/Component/EntityBus.h>
 #include <AzCore/Math/Spline.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -23,20 +24,18 @@
 #include <AzFramework/Physics/Common/PhysicsSimulatedBodyEvents.h>
 #include <AzFramework/Physics/Material/PhysicsMaterialAsset.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
-#include <AzCore/Component/EntityBus.h>
 
 namespace ROS2
 {
     //! Component that simulates a conveyor belt using kinematic physics.
     //! The conveyor belt is simulated using a spline and number of kinematic rigid bodies.
-    //! The kinimatic rigid bodies have their kinematic targets set to interpolate along the spline.
+    //! The kinematic rigid bodies have their kinematic targets set to interpolate along the spline.
     //! The component is updating kinematic targets every physic sub-step and creates and despawns rigid bodies as needed.
     class ConveyorBeltComponentKinematic
         : public AZ::Component
         , public AZ::TickBus::Handler
         , public AZ::EntityBus::Handler
     {
-        static constexpr float SegmentWidth = 0.1f; //!< The width of the segment of the belt (in meters)
         static constexpr float SegmentSeparation = 1.0f; //!< Separation between segments of the belt (in normalized units)
 
     public:
@@ -104,15 +103,15 @@ namespace ROS2
         AZ::ConstSplinePtr m_splineConsPtr{ nullptr }; //!< Pointer to the spline
         float m_splineLength = -1.0f; //!< Non-normalized spline length
         AZ::Transform m_splineTransform; //!< Transform from spline's local frame to world frame
-        AZ::Vector3 m_startPoint;//!< Start point of the belt
-        AZ::Vector3 m_endPoint;//!< End point of the belt
+        AZ::Vector3 m_startPoint; //!< Start point of the belt
+        AZ::Vector3 m_endPoint; //!< End point of the belt
         AzPhysics::SceneHandle m_sceneHandle; //!< Scene handle of the scene the belt is in
-        AZStd::string m_graphicalMaterialSlot {"Belt"}; //!< Name of the material slot to change UVs of
+        AZStd::string m_graphicalMaterialSlot{ "Belt" }; //!< Name of the material slot to change UVs of
 
         float m_speed = 1.0f; //!< Speed of the conveyor belt.
         float m_beltWidth = 1.0f; //!< Width of the conveyor belt.
         float m_segmentLength = 1.0f; //!< Length of individual segments of the conveyor belt
-        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset; //!<Material of individual segments of the conveyor belt
+        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset; //!< Material of individual segments of the conveyor belt
         AZ::EntityId m_ConveyorEntityId; //!< Conveyor belt entity (used for texture movement)
         float m_textureScale = 1.0f; //!< Scaling factor of the texture
         float m_deltaTimeFromLastSpawn = 0.0f; //!< Time since the last spawn

@@ -178,9 +178,8 @@ namespace ROS2
         auto colliderConfiguration = AZStd::make_shared<Physics::ColliderConfiguration>();
         colliderConfiguration->m_isInSceneQueries = false;
         colliderConfiguration->m_materialSlots.SetMaterialAsset(0, m_materialAsset);
-        colliderConfiguration->m_position = AZ::Vector3{0.f, 0.f, -SegmentWidth/2.0f};
-        auto shapeConfiguration =
-            AZStd::make_shared<Physics::BoxShapeConfiguration>(AZ::Vector3(m_segmentLength, m_beltWidth, SegmentWidth));
+        colliderConfiguration->m_rotation = AZ::Quaternion::CreateFromAxisAngle(AZ::Vector3::CreateAxisX(), AZ::DegToRad(90.0f));
+        auto shapeConfiguration = AZStd::make_shared<Physics::CapsuleShapeConfiguration>(m_beltWidth, m_segmentLength / 2.0f);
         const auto transform = GetTransformFromSpline(m_splineConsPtr, normalizedLocation);
         AzPhysics::RigidBodyConfiguration conveyorSegmentRigidBodyConfig;
         conveyorSegmentRigidBodyConfig.m_kinematic = true;
@@ -202,7 +201,6 @@ namespace ROS2
     void ConveyorBeltComponentKinematic::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         MoveSegmentsGraphically(deltaTime);
-        AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_ConveyorSegments.size());
     }
 
     AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
@@ -231,7 +229,7 @@ namespace ROS2
         AZ_Assert(rotationMatrix.IsOrthogonal(0.001f), "Rotation matrix is not orthogonal");
         rotationMatrix.Orthogonalize();
         AZ::Transform transform =
-            AZ::Transform::CreateFromMatrix3x3AndTranslation(rotationMatrix, p - AZ::Vector3::CreateAxisZ(SegmentWidth / 2.f));
+            AZ::Transform::CreateFromMatrix3x3AndTranslation(rotationMatrix, p - AZ::Vector3::CreateAxisZ(m_segmentLength / 2.f));
         return m_splineTransform * transform;
     }
 
