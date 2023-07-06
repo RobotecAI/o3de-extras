@@ -36,12 +36,12 @@ set(FILES
     Source/RobotImporter/SDFormat/InertialsMaker.h
     Source/RobotImporter/SDFormat/JointsMaker.cpp
     Source/RobotImporter/SDFormat/JointsMaker.h
+    Source/RobotImporter/SDFormat/PrefabMaker.cpp
+    Source/RobotImporter/SDFormat/PrefabMaker.h
     Source/RobotImporter/SDFormat/PrefabMakerUtils.cpp
     Source/RobotImporter/SDFormat/PrefabMakerUtils.h
     Source/RobotImporter/SDFormat/SDFormatParser.cpp
     Source/RobotImporter/SDFormat/SDFormatParser.h
-    Source/RobotImporter/SDFormat/URDFPrefabMaker.cpp
-    Source/RobotImporter/SDFormat/URDFPrefabMaker.h
     Source/RobotImporter/SDFormat/VisualsMaker.cpp
     Source/RobotImporter/SDFormat/VisualsMaker.h
     Source/RobotImporter/SDF_URDF/SDFormatURDF.cpp

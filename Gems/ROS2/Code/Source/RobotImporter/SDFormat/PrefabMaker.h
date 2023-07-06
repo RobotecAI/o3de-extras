@@ -20,32 +20,35 @@
 #include <AzCore/std/string/string.h>
 #include <AzToolsFramework/Prefab/PrefabPublicInterface.h>
 #include <RobotImporter/Utils/SourceAssetsStorage.h>
+#include <sdf/sdf.hh>
 #include <urdf_parser/urdf_parser.h>
 
 namespace ROS2::SDFormat
 {
     //! Encapsulates constructive mapping of URDF elements to a complete prefab with entities and components
-    class URDFPrefabMaker
+    class PrefabMaker
     {
     public:
-        //! Construct URDFPrefabMaker from arguments.
+        //! Construct PrefabMaker from arguments.
         //! @param modelFilePath path to the source URDF model.
-        //! @param model parsed model.
+        //! @param model parsed URDF model.
+        //! @param modelSDFormat parsed SDFormat model.
         //! @param prefabPath path to the prefab which will be created as a result of import.
         //! @param urdfAssetsMapping prepared mapping of URDF meshes to Assets.
         //! @param useArticulations allows urdfImporter to create PhysXArticulations instead of multiple rigid bodies and joints.
-        URDFPrefabMaker(
+        PrefabMaker(
             const AZStd::string& modelFilePath,
             urdf::ModelInterfaceSharedPtr model,
+            const AZStd::shared_ptr<sdf::Root> modelSDFormat,
             AZStd::string prefabPath,
             const AZStd::shared_ptr<Utils::UrdfAssetMap> urdfAssetsMapping,
             bool useArticulations = false);
 
-        ~URDFPrefabMaker() = default;
+        ~PrefabMaker() = default;
 
-        //! Create and return a prefab corresponding to the URDF model as set through the constructor.
-        //! @return result which is either a prefab containing the imported model based on URDF or an error.
-        AzToolsFramework::Prefab::CreatePrefabResult CreatePrefabFromURDF();
+        //! Create and return a prefab corresponding to the SDFormat model as set through the constructor.
+        //! @return result which is either a prefab containing the imported model or an error.
+        AzToolsFramework::Prefab::CreatePrefabResult CreatePrefab();
 
         //! Get path to the prefab resulting from the import.
         //! @return path to the prefab.
@@ -62,6 +65,7 @@ namespace ROS2::SDFormat
         static void MoveEntityToDefaultSpawnPoint(const AZ::EntityId& rootEntityId);
 
         urdf::ModelInterfaceSharedPtr m_model;
+        AZStd::shared_ptr<sdf::Root> m_modelSDFormat;
         AZStd::string m_prefabPath;
         VisualsMaker m_visualsMaker;
         CollidersMaker m_collidersMaker;

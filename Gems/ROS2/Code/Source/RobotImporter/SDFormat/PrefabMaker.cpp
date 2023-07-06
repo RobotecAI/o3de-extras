@@ -6,7 +6,7 @@
  *
  */
 
-#include "URDFPrefabMaker.h"
+#include "PrefabMaker.h"
 #include "CollidersMaker.h"
 #include "PrefabMakerUtils.h"
 #include <API/EditorAssetSystemAPI.h>
@@ -25,13 +25,15 @@
 
 namespace ROS2::SDFormat
 {
-    URDFPrefabMaker::URDFPrefabMaker(
+    PrefabMaker::PrefabMaker(
         const AZStd::string& modelFilePath,
         urdf::ModelInterfaceSharedPtr model,
+        const AZStd::shared_ptr<sdf::Root> modelSDFormat,
         AZStd::string prefabPath,
         const AZStd::shared_ptr<Utils::UrdfAssetMap> urdfAssetsMapping,
         bool useArticulations)
         : m_model(model)
+        , m_modelSDFormat(modelSDFormat)
         , m_visualsMaker(model->materials_, urdfAssetsMapping)
         , m_collidersMaker(urdfAssetsMapping)
         , m_prefabPath(std::move(prefabPath))
@@ -39,10 +41,11 @@ namespace ROS2::SDFormat
         , m_useArticulations(useArticulations)
     {
         AZ_Assert(!m_prefabPath.empty(), "Prefab path is empty");
-        AZ_Assert(m_model, "Model is nullptr");
+        AZ_Assert(m_model, "Model in URDF is nullptr");
+        AZ_Assert(m_modelSDFormat, "Model in SDFormat is nullptr");
     }
 
-    void URDFPrefabMaker::BuildAssetsForLink(urdf::LinkSharedPtr link)
+    void PrefabMaker::BuildAssetsForLink(urdf::LinkSharedPtr link)
     {
         m_collidersMaker.BuildColliders(link);
         for (auto childLink : link->child_links)
@@ -51,7 +54,7 @@ namespace ROS2::SDFormat
         }
     }
 
-    AzToolsFramework::Prefab::CreatePrefabResult URDFPrefabMaker::CreatePrefabFromURDF()
+    AzToolsFramework::Prefab::CreatePrefabResult PrefabMaker::CreatePrefab()
     {
         {
             AZStd::lock_guard<AZStd::mutex> lck(m_statusLock);
@@ -64,7 +67,7 @@ namespace ROS2::SDFormat
             currentUndoBatch, &AzToolsFramework::ToolsApplicationRequests::BeginUndoBatch, "Robot Importer prefab creation");
         if (currentUndoBatch == nullptr)
         {
-            AZ_Warning("URDF Prefab Maker", false, "Unable to start undobatch, EBus might not be listening");
+            AZ_Warning("PrefabMaker::CreatePrefab", false, "Unable to start undobatch, EBus might not be listening");
         }
 
         AZStd::unordered_map<AZStd::string, AzToolsFramework::Prefab::PrefabEntityResult> createdLinks;
@@ -93,7 +96,7 @@ namespace ROS2::SDFormat
         for (const auto& [name, result] : createdLinks)
         {
             AZ_TracePrintf(
-                "CreatePrefabFromURDF",
+                "CreatePrefab",
                 "Link with name %s was created as: %s\n",
                 name.c_str(),
                 result.IsSuccess() ? (result.GetValue().ToString().c_str()) : ("[Failed]"));
@@ -257,7 +260,7 @@ namespace ROS2::SDFormat
         return outcome;
     }
 
-    AzToolsFramework::Prefab::PrefabEntityResult URDFPrefabMaker::AddEntitiesForLink(urdf::LinkSharedPtr link, AZ::EntityId parentEntityId)
+    AzToolsFramework::Prefab::PrefabEntityResult PrefabMaker::AddEntitiesForLink(urdf::LinkSharedPtr link, AZ::EntityId parentEntityId)
     {
         if (!link)
         {
@@ -293,7 +296,7 @@ namespace ROS2::SDFormat
         return AZ::Success(entityId);
     }
 
-    void URDFPrefabMaker::AddRobotControl(AZ::EntityId rootEntityId)
+    void PrefabMaker::AddRobotControl(AZ::EntityId rootEntityId)
     {
         const auto componentId = Utils::CreateComponent(rootEntityId, ROS2RobotControlComponent::TYPEINFO_Uuid());
         if (componentId)
@@ -308,18 +311,18 @@ namespace ROS2::SDFormat
         }
     }
 
-    const AZStd::string& URDFPrefabMaker::GetPrefabPath() const
+    const AZStd::string& PrefabMaker::GetPrefabPath() const
     {
         return m_prefabPath;
     }
 
-    void URDFPrefabMaker::MoveEntityToDefaultSpawnPoint(const AZ::EntityId& rootEntityId)
+    void PrefabMaker::MoveEntityToDefaultSpawnPoint(const AZ::EntityId& rootEntityId)
     {
         auto spawner = ROS2::SpawnerInterface::Get();
 
         if (spawner == nullptr)
         {
-            AZ_TracePrintf("URDF Importer", "Spawner not found - creating entity in (0,0,0)\n") return;
+            AZ_TracePrintf("PrefabMaker::MoveEntityToDefaultSpawnPoint", "Spawner not found - creating entity in (0,0,0)\n") return;
         }
 
         auto entity_ = AzToolsFramework::GetEntityById(rootEntityId);
@@ -327,7 +330,7 @@ namespace ROS2::SDFormat
 
         if (transformInterface_ == nullptr)
         {
-            AZ_TracePrintf("URDF Importer", "TransformComponent not found in created entity\n") return;
+            AZ_TracePrintf("PrefabMaker::MoveEntityToDefaultSpawnPoint", "TransformComponent not found in created entity\n") return;
         }
 
         auto pose = spawner->GetDefaultSpawnPose();
@@ -335,7 +338,7 @@ namespace ROS2::SDFormat
         transformInterface_->SetWorldTM(pose);
     }
 
-    AZStd::string URDFPrefabMaker::GetStatus()
+    AZStd::string PrefabMaker::GetStatus()
     {
         AZStd::string str;
         AZStd::lock_guard<AZStd::mutex> lck(m_statusLock);
