@@ -148,8 +148,8 @@ namespace ROS2
             m_sceneFinishSimHandler = AzPhysics::SceneEvents::OnSceneSimulationFinishHandler(
                 [this]([[maybe_unused]] AzPhysics::SceneHandle sceneHandle, float fixedDeltaTime)
                 {
+                    SpawnSegments(fixedDeltaTime);
                     MoveSegmentsPhysically(fixedDeltaTime);
-                    SpawnSegments();
                     DespawnSegments();
                 },
                 aznumeric_cast<int32_t>(AzPhysics::SceneEvents::PhysicsStartFinishSimulationPriority::Components));
@@ -160,7 +160,7 @@ namespace ROS2
             m_splineLength = GetSplineLength(splinePtr);
 
             // initial segment population
-            const float normalizedDistanceStep = 0.5f * m_segmentLength / m_splineLength;
+            const float normalizedDistanceStep = SegmentSeparation * m_segmentLength / m_splineLength;
             for (float normalizedIndex = 0.f; normalizedIndex < 1.f; normalizedIndex += normalizedDistanceStep)
             {
                 m_ConveyorSegments.push_back(CreateSegment(splinePtr, normalizedIndex));
@@ -176,7 +176,9 @@ namespace ROS2
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
 
         auto colliderConfiguration = AZStd::make_shared<Physics::ColliderConfiguration>();
+        colliderConfiguration->m_isInSceneQueries = false;
         colliderConfiguration->m_materialSlots.SetMaterialAsset(0, m_materialAsset);
+        colliderConfiguration->m_position = AZ::Vector3{0.f, 0.f, -SegmentWidth/2.0f};
         auto shapeConfiguration =
             AZStd::make_shared<Physics::BoxShapeConfiguration>(AZ::Vector3(m_segmentLength, m_beltWidth, SegmentWidth));
         const auto transform = GetTransformFromSpline(m_splineConsPtr, normalizedLocation);
@@ -200,6 +202,7 @@ namespace ROS2
     void ConveyorBeltComponentKinematic::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         MoveSegmentsGraphically(deltaTime);
+        AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_ConveyorSegments.size());
     }
 
     AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
@@ -303,18 +306,18 @@ namespace ROS2
         }
     }
 
-    void ConveyorBeltComponentKinematic::SpawnSegments()
+    void ConveyorBeltComponentKinematic::SpawnSegments(float deltaTime)
     {
+        m_deltaTimeFromLastSpawn += deltaTime;
         if (m_ConveyorSegments.empty())
         {
             m_ConveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
             return;
         }
-        AZ::Vector3 position = GetLocationOfSegment(m_ConveyorSegments.front().second);
-        AZ::Vector3 distance = m_startPoint - position;
-        if (distance.GetLength() > m_segmentLength / 2.f)
+        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_segmentLength / m_speed)
         {
-            m_ConveyorSegments.push_front(CreateSegment(m_splineConsPtr, 0.f));
+            m_deltaTimeFromLastSpawn = 0.f;
+            m_ConveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
         }
     }
 
