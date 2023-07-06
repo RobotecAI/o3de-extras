@@ -43,7 +43,7 @@ namespace ROS2
         {
             serialize->Class<ConveyorBeltComponentKinematic>()
                 ->Version(1)
-                ->Field("BeltEntityId", &ConveyorBeltComponentKinematic::m_ConveyorEntityId)
+                ->Field("BeltEntityId", &ConveyorBeltComponentKinematic::m_conveyorEntityId)
                 ->Field("Speed", &ConveyorBeltComponentKinematic::m_speed)
                 ->Field("BeltWidth", &ConveyorBeltComponentKinematic::m_beltWidth)
                 ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength)
@@ -59,7 +59,7 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                     ->DataElement(
                         AZ::Edit::UIHandlers::EntityId,
-                        &ConveyorBeltComponentKinematic::m_ConveyorEntityId,
+                        &ConveyorBeltComponentKinematic::m_conveyorEntityId,
                         "Conveyor Belt Entity",
                         "Entity of the conveyor belt")
                     ->DataElement(
@@ -92,6 +92,14 @@ namespace ROS2
                     ->Attribute(AZ_CRC_CE("DisableEditButtonWhenNoAssetSelected"), true);
             }
         }
+        if (AZ::BehaviorContext* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
+        {
+            behaviorContext->EBus<ConveyorBeltRequestBus>("ConveyorBeltKinematic", "ConveyorBeltRequestBus")
+                ->Attribute(AZ::Edit::Attributes::Category, "ROS2/FactorySimulation/ConveyorBelt")
+                ->Event("StartBelt", &ConveyorBeltRequestBus::Events::StartBelt)
+                ->Event("StopBelt", &ConveyorBeltRequestBus::Events::StopBelt)
+                ->Event("IsBeltStopped", &ConveyorBeltRequestBus::Events::IsBeltStopped);
+        }
     }
 
     void ConveyorBeltComponentKinematic::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
@@ -101,12 +109,15 @@ namespace ROS2
 
     void ConveyorBeltComponentKinematic::Activate()
     {
-        AZ::EntityBus::Handler::BusConnect(m_ConveyorEntityId);
+        AZ::EntityBus::Handler::BusConnect(m_conveyorEntityId);
         AZ::EntityBus::Handler::BusConnect(m_entity->GetId());
+        ConveyorBeltRequestBus::Handler::BusConnect(m_conveyorEntityId);
     }
 
     void ConveyorBeltComponentKinematic::Deactivate()
     {
+        ConveyorBeltRequestBus::Handler::BusDisconnect();
+
         m_sceneFinishSimHandler.Disconnect();
         AZ::EntityBus::Handler::BusDisconnect();
         AZ::TickBus::Handler::BusDisconnect();
@@ -163,9 +174,9 @@ namespace ROS2
             const float normalizedDistanceStep = SegmentSeparation * m_segmentLength / m_splineLength;
             for (float normalizedIndex = 0.f; normalizedIndex < 1.f; normalizedIndex += normalizedDistanceStep)
             {
-                m_ConveyorSegments.push_back(CreateSegment(splinePtr, normalizedIndex));
+                m_conveyorSegments.push_back(CreateSegment(splinePtr, normalizedIndex));
             }
-            AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_ConveyorSegments.size());
+            AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_conveyorSegments.size());
             AZ::TickBus::Handler::BusConnect();
         }
     }
@@ -201,6 +212,21 @@ namespace ROS2
     void ConveyorBeltComponentKinematic::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         MoveSegmentsGraphically(deltaTime);
+    }
+
+    void ConveyorBeltComponentKinematic::StartBelt()
+    {
+        m_beltStopped = false;
+    }
+
+    void ConveyorBeltComponentKinematic::StopBelt()
+    {
+        m_beltStopped = true;
+    }
+
+    bool ConveyorBeltComponentKinematic::IsBeltStopped()
+    {
+        return m_beltStopped;
     }
 
     AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
@@ -244,11 +270,16 @@ namespace ROS2
 
     void ConveyorBeltComponentKinematic::MoveSegmentsGraphically(float deltaTime)
     {
+        if (m_beltStopped)
+        { // Do not move texture when stopped
+            return;
+        }
+
         // Animate texture
         AZ::Render::MaterialAssignmentId materialId;
         AZ::Render::MaterialComponentRequestBus::EventResult(
             materialId,
-            m_ConveyorEntityId,
+            m_conveyorEntityId,
             &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId,
             -1,
             m_graphicalMaterialSlot);
@@ -256,7 +287,7 @@ namespace ROS2
         m_textureOffset += deltaTime * m_speed * m_textureScale;
 
         AZ::Render::MaterialComponentRequestBus::Event(
-            m_ConveyorEntityId,
+            m_conveyorEntityId,
             &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>,
             materialId,
             "uv.offsetU",
@@ -266,7 +297,7 @@ namespace ROS2
     void ConveyorBeltComponentKinematic::DespawnSegments()
     {
         bool wasSegmentRemoved = false;
-        for (auto& [pos, handle] : m_ConveyorSegments)
+        for (auto& [pos, handle] : m_conveyorSegments)
         {
             if (pos > 1.0f)
             {
@@ -282,16 +313,21 @@ namespace ROS2
                 return pair.second == AzPhysics::InvalidSimulatedBodyHandle;
             };
             // clear object handle from cache
-            m_ConveyorSegments.erase(
-                AZStd::remove_if(m_ConveyorSegments.begin(), m_ConveyorSegments.end(), isInvalidHandle), m_ConveyorSegments.end());
+            m_conveyorSegments.erase(
+                AZStd::remove_if(m_conveyorSegments.begin(), m_conveyorSegments.end(), isInvalidHandle), m_conveyorSegments.end());
         }
     }
 
     void ConveyorBeltComponentKinematic::MoveSegmentsPhysically(float fixedDeltaTime)
     {
+        if (m_beltStopped)
+        { // Do not move segments when stopped
+            return;
+        }
+
         AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
         // update positions of the segments
-        for (auto& [pos, handle] : m_ConveyorSegments)
+        for (auto& [pos, handle] : m_conveyorSegments)
         {
             auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
             if (body)
@@ -307,15 +343,15 @@ namespace ROS2
     void ConveyorBeltComponentKinematic::SpawnSegments(float deltaTime)
     {
         m_deltaTimeFromLastSpawn += deltaTime;
-        if (m_ConveyorSegments.empty())
+        if (m_conveyorSegments.empty())
         {
-            m_ConveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
             return;
         }
         if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_segmentLength / m_speed)
         {
             m_deltaTimeFromLastSpawn = 0.f;
-            m_ConveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
         }
     }
 
