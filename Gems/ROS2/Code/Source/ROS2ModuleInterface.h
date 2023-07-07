@@ -15,7 +15,6 @@
 #include <GNSS/ROS2GNSSSensorComponent.h>
 #include <Imu/ROS2ImuSensorComponent.h>
 #include <Lidar/LidarRegistrarSystemComponent.h>
-#include <Lidar/ROS2LidarSensorComponent.h>
 #include <Lidar/ROS2Lidar2DSensorComponent.h>
 #include <Lidar/ROS2LidarSensorComponent.h>
 #include <Manipulation/Controllers/JointsArticulationControllerComponent.h>
