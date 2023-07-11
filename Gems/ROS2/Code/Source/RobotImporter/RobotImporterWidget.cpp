@@ -436,11 +436,4 @@ namespace ROS2
         QMessageBox::critical(this, QObject::tr("Error"), errorMessage);
         AZ_Error("RobotImporterWidget", false, "%s", errorMessage.toUtf8().constData());
     }
-
-    AZStd::string RobotImporterWidget::GetCapitalizedExtension(const AZ::IO::Path& filename) const
-    {
-        AZStd::string extension{ filename.Extension().Native() };
-        AZStd::to_upper(extension.begin(), extension.end());
-        return extension;
-    }
 } // namespace ROS2

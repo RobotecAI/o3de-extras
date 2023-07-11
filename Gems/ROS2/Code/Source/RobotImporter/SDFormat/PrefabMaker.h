@@ -71,7 +71,8 @@ namespace ROS2::SDFormat
         CollidersMaker m_collidersMaker;
         InertialsMaker m_inertialsMaker;
         JointsMaker m_jointsMaker;
-        ArticulationsMaker m_articulationsMaker;
+        // TODO: switch to SDFormat::ArticulationsMaker
+        ROS2::ArticulationsMaker m_articulationsMaker;
 
         AZStd::mutex m_statusLock;
         AZStd::multimap<AZStd::string, AZStd::string> m_status;

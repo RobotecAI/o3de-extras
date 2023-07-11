@@ -8,10 +8,13 @@
 
 #include "ArticulationsMaker.h"
 #include "RobotImporter/Utils/DefaultSolverConfiguration.h"
-#include <AzCore/Component/EntityId.h>
+#include <AzCore/std/containers/unordered_map.h>
 #include <AzToolsFramework/Entity/EditorEntityHelpers.h>
+#include <PhysX/ArticulationTypes.h>
 #include <RobotImporter/Utils/TypeConversions.h>
 #include <Source/EditorArticulationLinkComponent.h>
+#include <sdf/Joint.hh>
+#include <sdf/JointAxis.hh>
 
 namespace ROS2::SDFormat
 {
@@ -19,83 +22,86 @@ namespace ROS2::SDFormat
     namespace
     {
         using ArticulationCfg = PhysX::EditorArticulationLinkConfiguration;
-        static const AZStd::unordered_map<int, PhysX::ArticulationJointType> SupportedJointTypes{ {
-            { urdf::Joint::REVOLUTE, PhysX::ArticulationJointType::Hinge },
-            { urdf::Joint::CONTINUOUS, PhysX::ArticulationJointType::Hinge },
-            { urdf::Joint::PRISMATIC, PhysX::ArticulationJointType::Prismatic },
-            { urdf::Joint::FIXED, PhysX::ArticulationJointType::Fix },
+        static const AZStd::unordered_map<sdf::JointType, PhysX::ArticulationJointType> SupportedJointTypes{ {
+            { sdf::JointType::REVOLUTE, PhysX::ArticulationJointType::Hinge },
+            { sdf::JointType::CONTINUOUS, PhysX::ArticulationJointType::Hinge },
+            { sdf::JointType::PRISMATIC, PhysX::ArticulationJointType::Prismatic },
+            { sdf::JointType::FIXED, PhysX::ArticulationJointType::Fix },
         } };
     } // namespace
 
-    ArticulationCfg& AddToArticulationConfig(ArticulationCfg& articulationLinkConfiguration, const urdf::JointSharedPtr joint)
+    void AddToArticulationConfig(ArticulationCfg& articulationLinkConfiguration, const sdf::Joint* joint)
     {
         if (!joint)
         {
-            return articulationLinkConfiguration;
+            return;
         }
-        auto supportedArticulationType = SupportedJointTypes.find(joint->type);
+        auto supportedArticulationType = SupportedJointTypes.find(joint->Type());
         AZ_Warning(
             "ArticulationsMaker",
             supportedArticulationType != SupportedJointTypes.end(),
-            "Articulations do not support type %d for URDF joint %s.",
-            joint->type,
-            joint->name.c_str());
+            "Articulations do not support type %d for SDFormat joint %s.",
+            joint->Type(),
+            joint->Name().c_str());
         if (supportedArticulationType != SupportedJointTypes.end())
         {
             const auto type = supportedArticulationType->second;
             articulationLinkConfiguration.m_articulationJointType = type;
             const AZ::Vector3 o3deJointDir{ 1.0, 0.0, 0.0 };
-            const AZ::Vector3 jointAxis = URDF::TypeConversions::ConvertVector3(joint->axis);
+            const sdf::JointAxis* axis = joint->Axis(0);
+            ignition::math::Vector3d axisXyz;
+            sdf::Errors errors = axis->ResolveXyz(axisXyz, joint->Name());
+            AZ_Error(
+                "ArticulationsMaker",
+                !errors.empty(),
+                "Cannot resolve xyz axis for SDFormat joint %s.",
+                joint->Type(),
+                joint->Name().c_str());
+
+            const AZ::Vector3 jointAxis = TypeConversions::ConvertVector3(axisXyz);
             const auto quaternion =
                 jointAxis.IsZero() ? AZ::Quaternion::CreateIdentity() : AZ::Quaternion::CreateShortestArc(o3deJointDir, jointAxis);
             const AZ::Vector3 rotation = quaternion.GetEulerDegrees();
             articulationLinkConfiguration.m_localRotation = rotation;
 
-            if (joint->limits)
+            if (type == PhysX::ArticulationJointType::Hinge)
             {
-                if (type == PhysX::ArticulationJointType::Hinge)
-                {
-                    const double limitUpper = AZ::RadToDeg(joint->limits->upper);
-                    const double limitLower = AZ::RadToDeg(joint->limits->lower);
-                    articulationLinkConfiguration.m_angularLimitNegative = limitLower;
-                    articulationLinkConfiguration.m_angularLimitPositive = limitUpper;
-                }
-                else if (type == PhysX::ArticulationJointType::Prismatic)
-                {
-                    articulationLinkConfiguration.m_linearLimitLower = joint->limits->upper;
-                    articulationLinkConfiguration.m_linearLimitUpper = joint->limits->lower;
-                }
+                const double limitUpper = AZ::RadToDeg(axis->Upper());
+                const double limitLower = AZ::RadToDeg(axis->Lower());
+                articulationLinkConfiguration.m_angularLimitNegative = limitLower;
+                articulationLinkConfiguration.m_angularLimitPositive = limitUpper;
+            }
+            else if (type == PhysX::ArticulationJointType::Prismatic)
+            {
+                articulationLinkConfiguration.m_linearLimitLower = axis->Upper();
+                articulationLinkConfiguration.m_linearLimitUpper = axis->Lower();
             }
             else
             {
                 articulationLinkConfiguration.m_isLimited = false;
             }
         }
-        return articulationLinkConfiguration;
     }
 
-    ArticulationCfg& AddToArticulationConfig(ArticulationCfg& articulationLinkConfiguration, const urdf::InertialSharedPtr inertial)
+    void AddToArticulationConfig(
+        ArticulationCfg& articulationLinkConfiguration, const sdf::Joint* joint, const ignition::math::Inertiald& inertial)
     {
-        if (!inertial)
-        {
-            return articulationLinkConfiguration;
-        }
         articulationLinkConfiguration.m_solverPositionIterations =
-            AZStd::max(articulationLinkConfiguration.m_solverPositionIterations, URDF::DefaultNumberPosSolver);
+            AZStd::max(articulationLinkConfiguration.m_solverPositionIterations, DefaultNumberPosSolver);
         articulationLinkConfiguration.m_solverVelocityIterations =
-            AZStd::max(articulationLinkConfiguration.m_solverVelocityIterations, URDF::DefaultNumberVelSolver);
+            AZStd::max(articulationLinkConfiguration.m_solverVelocityIterations, DefaultNumberVelSolver);
 
-        articulationLinkConfiguration.m_mass = inertial->mass;
-        articulationLinkConfiguration.m_centerOfMassOffset = URDF::TypeConversions::ConvertVector3(inertial->origin.position);
+        articulationLinkConfiguration.m_mass = inertial.MassMatrix().Mass();
+        articulationLinkConfiguration.m_centerOfMassOffset = TypeConversions::ConvertVector3(inertial.Pose().Pos());
 
-        if (!URDF::TypeConversions::ConvertQuaternion(inertial->origin.rotation).IsIdentity())
-        { // There is a rotation component in URDF that we are not able to apply
-            AZ_Warning("AddArticulationLink", false, "Ignoring URDF inertial origin rotation (no such field in rigid body configuration)");
-        }
-        return articulationLinkConfiguration;
+        // There is a rotation component in SDFormat that we are not able to apply
+        AZ_Warning(
+            "AddArticulationLink",
+            TypeConversions::ConvertQuaternion(inertial.Pose().Rot()).IsIdentity(),
+            "Ignoring SDFormat inertial origin rotation (no such field in rigid body configuration)");
     }
 
-    void ArticulationsMaker::AddArticulationLink(const urdf::LinkSharedPtr link, AZ::EntityId entityId) const
+    void ArticulationsMaker::AddArticulationLink(const sdf::Link* link, const sdf::Joint* parentJoint, AZ::EntityId entityId) const
     {
         AZ::Entity* entity = AzToolsFramework::GetEntityById(entityId);
         AZ_Assert(entity, "No entity for id %s", entityId.ToString().c_str());
@@ -103,8 +109,8 @@ namespace ROS2::SDFormat
         AZ_TracePrintf("ArticulationsMaker", "Processing inertial for entity id: %s\n", entityId.ToString().c_str());
         PhysX::EditorArticulationLinkConfiguration articulationLinkConfiguration;
 
-        articulationLinkConfiguration = AddToArticulationConfig(articulationLinkConfiguration, link->inertial);
-        articulationLinkConfiguration = AddToArticulationConfig(articulationLinkConfiguration, link->parent_joint);
+        AddToArticulationConfig(articulationLinkConfiguration, parentJoint, link->Inertial());
+        AddToArticulationConfig(articulationLinkConfiguration, parentJoint);
 
         entity->CreateComponent<PhysX::EditorArticulationLinkComponent>(articulationLinkConfiguration);
     }
