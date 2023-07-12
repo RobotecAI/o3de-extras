@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#include "ConveyorBeltComponentKinematic.h"
+#include "ConveyorBeltComponent.h"
 #include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
 #include <AzCore/Asset/AssetSerializer.h>
 #include <AzCore/Math/Matrix3x3.h>
@@ -37,59 +37,25 @@ namespace ROS2
         return {};
     }
 
-    void ConveyorBeltComponentKinematic::Reflect(AZ::ReflectContext* context)
+    void ConveyorBeltComponent::Reflect(AZ::ReflectContext* context)
     {
+        ConveyorBeltComponentConfiguration::Reflect(context);
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serialize->Class<ConveyorBeltComponentKinematic>()
-                ->Version(1)
-                ->Field("BeltEntityId", &ConveyorBeltComponentKinematic::m_conveyorEntityId)
-                ->Field("Speed", &ConveyorBeltComponentKinematic::m_speed)
-                ->Field("BeltWidth", &ConveyorBeltComponentKinematic::m_beltWidth)
-                ->Field("SegmentLength", &ConveyorBeltComponentKinematic::m_segmentLength)
-                ->Field("TextureScale", &ConveyorBeltComponentKinematic::m_textureScale)
-                ->Field("MaterialAsset", &ConveyorBeltComponentKinematic::m_materialAsset)
-                ->Field("GraphicalMaterialSlot", &ConveyorBeltComponentKinematic::m_graphicalMaterialSlot);
+            serialize->Class<ConveyorBeltComponent>()->Version(1)->Field("Configuration", &ConveyorBeltComponent::m_configuration);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
-                ec->Class<ConveyorBeltComponentKinematic>("Conveyor Belt Component Kinematic", "Conveyor Belt Component")
+                ec->Class<ConveyorBeltComponent>("Conveyor Belt Component", "Conveyor Belt Component.")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                     ->DataElement(
-                        AZ::Edit::UIHandlers::EntityId,
-                        &ConveyorBeltComponentKinematic::m_conveyorEntityId,
-                        "Conveyor Belt Entity",
-                        "Entity of the conveyor belt")
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default, &ConveyorBeltComponentKinematic::m_speed, "Speed", "Speed of the conveyor belt")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &ConveyorBeltComponentKinematic::m_beltWidth, "Width", "Belt width")
-                    ->DataElement(
                         AZ::Edit::UIHandlers::Default,
-                        &ConveyorBeltComponentKinematic::m_segmentLength,
-                        "Segment Length",
-                        "Length of simulated segments. Short segments might affect performance"
-                        "physics engine.")
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default,
-                        &ConveyorBeltComponentKinematic::m_textureScale,
-                        "Texture scale",
-                        "Scale of the texture on conveyor belt.")
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default,
-                        &ConveyorBeltComponentKinematic::m_materialAsset,
-                        "Physical Material",
-                        "Physical Material asset of the conveyor belt")
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default,
-                        &ConveyorBeltComponentKinematic::m_graphicalMaterialSlot,
-                        "Graphical Material slot ",
-                        "The graphical material slot name to have its UV coordinates animated.")
-                    ->Attribute(AZ::Edit::Attributes::DefaultAsset, &GetDefaultPhysicsMaterialAssetId)
-                    ->Attribute(AZ_CRC_CE("EditButton"), "")
-                    ->Attribute(AZ_CRC_CE("EditDescription"), "Open in Asset Editor")
-                    ->Attribute(AZ_CRC_CE("DisableEditButtonWhenNoAssetSelected"), true);
+                        &ConveyorBeltComponent::m_configuration,
+                        "Configuration",
+                        "Configuration of the conveyor belt");
             }
         }
         if (AZ::BehaviorContext* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -102,19 +68,19 @@ namespace ROS2
         }
     }
 
-    void ConveyorBeltComponentKinematic::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
+    void ConveyorBeltComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
         required.push_back(AZ_CRC_CE("SplineService"));
     }
 
-    void ConveyorBeltComponentKinematic::Activate()
+    void ConveyorBeltComponent::Activate()
     {
-        AZ::EntityBus::Handler::BusConnect(m_conveyorEntityId);
+        AZ::EntityBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
         AZ::EntityBus::Handler::BusConnect(m_entity->GetId());
-        ConveyorBeltRequestBus::Handler::BusConnect(m_conveyorEntityId);
+        ConveyorBeltRequestBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
     }
 
-    void ConveyorBeltComponentKinematic::Deactivate()
+    void ConveyorBeltComponent::Deactivate()
     {
         ConveyorBeltRequestBus::Handler::BusDisconnect();
 
@@ -123,7 +89,7 @@ namespace ROS2
         AZ::TickBus::Handler::BusDisconnect();
     }
 
-    AZ::Vector3 ConveyorBeltComponentKinematic::GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle)
+    AZ::Vector3 ConveyorBeltComponent::GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle)
     {
         AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
         AZ_Assert(sceneInterface, "No scene interface");
@@ -136,7 +102,7 @@ namespace ROS2
         }
         return AZ::Vector3::CreateZero();
     }
-    void ConveyorBeltComponentKinematic::OnEntityActivated(const AZ::EntityId& entityId)
+    void ConveyorBeltComponent::OnEntityActivated(const AZ::EntityId& entityId)
     {
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
         AZ_Assert(physicsSystem, "No physics system");
@@ -171,26 +137,27 @@ namespace ROS2
             m_splineLength = GetSplineLength(splinePtr);
 
             // initial segment population
-            const float normalizedDistanceStep = SegmentSeparation * m_segmentLength / m_splineLength;
+            const float normalizedDistanceStep = SegmentSeparation * m_configuration.m_segmentSize / m_splineLength;
             for (float normalizedIndex = 0.f; normalizedIndex < 1.f; normalizedIndex += normalizedDistanceStep)
             {
                 m_conveyorSegments.push_back(CreateSegment(splinePtr, normalizedIndex));
             }
-            AZ_Printf("ConveyorBeltComponentKinematic", "Initial Number of segments: %d", m_conveyorSegments.size());
+            AZ_Printf("ConveyorBeltComponent", "Initial Number of segments: %d", m_conveyorSegments.size());
             AZ::TickBus::Handler::BusConnect();
         }
     }
 
-    AZStd::pair<float, AzPhysics::SimulatedBodyHandle> ConveyorBeltComponentKinematic::CreateSegment(
+    AZStd::pair<float, AzPhysics::SimulatedBodyHandle> ConveyorBeltComponent::CreateSegment(
         AZ::ConstSplinePtr splinePtr, float normalizedLocation)
     {
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
 
         auto colliderConfiguration = AZStd::make_shared<Physics::ColliderConfiguration>();
         colliderConfiguration->m_isInSceneQueries = false;
-        colliderConfiguration->m_materialSlots.SetMaterialAsset(0, m_materialAsset);
+        colliderConfiguration->m_materialSlots.SetMaterialAsset(0, m_configuration.m_materialAsset);
         colliderConfiguration->m_rotation = AZ::Quaternion::CreateFromAxisAngle(AZ::Vector3::CreateAxisX(), AZ::DegToRad(90.0f));
-        auto shapeConfiguration = AZStd::make_shared<Physics::CapsuleShapeConfiguration>(m_beltWidth, m_segmentLength / 2.0f);
+        auto shapeConfiguration =
+            AZStd::make_shared<Physics::CapsuleShapeConfiguration>(m_configuration.m_beltWidth, m_configuration.m_segmentSize / 2.0f);
         const auto transform = GetTransformFromSpline(m_splineConsPtr, normalizedLocation);
         AzPhysics::RigidBodyConfiguration conveyorSegmentRigidBodyConfig;
         conveyorSegmentRigidBodyConfig.m_kinematic = true;
@@ -209,27 +176,27 @@ namespace ROS2
         return AZStd::make_pair(normalizedLocation, handle);
     }
 
-    void ConveyorBeltComponentKinematic::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void ConveyorBeltComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         MoveSegmentsGraphically(deltaTime);
     }
 
-    void ConveyorBeltComponentKinematic::StartBelt()
+    void ConveyorBeltComponent::StartBelt()
     {
         m_beltStopped = false;
     }
 
-    void ConveyorBeltComponentKinematic::StopBelt()
+    void ConveyorBeltComponent::StopBelt()
     {
         m_beltStopped = true;
     }
 
-    bool ConveyorBeltComponentKinematic::IsBeltStopped()
+    bool ConveyorBeltComponent::IsBeltStopped()
     {
         return m_beltStopped;
     }
 
-    AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponentKinematic::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
+    AZStd::pair<AZ::Vector3, AZ::Vector3> ConveyorBeltComponent::GetStartAndEndPointOfBelt(AZ::ConstSplinePtr splinePtr)
     {
         AZ::Transform splineTransform = AZ::Transform::Identity();
         AZ::TransformBus::EventResult(splineTransform, m_entity->GetId(), &AZ::TransformBus::Events::GetWorldTM);
@@ -240,7 +207,7 @@ namespace ROS2
         return { m_splineTransform.TransformPoint(posBegin), m_splineTransform.TransformPoint(posEnd) };
     }
 
-    AZ::Transform ConveyorBeltComponentKinematic::GetTransformFromSpline(AZ::ConstSplinePtr splinePtr, float distanceNormalized)
+    AZ::Transform ConveyorBeltComponent::GetTransformFromSpline(AZ::ConstSplinePtr splinePtr, float distanceNormalized)
     {
         AZ_Assert(splinePtr, "Spline pointer is null");
         AZ::SplineAddress address = splinePtr->GetAddressByFraction(distanceNormalized);
@@ -254,12 +221,12 @@ namespace ROS2
         AZ::Matrix3x3 rotationMatrix = AZ::Matrix3x3::CreateFromColumns(v1, v2, v3);
         AZ_Assert(rotationMatrix.IsOrthogonal(0.001f), "Rotation matrix is not orthogonal");
         rotationMatrix.Orthogonalize();
-        AZ::Transform transform =
-            AZ::Transform::CreateFromMatrix3x3AndTranslation(rotationMatrix, p - AZ::Vector3::CreateAxisZ(m_segmentLength / 2.f));
+        AZ::Transform transform = AZ::Transform::CreateFromMatrix3x3AndTranslation(
+            rotationMatrix, p - AZ::Vector3::CreateAxisZ(m_configuration.m_segmentSize / 2.f));
         return m_splineTransform * transform;
     }
 
-    float ConveyorBeltComponentKinematic::GetSplineLength(AZ::ConstSplinePtr splinePtr)
+    float ConveyorBeltComponent::GetSplineLength(AZ::ConstSplinePtr splinePtr)
     {
         AZ_Assert(splinePtr, "Spline pointer is null");
         AZ::Transform splineTransform = AZ::Transform::Identity();
@@ -268,7 +235,7 @@ namespace ROS2
         return splinePtr->GetLength(addressEnd);
     }
 
-    void ConveyorBeltComponentKinematic::MoveSegmentsGraphically(float deltaTime)
+    void ConveyorBeltComponent::MoveSegmentsGraphically(float deltaTime)
     {
         if (m_beltStopped)
         { // Do not move texture when stopped
@@ -279,22 +246,22 @@ namespace ROS2
         AZ::Render::MaterialAssignmentId materialId;
         AZ::Render::MaterialComponentRequestBus::EventResult(
             materialId,
-            m_conveyorEntityId,
+            m_configuration.m_conveyorEntityId,
             &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId,
             -1,
-            m_graphicalMaterialSlot);
+            m_configuration.m_graphicalMaterialSlot);
 
-        m_textureOffset += deltaTime * m_speed * m_textureScale;
+        m_textureOffset += deltaTime * m_configuration.m_speed * m_configuration.m_textureScale;
 
         AZ::Render::MaterialComponentRequestBus::Event(
-            m_conveyorEntityId,
+            m_configuration.m_conveyorEntityId,
             &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>,
             materialId,
             "uv.offsetU",
             m_textureOffset);
     }
 
-    void ConveyorBeltComponentKinematic::DespawnSegments()
+    void ConveyorBeltComponent::DespawnSegments()
     {
         bool wasSegmentRemoved = false;
         for (auto& [pos, handle] : m_conveyorSegments)
@@ -318,7 +285,7 @@ namespace ROS2
         }
     }
 
-    void ConveyorBeltComponentKinematic::MoveSegmentsPhysically(float fixedDeltaTime)
+    void ConveyorBeltComponent::MoveSegmentsPhysically(float fixedDeltaTime)
     {
         if (m_beltStopped)
         { // Do not move segments when stopped
@@ -332,7 +299,7 @@ namespace ROS2
             auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
             if (body)
             {
-                pos += m_speed * fixedDeltaTime / m_splineLength;
+                pos += m_configuration.m_speed * fixedDeltaTime / m_splineLength;
                 auto transform = GetTransformFromSpline(m_splineConsPtr, pos);
                 transform.SetTranslation(transform.GetTranslation());
                 body->SetKinematicTarget(transform);
@@ -340,7 +307,7 @@ namespace ROS2
         }
     }
 
-    void ConveyorBeltComponentKinematic::SpawnSegments(float deltaTime)
+    void ConveyorBeltComponent::SpawnSegments(float deltaTime)
     {
         m_deltaTimeFromLastSpawn += deltaTime;
         if (m_conveyorSegments.empty())
@@ -348,7 +315,7 @@ namespace ROS2
             m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
             return;
         }
-        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_segmentLength / m_speed)
+        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / m_configuration.m_speed)
         {
             m_deltaTimeFromLastSpawn = 0.f;
             m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));

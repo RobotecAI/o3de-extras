@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include "ConveyorBeltComponentConfiguration.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityBus.h>
@@ -28,7 +29,7 @@ namespace ROS2
     //! The conveyor belt is simulated using a spline and number of kinematic rigid bodies.
     //! The kinematic rigid bodies have their kinematic targets set to interpolate along the spline.
     //! The component is updating kinematic targets every physic sub-step and creates and despawns rigid bodies as needed.
-    class ConveyorBeltComponentKinematic
+    class ConveyorBeltComponent
         : public AZ::Component
         , public AZ::TickBus::Handler
         , public AZ::EntityBus::Handler
@@ -37,9 +38,9 @@ namespace ROS2
         static constexpr float SegmentSeparation = 1.0f; //!< Separation between segments of the belt (in normalized units)
 
     public:
-        AZ_COMPONENT(ConveyorBeltComponentKinematic, "{B7F56411-01D4-48B0-8874-230C58A578BD}");
-        ConveyorBeltComponentKinematic() = default;
-        virtual ~ConveyorBeltComponentKinematic() = default;
+        AZ_COMPONENT(ConveyorBeltComponent, "{B7F56411-01D4-48B0-8874-230C58A578BD}");
+        ConveyorBeltComponent() = default;
+        virtual ~ConveyorBeltComponent() = default;
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void Reflect(AZ::ReflectContext* context);
 
@@ -100,6 +101,8 @@ namespace ROS2
         //! @param deltaTime the time since the last call of the function
         void SpawnSegments(float deltaTime);
 
+        ConveyorBeltComponentConfiguration m_configuration; //!< Configuration of the component
+
         AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneFinishSimHandler; //!< Handler called after every physics sub-step
         AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_conveyorSegments; //!< Cache of created segments
         float m_textureOffset = 0.0f; //!< Current offset of the texture during animation
@@ -109,15 +112,7 @@ namespace ROS2
         AZ::Vector3 m_startPoint; //!< Start point of the belt
         AZ::Vector3 m_endPoint; //!< End point of the belt
         AzPhysics::SceneHandle m_sceneHandle; //!< Scene handle of the scene the belt is in
-        AZStd::string m_graphicalMaterialSlot{ "Belt" }; //!< Name of the material slot to change UVs of
-
         bool m_beltStopped = false; //!< State of the conveyor belt
-        float m_speed = 1.0f; //!< Speed of the conveyor belt
-        float m_beltWidth = 1.0f; //!< Width of the conveyor belt
-        float m_segmentLength = 1.0f; //!< Length of individual segments of the conveyor belt
-        AZ::Data::Asset<Physics::MaterialAsset> m_materialAsset; //!< Material of individual segments of the conveyor belt
-        AZ::EntityId m_conveyorEntityId; //!< Conveyor belt entity (used for texture movement)
-        float m_textureScale = 1.0f; //!< Scaling factor of the texture
         float m_deltaTimeFromLastSpawn = 0.0f; //!< Time since the last spawn
     };
 } // namespace ROS2
