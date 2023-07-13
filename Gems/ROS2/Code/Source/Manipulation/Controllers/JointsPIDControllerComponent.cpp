@@ -38,6 +38,12 @@ namespace ROS2
         JointPosition targetPosition,
         float deltaTime)
     {
+        AZ_Printf(
+            "JointsPIDControllerComponent",
+            "Joint %s, current position %f, target position %f\n",
+            jointName.c_str(),
+            currentPosition,
+            targetPosition);
         if (joint.m_isArticulation)
         {
             return AZ::Failure(AZStd::string::format("Joint %s is articulation link, JointsPIDControllerComponent only handles classic Hinge joints. Use "

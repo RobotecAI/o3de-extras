@@ -18,6 +18,7 @@
 #include <ROS2/Utilities/ROS2Names.h>
 #include <Source/ArticulationLinkComponent.h>
 #include <Source/HingeJointComponent.h>
+#include <Source/PrismaticJointComponent.h>
 
 namespace ROS2
 {
@@ -117,7 +118,12 @@ namespace ROS2
                 }
                 const AZStd::string jointName(frameComponent->GetJointName().GetCStr());
 
-                auto* hingeComponent = Utils::GetGameOrEditorComponent<PhysX::HingeJointComponent>(entity);
+                auto* hingeComponent = azrtti_cast<PhysX::JointComponent*>(Utils::GetGameOrEditorComponent<PhysX::HingeJointComponent>(entity));
+                if (!hingeComponent)
+                {
+                    hingeComponent = azrtti_cast<PhysX::JointComponent*>(Utils::GetGameOrEditorComponent<PhysX::PrismaticJointComponent>(entity));
+                }
+
                 auto* articulationComponent = Utils::GetGameOrEditorComponent<PhysX::ArticulationLinkComponent>(entity);
                 AZ_Warning(
                     "JointsManipulationComponent",
