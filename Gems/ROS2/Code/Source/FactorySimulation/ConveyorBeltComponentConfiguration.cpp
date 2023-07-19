@@ -45,7 +45,7 @@ namespace ROS2
                         &ConveyorBeltComponentConfiguration::m_segmentSize,
                         "Segment Size",
                         "Size of simulated segments. Short segments might affect performance"
-                        "physics engine.")
+                        "of the physics engine.")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ConveyorBeltComponentConfiguration::m_textureScale,
@@ -59,7 +59,7 @@ namespace ROS2
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ConveyorBeltComponentConfiguration::m_graphicalMaterialSlot,
-                        "Graphical Material slot ",
+                        "Graphical Material slot",
                         "The graphical material slot name to have its UV coordinates animated.")
                     ->Attribute(AZ::Edit::Attributes::DefaultAsset, &GetDefaultPhysicsMaterialAssetId)
                     ->Attribute(AZ_CRC_CE("EditButton"), "")

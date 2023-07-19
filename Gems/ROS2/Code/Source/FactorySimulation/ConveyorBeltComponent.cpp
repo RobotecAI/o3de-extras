@@ -7,6 +7,7 @@
  */
 #include "ConveyorBeltComponent.h"
 #include <AtomLyIntegration/CommonFeatures/Material/MaterialComponentBus.h>
+#include <AtomLyIntegration/CommonFeatures/Mesh/MeshComponentBus.h>
 #include <AzCore/Asset/AssetSerializer.h>
 #include <AzCore/Math/Matrix3x3.h>
 #include <AzCore/Math/Transform.h>
@@ -19,7 +20,6 @@
 #include <AzFramework/Physics/RigidBodyBus.h>
 #include <LmbrCentral/Shape/SplineComponentBus.h>
 #include <Source/RigidBodyComponent.h>
-
 namespace ROS2
 {
     static AZ::Data::AssetId GetDefaultPhysicsMaterialAssetId()
@@ -75,35 +75,6 @@ namespace ROS2
 
     void ConveyorBeltComponent::Activate()
     {
-        AZ::EntityBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
-        AZ::EntityBus::Handler::BusConnect(m_entity->GetId());
-        ConveyorBeltRequestBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
-    }
-
-    void ConveyorBeltComponent::Deactivate()
-    {
-        ConveyorBeltRequestBus::Handler::BusDisconnect();
-
-        m_sceneFinishSimHandler.Disconnect();
-        AZ::EntityBus::Handler::BusDisconnect();
-        AZ::TickBus::Handler::BusDisconnect();
-    }
-
-    AZ::Vector3 ConveyorBeltComponent::GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle)
-    {
-        AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
-        AZ_Assert(sceneInterface, "No scene interface");
-        auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
-        AZ_Assert(body, "No valid body found");
-        if (body)
-        {
-            AZ::Vector3 beginOfSegments = body->GetPosition();
-            return beginOfSegments;
-        }
-        return AZ::Vector3::CreateZero();
-    }
-    void ConveyorBeltComponent::OnEntityActivated(const AZ::EntityId& entityId)
-    {
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
         AZ_Assert(physicsSystem, "No physics system");
         AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
@@ -117,7 +88,7 @@ namespace ROS2
 
         AZ::ConstSplinePtr splinePtr{ nullptr };
         LmbrCentral::SplineComponentRequestBus::EventResult(splinePtr, m_entity->GetId(), &LmbrCentral::SplineComponentRequests::GetSpline);
-        AZ_Assert(splinePtr, "Spline pointer is null");
+        AZ_Assert(splinePtr, "Unable to get spline for entity id (%s)", m_entity->GetId().ToString().c_str());
 
         if (splinePtr)
         {
@@ -137,6 +108,7 @@ namespace ROS2
             m_splineLength = GetSplineLength(splinePtr);
 
             // initial segment population
+            AZ_Assert(m_splineLength != 0.0f, "m_splineLength must be non-zero");
             const float normalizedDistanceStep = SegmentSeparation * m_configuration.m_segmentSize / m_splineLength;
             for (float normalizedIndex = 0.f; normalizedIndex < 1.f; normalizedIndex += normalizedDistanceStep)
             {
@@ -145,12 +117,68 @@ namespace ROS2
             AZ_Printf("ConveyorBeltComponent", "Initial Number of segments: %d", m_conveyorSegments.size());
             AZ::TickBus::Handler::BusConnect();
         }
+        AZ::EntityBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
+        ConveyorBeltRequestBus::Handler::BusConnect(m_configuration.m_conveyorEntityId);
+    }
+
+    void ConveyorBeltComponent::Deactivate()
+    {
+        if (m_sceneFinishSimHandler.IsConnected())
+        {
+            m_sceneFinishSimHandler.Disconnect();
+        }
+        ConveyorBeltRequestBus::Handler::BusDisconnect();
+        AZ::EntityBus::Handler::BusDisconnect();
+        AZ::TickBus::Handler::BusDisconnect();
+    }
+
+    AZ::Vector3 ConveyorBeltComponent::GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle)
+    {
+        AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        AZ_Assert(sceneInterface, "No scene interface");
+        auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
+        AZ_Assert(body, "No valid body found");
+        if (body)
+        {
+            AZ::Vector3 beginOfSegments = body->GetPosition();
+            return beginOfSegments;
+        }
+        return AZ::Vector3::CreateZero();
+    }
+    void ConveyorBeltComponent::OnEntityActivated(const AZ::EntityId& entityId)
+    {
+        if (m_configuration.m_conveyorEntityId.IsValid() && entityId == m_configuration.m_conveyorEntityId)
+        {
+            AZ::Render::MaterialComponentRequestBus::EventResult(
+                m_graphhicalMaterialId,
+                m_configuration.m_conveyorEntityId,
+                &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId,
+                -1,
+                m_configuration.m_graphicalMaterialSlot);
+
+            AZStd::string foundMaterialName;
+            AZ::Render::MaterialComponentRequestBus::EventResult(
+                foundMaterialName,
+                m_configuration.m_conveyorEntityId,
+                &AZ::Render::MaterialComponentRequestBus::Events::GetMaterialLabel,
+                m_graphhicalMaterialId);
+
+            AZ_Warning(
+                "ConveyorBeltComponent",
+                m_configuration.m_graphicalMaterialSlot == foundMaterialName,
+                "Material slot \"%s\" not found on entity %s, found material slot \"%s\" instead.",
+                m_configuration.m_graphicalMaterialSlot.c_str(),
+                m_configuration.m_conveyorEntityId.ToString().c_str(),
+                foundMaterialName.c_str());
+            AZ_Assert(m_graphhicalMaterialId.IsSlotIdOnly(), "m_graphhicalMaterialId should be a slot id only");
+        }
     }
 
     AZStd::pair<float, AzPhysics::SimulatedBodyHandle> ConveyorBeltComponent::CreateSegment(
         AZ::ConstSplinePtr splinePtr, float normalizedLocation)
     {
         AzPhysics::SystemInterface* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
+        AZ_Assert(physicsSystem != nullptr, "Unable to get Physics System");
 
         auto colliderConfiguration = AZStd::make_shared<Physics::ColliderConfiguration>();
         colliderConfiguration->m_isInSceneQueries = false;
@@ -242,21 +270,19 @@ namespace ROS2
             return;
         }
 
+        if (!m_configuration.m_conveyorEntityId.IsValid())
+        {
+            return;
+        }
+
         // Animate texture
-        AZ::Render::MaterialAssignmentId materialId;
-        AZ::Render::MaterialComponentRequestBus::EventResult(
-            materialId,
-            m_configuration.m_conveyorEntityId,
-            &AZ::Render::MaterialComponentRequestBus::Events::FindMaterialAssignmentId,
-            -1,
-            m_configuration.m_graphicalMaterialSlot);
 
         m_textureOffset += deltaTime * m_configuration.m_speed * m_configuration.m_textureScale;
 
         AZ::Render::MaterialComponentRequestBus::Event(
             m_configuration.m_conveyorEntityId,
             &AZ::Render::MaterialComponentRequestBus::Events::SetPropertyValueT<float>,
-            materialId,
+            m_graphhicalMaterialId,
             "uv.offsetU",
             m_textureOffset);
     }
@@ -293,6 +319,7 @@ namespace ROS2
         }
 
         AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        AZ_Assert(sceneInterface != nullptr, "Unable to get Scene Interface");
         // update positions of the segments
         for (auto& [pos, handle] : m_conveyorSegments)
         {

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "ConveyorBeltComponentConfiguration.h"
+#include <AtomLyIntegration/CommonFeatures/Material/MaterialAssignmentId.h>
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityBus.h>
@@ -66,13 +67,13 @@ namespace ROS2
         //! @return the location of the segment in world space
         AZ::Vector3 GetLocationOfSegment(const AzPhysics::SimulatedBodyHandle handle);
 
-        //! Obtains the transform of of the pose on the spline at the given distance
+        //! Obtains the transform of the pose on the spline at the given distance
         //! @param splinePtr the spline to obtain the transform from
         //! @param distanceNormalized the distance along the spline to obtain the transform from (normalized)
         //! @return the transform of the pose on the spline at the given distance
         AZ::Transform GetTransformFromSpline(AZ::ConstSplinePtr splinePtr, float distanceNormalized);
 
-        //! Spawn rigid body at the given location
+        //! Spawn a rigid body at the given location
         //! @param splinePtr the spline to spawn the rigid body on
         //! @param location the location to spawn the rigid body at (normalized)
         //! @return a pair of the normalized location and the handle of the simulated body
@@ -114,5 +115,6 @@ namespace ROS2
         AzPhysics::SceneHandle m_sceneHandle; //!< Scene handle of the scene the belt is in
         bool m_beltStopped = false; //!< State of the conveyor belt
         float m_deltaTimeFromLastSpawn = 0.0f; //!< Time since the last spawn
+        AZ::Render::MaterialAssignmentId m_graphhicalMaterialId; //!< Material id of the animated belt
     };
 } // namespace ROS2
