@@ -42,7 +42,7 @@ namespace ROS2
             m_cameraConfiguration.m_width > 0 && m_cameraConfiguration.m_height > 0, "Camera resolution dimensions should be above zero");
         AZ_Assert(!m_cameraName.empty(), "Camera name cannot be empty");
         AZ_Assert(m_cameraConfiguration.m_nearClipDistance > 0.0f, "Near clip distance should be above zero");
-        AZ_Assert(m_cameraConfiguration.m_farClipDistance > 0.0f, "Near clip distance should be above zero");
+        AZ_Assert(m_cameraConfiguration.m_farClipDistance > 0.0f, "Far clip distance should be above zero");
         AZ_Assert(
             m_cameraConfiguration.m_farClipDistance > m_cameraConfiguration.m_nearClipDistance,
             "Far clip distance should be greater than near clip distance");
