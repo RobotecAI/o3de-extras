@@ -60,16 +60,17 @@ namespace ROS2
         rclcpp::Service<gazebo_msgs::srv::SpawnEntity>::SharedPtr m_spawnService;
         rclcpp::Service<gazebo_msgs::srv::GetModelState>::SharedPtr m_getSpawnPointInfoService;
 
-        void GetAvailableSpawnableNames(const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response);
-        void SpawnEntity(const SpawnEntityRequest request, SpawnEntityResponse response);
+        void GetAvailableSpawnableNames(const GetAvailableSpawnableNamesRequest& request, GetAvailableSpawnableNamesResponse response);
+        void SpawnEntity(const SpawnEntityRequest& request, SpawnEntityResponse response);
+
         void PreSpawn(
             AzFramework::EntitySpawnTicket::Id,
             AzFramework::SpawnableEntityContainerView,
             const AZ::Transform&,
             const AZStd::string& spawnableName);
 
-        void GetSpawnPointsNames(const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response);
-        void GetSpawnPointInfo(const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response);
+        void GetSpawnPointsNames(const GetSpawnPointsNamesRequest& request, GetSpawnPointsNamesResponse response);
+        void GetSpawnPointInfo(const GetSpawnPointInfoRequest& request, GetSpawnPointInfoResponse response);
 
         AZStd::unordered_map<AZStd::string, SpawnPointInfo> GetSpawnPoints();
     };

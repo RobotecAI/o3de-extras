@@ -18,7 +18,6 @@
 
 namespace ROS2
 {
-
     ROS2SpawnerComponent::ROS2SpawnerComponent(const ROS2SpawnerComponentConfig& properties)
         : ROS2SpawnerComponentBase(properties)
     {
@@ -30,29 +29,31 @@ namespace ROS2
 
         auto ros2Node = ROS2Interface::Get()->GetNode();
 
+        const auto& ns = m_controller.GetNamespace();
+
         m_getSpawnablesNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
-            "get_available_spawnable_namespawnable_names",
+            AZStd::string::format("%s/get_available_spawnable_names", ns.data()).data(),
             [this](const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
             {
                 GetAvailableSpawnableNames(request, response);
             });
 
         m_spawnService = ros2Node->create_service<gazebo_msgs::srv::SpawnEntity>(
-            "spawn_entity",
+            AZStd::string::format("%s/spawn_entity", ns.data()).data(),
             [this](const SpawnEntityRequest request, SpawnEntityResponse response)
             {
                 SpawnEntity(request, response);
             });
 
         m_getSpawnPointInfoService = ros2Node->create_service<gazebo_msgs::srv::GetModelState>(
-            "get_spawn_point_info",
+            AZStd::string::format("%s/get_spawn_point_info", ns.data()).data(),
             [this](const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response)
             {
                 GetSpawnPointInfo(request, response);
             });
 
         m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
-            "get_spawn_points_names",
+            AZStd::string::format("%s/get_spawn_points_names", ns.data()).data(),
             [this](const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response)
             {
                 GetSpawnPointsNames(request, response);
@@ -73,32 +74,53 @@ namespace ROS2
     {
         ROS2SpawnerComponentBase::Reflect(context);
 
-        if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<ROS2SpawnerComponent, ROS2SpawnerComponentBase>()->Version(1);
         }
     }
 
     void ROS2SpawnerComponent::GetAvailableSpawnableNames(
-        const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
+        const GetAvailableSpawnableNamesRequest& request, GetAvailableSpawnableNamesResponse response)
     {
-        for (const auto& spawnable : m_controller.GetSpawnables())
+        for (const auto& [name, asset] : m_controller.GetSpawnables())
         {
-            response->model_names.emplace_back(spawnable.first.c_str());
+            response->model_names.emplace_back(name.c_str());
         }
+        response->success = true;
     }
 
-    void ROS2SpawnerComponent::SpawnEntity(const SpawnEntityRequest request, SpawnEntityResponse response)
+    void ROS2SpawnerComponent::SpawnEntity(const SpawnEntityRequest& request, SpawnEntityResponse response)
     {
         AZStd::string spawnableName(request->name.c_str());
         AZStd::string spawnPointName(request->xml.c_str(), request->xml.size());
 
         auto spawnPoints = GetSpawnPoints();
+        const auto& spawnables = m_controller.GetSpawnables();
 
-        if (!m_controller.GetSpawnables().contains(spawnableName))
+        auto spawnable = spawnables.find(spawnableName);
+        if (spawnable == spawnables.end())
         {
             response->success = false;
             response->status_message = "Could not find spawnable with given name: " + request->name;
+            return;
+        }
+
+        AZ::Transform transform;
+
+        if (auto it = spawnPoints.find(spawnPointName); it != spawnPoints.end())
+        {
+            transform = it->second.pose;
+        }
+        else if (spawnPointName.empty())
+        {
+            transform = ROS2::ROS2Conversions::FromROS2Pose(request->initial_pose);
+        }
+        else
+        {
+            response->success = false;
+            response->status_message =
+                "Could not find spawn point with given name: " + request->xml + ". To use initial_pose keep xml empty";
             return;
         }
 
@@ -106,30 +128,12 @@ namespace ROS2
         {
             // if a ticket for this spawnable was not created but the spawnable name is correct, create the ticket and then use it to
             // spawn an entity
-            auto spawnable = m_controller.GetSpawnables().find(spawnableName);
             m_tickets.emplace(spawnable->first, AzFramework::EntitySpawnTicket(spawnable->second));
         }
 
         auto spawner = AZ::Interface<AzFramework::SpawnableEntitiesDefinition>::Get();
 
         AzFramework::SpawnAllEntitiesOptionalArgs optionalArgs;
-
-        AZ::Transform transform;
-
-        if (spawnPoints.contains(spawnPointName))
-        {
-            transform = spawnPoints.at(spawnPointName).pose;
-        }
-        else
-        {
-            transform = { AZ::Vector3(request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
-                          AZ::Quaternion(
-                              request->initial_pose.orientation.x,
-                              request->initial_pose.orientation.y,
-                              request->initial_pose.orientation.z,
-                              request->initial_pose.orientation.w),
-                          1.0f };
-        }
 
         optionalArgs.m_preInsertionCallback = [this, transform, spawnableName](auto id, auto view)
         {
@@ -169,24 +173,26 @@ namespace ROS2
     }
 
     void ROS2SpawnerComponent::GetSpawnPointsNames(
-        const ROS2::GetSpawnPointsNamesRequest request, ROS2::GetSpawnPointsNamesResponse response)
+        const ROS2::GetSpawnPointsNamesRequest& request, ROS2::GetSpawnPointsNamesResponse response)
     {
-        for (auto spawnPoint : GetSpawnPoints())
+        for (const auto& [name, info] : GetSpawnPoints())
         {
-            response->model_names.emplace_back(spawnPoint.first.c_str());
+            response->model_names.emplace_back(name.c_str());
         }
+        response->success = true;
     }
 
-    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest request, ROS2::GetSpawnPointInfoResponse response)
+    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest& request, ROS2::GetSpawnPointInfoResponse response)
     {
         const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
 
         auto spawnPoints = GetSpawnPoints();
-        if (spawnPoints.contains(key))
+        if (auto it = spawnPoints.find(key); it != spawnPoints.end())
         {
-            auto info = spawnPoints.at(key);
+            const auto& info = it->second;
             response->pose = ROS2Conversions::ToROS2Pose(info.pose);
             response->status_message = info.info.c_str();
+            response->success = true;
         }
         else
         {

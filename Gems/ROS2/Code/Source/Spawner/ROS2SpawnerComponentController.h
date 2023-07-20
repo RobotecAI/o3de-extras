@@ -31,6 +31,7 @@ namespace ROS2
 
         AZ::EntityId m_editorEntityId;
         AZ::Transform m_defaultSpawnPose = { AZ::Vector3{ 0, 0, 0 }, AZ::Quaternion{ 0, 0, 0, 1 }, 1.0 };
+        AZStd::string m_namespace;
 
         AZStd::unordered_map<AZStd::string, AZ::Data::Asset<AzFramework::Spawnable>> m_spawnables;
     };
@@ -62,6 +63,7 @@ namespace ROS2
         SpawnPointInfoMap GetSpawnPoints() const;
         AZ::EntityId GetEditorEntityId() const;
         AZStd::unordered_map<AZStd::string, AZ::Data::Asset<AzFramework::Spawnable>> GetSpawnables() const;
+        const AZStd::string& GetNamespace() const;
 
     private:
         ROS2SpawnerComponentConfig m_config;

@@ -24,10 +24,11 @@ namespace ROS2
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<ROS2SpawnerComponentConfig, AZ::ComponentConfig>()
-                ->Version(1)
+                ->Version(2)
                 ->Field("Editor entity id", &ROS2SpawnerComponentConfig::m_editorEntityId)
                 ->Field("Spawnables", &ROS2SpawnerComponentConfig::m_spawnables)
-                ->Field("Default spawn pose", &ROS2SpawnerComponentConfig::m_defaultSpawnPose);
+                ->Field("Default spawn pose", &ROS2SpawnerComponentConfig::m_defaultSpawnPose)
+                ->Field("Namespace", &ROS2SpawnerComponentConfig::m_namespace);
 
             if (auto editContext = serializeContext->GetEditContext())
             {
@@ -37,8 +38,13 @@ namespace ROS2
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2SpawnerComponentConfig::m_defaultSpawnPose,
-                        "Default spawn pose",
-                        "Default spawn pose");
+                        "Default Spawn Pose",
+                        "Default spawn pose")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2SpawnerComponentConfig::m_namespace,
+                        "Namespace",
+                        "Namespace for provided services. Global if empty");
             }
         }
     }
@@ -56,6 +62,11 @@ namespace ROS2
     const AZ::Transform& ROS2SpawnerComponentController::GetDefaultSpawnPose() const
     {
         return m_config.m_defaultSpawnPose;
+    }
+
+    const AZStd::string& ROS2SpawnerComponentController::GetNamespace() const
+    {
+        return m_config.m_namespace;
     }
 
     AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponentController::GetAllSpawnPointInfos() const
