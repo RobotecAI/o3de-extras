@@ -23,14 +23,14 @@
 
 namespace ROS2
 {
-    using GetAvailableSpawnableNamesRequest = std::shared_ptr<gazebo_msgs::srv::GetWorldProperties::Request>;
-    using GetAvailableSpawnableNamesResponse = std::shared_ptr<gazebo_msgs::srv::GetWorldProperties::Response>;
-    using SpawnEntityRequest = std::shared_ptr<gazebo_msgs::srv::SpawnEntity::Request>;
-    using SpawnEntityResponse = std::shared_ptr<gazebo_msgs::srv::SpawnEntity::Response>;
-    using GetSpawnPointInfoRequest = std::shared_ptr<gazebo_msgs::srv::GetModelState::Request>;
-    using GetSpawnPointInfoResponse = std::shared_ptr<gazebo_msgs::srv::GetModelState::Response>;
-    using GetSpawnPointsNamesRequest = std::shared_ptr<gazebo_msgs::srv::GetWorldProperties::Request>;
-    using GetSpawnPointsNamesResponse = std::shared_ptr<gazebo_msgs::srv::GetWorldProperties::Response>;
+    using GetAvailableSpawnableNamesRequest = gazebo_msgs::srv::GetWorldProperties::Request::ConstSharedPtr;
+    using GetAvailableSpawnableNamesResponse = gazebo_msgs::srv::GetWorldProperties::Response::SharedPtr;
+    using SpawnEntityRequest = gazebo_msgs::srv::SpawnEntity::Request::ConstSharedPtr;
+    using SpawnEntityResponse = gazebo_msgs::srv::SpawnEntity::Response::SharedPtr;
+    using GetSpawnPointInfoRequest = gazebo_msgs::srv::GetModelState::Request::ConstSharedPtr;
+    using GetSpawnPointInfoResponse = gazebo_msgs::srv::GetModelState::Response::SharedPtr;
+    using GetSpawnPointsNamesRequest = gazebo_msgs::srv::GetWorldProperties::Request::ConstSharedPtr;
+    using GetSpawnPointsNamesResponse = gazebo_msgs::srv::GetWorldProperties::Response::SharedPtr;
 
     using ROS2SpawnerComponentBase = AzFramework::Components::ComponentAdapter<ROS2SpawnerComponentController, ROS2SpawnerComponentConfig>;
     //! Manages robots spawning.
@@ -60,17 +60,16 @@ namespace ROS2
         rclcpp::Service<gazebo_msgs::srv::SpawnEntity>::SharedPtr m_spawnService;
         rclcpp::Service<gazebo_msgs::srv::GetModelState>::SharedPtr m_getSpawnPointInfoService;
 
-        void GetAvailableSpawnableNames(const GetAvailableSpawnableNamesRequest& request, GetAvailableSpawnableNamesResponse response);
-        void SpawnEntity(const SpawnEntityRequest& request, SpawnEntityResponse response);
-
+        void GetAvailableSpawnableNames(const GetAvailableSpawnableNamesRequest& request, const GetAvailableSpawnableNamesResponse& response);
+        void SpawnEntity(const SpawnEntityRequest& request, const SpawnEntityResponse& response);
         void PreSpawn(
             AzFramework::EntitySpawnTicket::Id,
             AzFramework::SpawnableEntityContainerView,
             const AZ::Transform&,
             const AZStd::string& spawnableName);
 
-        void GetSpawnPointsNames(const GetSpawnPointsNamesRequest& request, GetSpawnPointsNamesResponse response);
-        void GetSpawnPointInfo(const GetSpawnPointInfoRequest& request, GetSpawnPointInfoResponse response);
+        void GetSpawnPointsNames(const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response);
+        void GetSpawnPointInfo(const GetSpawnPointInfoRequest& request, const GetSpawnPointInfoResponse& response);
 
         AZStd::unordered_map<AZStd::string, SpawnPointInfo> GetSpawnPoints();
     };

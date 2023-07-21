@@ -33,28 +33,28 @@ namespace ROS2
 
         m_getSpawnablesNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
             AZStd::string::format("%s/get_available_spawnable_names", ns.data()).data(),
-            [this](const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
+            [this](const GetAvailableSpawnableNamesRequest& request, const GetAvailableSpawnableNamesResponse& response)
             {
                 GetAvailableSpawnableNames(request, response);
             });
 
         m_spawnService = ros2Node->create_service<gazebo_msgs::srv::SpawnEntity>(
             AZStd::string::format("%s/spawn_entity", ns.data()).data(),
-            [this](const SpawnEntityRequest request, SpawnEntityResponse response)
+            [this](const SpawnEntityRequest& request, const SpawnEntityResponse& response)
             {
                 SpawnEntity(request, response);
             });
 
         m_getSpawnPointInfoService = ros2Node->create_service<gazebo_msgs::srv::GetModelState>(
             AZStd::string::format("%s/get_spawn_point_info", ns.data()).data(),
-            [this](const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response)
+            [this](const GetSpawnPointInfoRequest& request, const GetSpawnPointInfoResponse& response)
             {
                 GetSpawnPointInfo(request, response);
             });
 
         m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
             AZStd::string::format("%s/get_spawn_points_names", ns.data()).data(),
-            [this](const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response)
+            [this](const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response)
             {
                 GetSpawnPointsNames(request, response);
             });
@@ -81,7 +81,7 @@ namespace ROS2
     }
 
     void ROS2SpawnerComponent::GetAvailableSpawnableNames(
-        const GetAvailableSpawnableNamesRequest& request, GetAvailableSpawnableNamesResponse response)
+        const GetAvailableSpawnableNamesRequest& request, const GetAvailableSpawnableNamesResponse& response)
     {
         for (const auto& [name, asset] : m_controller.GetSpawnables())
         {
@@ -90,7 +90,7 @@ namespace ROS2
         response->success = true;
     }
 
-    void ROS2SpawnerComponent::SpawnEntity(const SpawnEntityRequest& request, SpawnEntityResponse response)
+    void ROS2SpawnerComponent::SpawnEntity(const SpawnEntityRequest& request, const SpawnEntityResponse& response)
     {
         AZStd::string spawnableName(request->name.c_str());
         AZStd::string spawnPointName(request->xml.c_str(), request->xml.size());
@@ -173,7 +173,7 @@ namespace ROS2
     }
 
     void ROS2SpawnerComponent::GetSpawnPointsNames(
-        const ROS2::GetSpawnPointsNamesRequest& request, ROS2::GetSpawnPointsNamesResponse response)
+        const ROS2::GetSpawnPointsNamesRequest& request, const ROS2::GetSpawnPointsNamesResponse& response)
     {
         for (const auto& [name, info] : GetSpawnPoints())
         {
@@ -182,7 +182,7 @@ namespace ROS2
         response->success = true;
     }
 
-    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest& request, ROS2::GetSpawnPointInfoResponse response)
+    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest& request, const ROS2::GetSpawnPointInfoResponse& response)
     {
         const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
 
