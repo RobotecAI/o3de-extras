@@ -148,14 +148,6 @@ namespace ROS2
         const AZ::Vector3 robotDirectionSpline = robotLocationSpline.GetBasisX();
         const float bearingError = GetAngle(robotDirectionSpline, tangent);
 
-        AZ_Printf(
-            "ROS2",
-            " %d %f %f %f",
-            splineQuery.m_splineAddress.m_segmentIndex,
-            robotLocationInGoalSpace.GetX(),
-            robotLocationInGoalSpace.GetY(),
-            robotLocationInGoalSpace.GetZ());
-
         geometry_msgs::msg::Twist cmd;
         cmd.angular.z = bearingError * m_angularSpeedFactor - crossTrackError * m_crossTrackFactor;
         cmd.linear.x = linearVelocity;
