@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+#include <Camera/ROS2CameraSensorEditorComponent.h>
 #include <Lidar/LidarRegistrarEditorSystemComponent.h>
 #include <ROS2EditorSystemComponent.h>
 #include <ROS2ModuleInterface.h>
-#include <Camera/ROS2CameraSensorEditorComponent.h>
 #include <RobotImporter/ROS2RobotImporterEditorSystemComponent.h>
+#include <Spawner/ROS2SpawnPointEditorComponent.h>
+#include <Spawner/ROS2SpawnerEditorComponent.h>
 
 #include <QtCore/qglobal.h>
 
@@ -30,19 +32,19 @@ namespace ROS2
         ROS2EditorModule()
         {
             InitROS2Resources();
-            
+
             // Push results of [MyComponent]::CreateDescriptor() into m_descriptors here.
             // Add ALL components descriptors associated with this gem to m_descriptors.
             // This will associate the AzTypeInfo information for the components with the SerializeContext, BehaviorContext and
             // EditContext. This happens through the [MyComponent]::Reflect() function.
             m_descriptors.insert(
                 m_descriptors.end(),
-                {
-                    ROS2EditorSystemComponent::CreateDescriptor(),
-                    LidarRegistrarEditorSystemComponent::CreateDescriptor(),
-                    ROS2RobotImporterEditorSystemComponent::CreateDescriptor(),
-                    ROS2CameraSensorEditorComponent::CreateDescriptor(),
-                });
+                { ROS2EditorSystemComponent::CreateDescriptor(),
+                  LidarRegistrarEditorSystemComponent::CreateDescriptor(),
+                  ROS2RobotImporterEditorSystemComponent::CreateDescriptor(),
+                  ROS2CameraSensorEditorComponent::CreateDescriptor(),
+                  ROS2SpawnerEditorComponent::CreateDescriptor(),
+                  ROS2SpawnPointEditorComponent::CreateDescriptor() });
         }
 
         /**
