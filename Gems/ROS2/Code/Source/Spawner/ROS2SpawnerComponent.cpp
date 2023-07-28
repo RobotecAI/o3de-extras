@@ -94,6 +94,7 @@ namespace ROS2
     {
         AZStd::string spawnableName(request->name.c_str());
         AZStd::string spawnPointName(request->xml.c_str(), request->xml.size());
+        AZStd::string spawnableCustomName(request->robot_namespace.c_str());
 
         auto spawnPoints = GetSpawnPoints();
         const auto& spawnables = m_controller.GetSpawnables();
@@ -135,9 +136,9 @@ namespace ROS2
 
         AzFramework::SpawnAllEntitiesOptionalArgs optionalArgs;
 
-        optionalArgs.m_preInsertionCallback = [this, transform, spawnableName](auto id, auto view)
+        optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableCustomName](auto id, auto view)
         {
-            PreSpawn(id, view, transform, spawnableName);
+            PreSpawn(id, view, transform, spawnableName, spawnableCustomName);
         };
 
         spawner->SpawnAllEntities(m_tickets.at(spawnableName), optionalArgs);
@@ -149,7 +150,8 @@ namespace ROS2
         AzFramework::EntitySpawnTicket::Id id [[maybe_unused]],
         AzFramework::SpawnableEntityContainerView view,
         const AZ::Transform& transform,
-        const AZStd::string& spawnableName)
+        const AZStd::string& spawnableName,
+        const AZStd::string& customName)
     {
         if (view.empty())
         {
@@ -160,20 +162,31 @@ namespace ROS2
         auto* transformInterface = root->FindComponent<AzFramework::TransformComponent>();
         transformInterface->SetWorldTM(transform);
 
-        AZStd::string instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
+        AZStd::string instanceName = customName;
+        if (instanceName.empty())
+        {
+            instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
+        }
+        instanceName = ROS2::ROS2Names::RosifyName(instanceName);
+
+        bool frameComponentFound = false;
         for (AZ::Entity* entity : view)
         { // Update name for the first entity with ROS2Frame in hierarchy (left to right)
-            const auto* frameComponent = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(entity);
-            if (frameComponent)
+            frameComponentFound = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(entity) != nullptr;
+            if (frameComponentFound)
             {
                 entity->SetName(instanceName);
                 break;
             }
         }
+        if (!frameComponentFound) {
+             // Update name for the root of spawnable hierarchy otherwise
+            root->SetName(instanceName);
+        }
     }
 
     void ROS2SpawnerComponent::GetSpawnPointsNames(
-        const ROS2::GetSpawnPointsNamesRequest& request, const ROS2::GetSpawnPointsNamesResponse& response)
+        const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response)
     {
         for (const auto& [name, info] : GetSpawnPoints())
         {
@@ -182,7 +195,8 @@ namespace ROS2
         response->success = true;
     }
 
-    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest& request, const ROS2::GetSpawnPointInfoResponse& response)
+    void ROS2SpawnerComponent::GetSpawnPointInfo(
+        const GetSpawnPointInfoRequest& request, const GetSpawnPointInfoResponse& response)
     {
         const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
 
