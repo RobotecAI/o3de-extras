@@ -31,7 +31,7 @@ namespace ROS2
 
         const auto& ns = m_controller.GetNamespace();
 
-        m_getSpawnablesNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
+        m_getSpawnablesNamesService = ros2Node->create_service<gazebo_msgs::srv::GetModelList>(
             AZStd::string::format("%s/get_available_spawnable_names", ns.data()).data(),
             [this](const GetAvailableSpawnableNamesRequest& request, const GetAvailableSpawnableNamesResponse& response)
             {
@@ -52,7 +52,7 @@ namespace ROS2
                 GetSpawnPointInfo(request, response);
             });
 
-        m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
+        m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetModelList>(
             AZStd::string::format("%s/get_spawn_points_names", ns.data()).data(),
             [this](const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response)
             {

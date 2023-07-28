@@ -17,20 +17,20 @@
 #include <AzFramework/Spawnable/Spawnable.h>
 #include <AzFramework/Spawnable/SpawnableEntitiesInterface.h>
 #include <gazebo_msgs/srv/get_model_state.hpp>
-#include <gazebo_msgs/srv/get_world_properties.hpp>
+#include <gazebo_msgs/srv/get_model_list.hpp>
 #include <gazebo_msgs/srv/spawn_entity.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace ROS2
 {
-    using GetAvailableSpawnableNamesRequest = gazebo_msgs::srv::GetWorldProperties::Request::ConstSharedPtr;
-    using GetAvailableSpawnableNamesResponse = gazebo_msgs::srv::GetWorldProperties::Response::SharedPtr;
+    using GetAvailableSpawnableNamesRequest = gazebo_msgs::srv::GetModelList::Request::ConstSharedPtr;
+    using GetAvailableSpawnableNamesResponse = gazebo_msgs::srv::GetModelList::Response::SharedPtr;
     using SpawnEntityRequest = gazebo_msgs::srv::SpawnEntity::Request::ConstSharedPtr;
     using SpawnEntityResponse = gazebo_msgs::srv::SpawnEntity::Response::SharedPtr;
     using GetSpawnPointInfoRequest = gazebo_msgs::srv::GetModelState::Request::ConstSharedPtr;
     using GetSpawnPointInfoResponse = gazebo_msgs::srv::GetModelState::Response::SharedPtr;
-    using GetSpawnPointsNamesRequest = gazebo_msgs::srv::GetWorldProperties::Request::ConstSharedPtr;
-    using GetSpawnPointsNamesResponse = gazebo_msgs::srv::GetWorldProperties::Response::SharedPtr;
+    using GetSpawnPointsNamesRequest = gazebo_msgs::srv::GetModelList::Request::ConstSharedPtr;
+    using GetSpawnPointsNamesResponse = gazebo_msgs::srv::GetModelList::Response::SharedPtr;
 
     using ROS2SpawnerComponentBase = AzFramework::Components::ComponentAdapter<ROS2SpawnerComponentController, ROS2SpawnerComponentConfig>;
     //! Manages robots spawning.
@@ -55,8 +55,8 @@ namespace ROS2
         int m_counter = 1;
         AZStd::unordered_map<AZStd::string, AzFramework::EntitySpawnTicket> m_tickets;
 
-        rclcpp::Service<gazebo_msgs::srv::GetWorldProperties>::SharedPtr m_getSpawnablesNamesService;
-        rclcpp::Service<gazebo_msgs::srv::GetWorldProperties>::SharedPtr m_getSpawnPointsNamesService;
+        rclcpp::Service<gazebo_msgs::srv::GetModelList>::SharedPtr m_getSpawnablesNamesService;
+        rclcpp::Service<gazebo_msgs::srv::GetModelList>::SharedPtr m_getSpawnPointsNamesService;
         rclcpp::Service<gazebo_msgs::srv::SpawnEntity>::SharedPtr m_spawnService;
         rclcpp::Service<gazebo_msgs::srv::GetModelState>::SharedPtr m_getSpawnPointInfoService;
 
