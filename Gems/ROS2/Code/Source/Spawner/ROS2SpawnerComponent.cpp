@@ -10,6 +10,7 @@
 #include "Spawner/ROS2SpawnerComponentController.h"
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzFramework/Physics/Components/SimulatedBodyComponentBus.h>
 #include <AzFramework/Spawnable/Spawnable.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/ROS2Bus.h>
@@ -18,6 +19,19 @@
 
 namespace ROS2
 {
+    namespace Internal
+    {
+        bool IsEntitySimulated(const AZ::Entity* entity)
+        {
+            AzPhysics::SimulatedBodyHandle handle;
+            // Check if the physics body is simulated
+            AzPhysics::SimulatedBodyComponentRequestsBus::EventResult(
+                handle, entity->GetId(), &AzPhysics::SimulatedBodyComponentRequests::GetSimulatedBodyHandle);
+
+            return handle == AzPhysics::InvalidSimulatedBodyHandle;
+        }
+    } // namespace Internal
+
     ROS2SpawnerComponent::ROS2SpawnerComponent(const ROS2SpawnerComponentConfig& properties)
         : ROS2SpawnerComponentBase(properties)
     {
@@ -176,17 +190,23 @@ namespace ROS2
             if (frameComponentFound)
             {
                 entity->SetName(instanceName);
-                break;
+                return;
             }
         }
-        if (!frameComponentFound) {
-             // Update name for the root of spawnable hierarchy otherwise
-            root->SetName(instanceName);
+
+        for (AZ::Entity* entity : view)
+        { // Otherwise update name for the first entity with Simulated Body in hierarchy (left to right)
+            if (Internal::IsEntitySimulated(entity))
+            {
+                entity->SetName(instanceName);
+                return;
+            }
         }
+        // Otherwise update name for the root of spawnable hierarchy otherwise
+        root->SetName(instanceName);
     }
 
-    void ROS2SpawnerComponent::GetSpawnPointsNames(
-        const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response)
+    void ROS2SpawnerComponent::GetSpawnPointsNames(const GetSpawnPointsNamesRequest& request, const GetSpawnPointsNamesResponse& response)
     {
         for (const auto& [name, info] : GetSpawnPoints())
         {
@@ -195,8 +215,7 @@ namespace ROS2
         response->success = true;
     }
 
-    void ROS2SpawnerComponent::GetSpawnPointInfo(
-        const GetSpawnPointInfoRequest& request, const GetSpawnPointInfoResponse& response)
+    void ROS2SpawnerComponent::GetSpawnPointInfo(const GetSpawnPointInfoRequest& request, const GetSpawnPointInfoResponse& response)
     {
         const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
 
