@@ -68,7 +68,7 @@ def SmokeTest_EnterGameModeWorks():
 
     # Open the level called "Warehouse".
     # We use a warehouse level for a smoke test - it already has a robot prefab present
-    helper.open_level(level="Warehouse", directory='')
+    helper.open_level(level="DemoLevel", directory='')
 
     topics_before_game_mode = check_topics()
 
