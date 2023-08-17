@@ -33,12 +33,12 @@ cd /data/workspace/WarehouseTest
 command="cmake --build build/linux --config profile --target WarehouseTest.GameLauncher Editor"
 runTestCommand
 
-cd ..
-command="./o3de/python/python.sh -m pytest --build-directory ./WarehouseTest/build/linux/bin/profile/ ./o3de-extras/Gems/ROS2/Code/PythonTests/SmokeTests_Periodic.py"
+cd build/linux
+command="ctest -C profile -R ROS2 -V --output-on-failure"
 runTestCommand
 
 summorizeTests
-if [ $sumOfTests -eq $sumOfSuccesfulTests ] then
+if [ $sumOfTests -eq $sumOfSuccesfulTests ] ; then
     exit 0
 else
     exit 1
