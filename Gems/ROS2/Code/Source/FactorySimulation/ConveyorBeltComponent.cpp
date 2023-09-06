@@ -96,7 +96,7 @@ namespace ROS2
             // initial segment population
             AZ_Assert(m_splineLength != 0.0f, "m_splineLength must be non-zero");
             const float normalizedDistanceStep = SegmentSeparation * m_configuration.m_segmentSize / m_splineLength;
-            for (float normalizedIndex = 0.f; normalizedIndex < 1.f; normalizedIndex += normalizedDistanceStep)
+            for (float normalizedIndex = 0.f; normalizedIndex < 1.f + normalizedDistanceStep; normalizedIndex += normalizedDistanceStep)
             {
                 m_conveyorSegments.push_back(CreateSegment(splinePtr, normalizedIndex));
             }
@@ -278,7 +278,7 @@ namespace ROS2
         bool wasSegmentRemoved = false;
         for (auto& [pos, handle] : m_conveyorSegments)
         {
-            if (pos > 1.0f)
+            if ((m_configuration.m_speed > 0.0f && pos > 1.0f) || (m_configuration.m_speed < 0.0f && pos < 0.0f))
             {
                 AZ::Interface<AzPhysics::SceneInterface>::Get()->RemoveSimulatedBody(m_sceneHandle, handle);
                 handle = AzPhysics::InvalidSimulatedBodyHandle;
@@ -325,13 +325,13 @@ namespace ROS2
         m_deltaTimeFromLastSpawn += deltaTime;
         if (m_conveyorSegments.empty())
         {
-            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
             return;
         }
-        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / m_configuration.m_speed)
+        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / abs(m_configuration.m_speed))
         {
             m_deltaTimeFromLastSpawn = 0.f;
-            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, 0.f));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
         }
     }
 
