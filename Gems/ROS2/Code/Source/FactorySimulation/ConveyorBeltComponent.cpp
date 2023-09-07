@@ -278,7 +278,8 @@ namespace ROS2
         bool wasSegmentRemoved = false;
         for (auto& [pos, handle] : m_conveyorSegments)
         {
-            if ((m_configuration.m_speed > 0.0f && pos > 1.0f) || (m_configuration.m_speed < 0.0f && pos < 0.0f))
+            const bool positiveDirection = m_configuration.m_speed > 0.0f;
+            if ((positiveDirection && pos > 1.0f) || (!positiveDirection && pos < 0.0f))
             {
                 AZ::Interface<AzPhysics::SceneInterface>::Get()->RemoveSimulatedBody(m_sceneHandle, handle);
                 handle = AzPhysics::InvalidSimulatedBodyHandle;
@@ -328,7 +329,7 @@ namespace ROS2
             m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
             return;
         }
-        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / abs(m_configuration.m_speed))
+        if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / AZStd::abs(m_configuration.m_speed))
         {
             m_deltaTimeFromLastSpawn = 0.f;
             m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
