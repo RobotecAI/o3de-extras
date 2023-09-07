@@ -323,16 +323,18 @@ namespace ROS2
 
     void ConveyorBeltComponent::SpawnSegments(float deltaTime)
     {
+        // Find normalized spawn place (0.0 or 1.0) depending on movement direction
+        const float spawnPlaceNormalized = static_cast<float>(m_configuration.m_speed<0.0f);
         m_deltaTimeFromLastSpawn += deltaTime;
         if (m_conveyorSegments.empty())
         {
-            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, spawnPlaceNormalized));
             return;
         }
         if (m_deltaTimeFromLastSpawn > SegmentSeparation * m_configuration.m_segmentSize / AZStd::abs(m_configuration.m_speed))
         {
             m_deltaTimeFromLastSpawn = 0.f;
-            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, (float)(m_configuration.m_speed<0.0f)));
+            m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, spawnPlaceNormalized));
         }
     }
 
