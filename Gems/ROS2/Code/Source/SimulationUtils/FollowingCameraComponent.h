@@ -15,12 +15,8 @@
 
 namespace ROS2
 {
-    //! The component used for camera following robots.
-    //! It allows to switch between different camera that can be attached to entities, and to control the camera with the keyboard.
-    //! It allows to offset angle around parent's Z axis, and to offset the distance from parent.
-    //! More over it is smoothing movement of the camera.
-    //! The theoretical background for handling quaternions as tangent vectors can be found in the paper:
-    //! "A micro Lie theory for state estimation in robotics" by Joan Solà, J. M. Porta, and Alberto Sanfeliu.
+    //! The component used for cameras that follow robots.
+    //! It allows to switch between different cameras attached to entities, and to control the active camera using keyboard.
     class FollowingCameraComponent
         : public AZ::Component
         , public AZ::TickBus::Handler
@@ -34,17 +30,16 @@ namespace ROS2
         AZ_COMPONENT(FollowingCameraComponent, "{6a21768a-f327-11ed-a05b-0242ac120003}", AZ::Component);
 
         // AZ::Component
-        void Init() override;
         void Activate() override;
         void Deactivate() override;
 
+    private:
         // AZ::TickBus overrides
         void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
 
         // AzFramework::InputChannelEventListener overrides
         bool OnInputChannelEventFiltered(const AzFramework::InputChannel& inputChannel) override;
 
-    private:
         void OnKeyboardEvent(const AzFramework::InputChannel& inputChannel);
 
         //! Compute weighted average of the vectors in the buffer.
@@ -69,10 +64,7 @@ namespace ROS2
         AZStd::deque<AZStd::pair<AZ::Vector3, float>> m_lastTranslationsBuffer;
 
         //! The smoothing buffer for rotation, the first element is the tangential vector, the second element is the weight.
-        AZStd::deque<AZStd::pair<AZ::Vector3, float>> m_lastRotationsBuffer;
-
-        //! The last translation, used to compute determine the incremental rotation.
-        AZ::Quaternion m_lastRotation;
+        AZStd::deque<AZStd::pair<AZ::Quaternion, float>> m_lastRotationsBuffer;
 
         //! Predefined view points.
         AZStd::vector<AZ::EntityId> m_predefinedViews;
