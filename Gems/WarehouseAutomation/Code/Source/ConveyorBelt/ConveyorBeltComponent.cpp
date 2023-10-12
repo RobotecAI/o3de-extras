@@ -83,9 +83,10 @@ namespace WarehouseAutomation
             m_sceneFinishSimHandler = AzPhysics::SceneEvents::OnSceneSimulationFinishHandler(
                 [this]([[maybe_unused]] AzPhysics::SceneHandle sceneHandle, float fixedDeltaTime)
                 {
-                    SpawnSegments(fixedDeltaTime);
+                    //SpawnSegments(fixedDeltaTime);
                     MoveSegmentsPhysically(fixedDeltaTime);
-                    DespawnSegments();
+                    //DespawnSegments();
+                    TeleportSegments();
                 },
                 aznumeric_cast<int32_t>(AzPhysics::SceneEvents::PhysicsStartFinishSimulationPriority::Components));
             sceneInterface->RegisterSceneSimulationFinishHandler(defaultSceneHandle, m_sceneFinishSimHandler);
@@ -258,6 +259,7 @@ namespace WarehouseAutomation
         if (m_beltStopped)
         { // Do not move texture when stopped
             return;
+            return;
         }
 
         if (!m_configuration.m_conveyorEntityId.IsValid())
@@ -314,6 +316,8 @@ namespace WarehouseAutomation
         // update positions of the segments
         for (auto& [pos, handle] : m_conveyorSegments)
         {
+
+            AZ::Interface<AzPhysics::SceneInterface>::Get()->EnableSimulationOfBody(m_sceneHandle, handle);
             auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
             if (body)
             {
@@ -340,6 +344,28 @@ namespace WarehouseAutomation
             m_deltaTimeFromLastSpawn = 0.f;
             m_conveyorSegments.push_back(CreateSegment(m_splineConsPtr, spawnPlaceNormalized));
         }
+    }
+
+    void ConveyorBeltComponent::TeleportSegments()
+    {
+        AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        AZ_Assert(sceneInterface != nullptr, "Unable to get Scene Interface");
+        for (auto& [pos, handle] : m_conveyorSegments)
+        {
+            const bool positiveDirection = m_configuration.m_speed > 0.0f;
+            if ((positiveDirection && pos > 1.0f) || (!positiveDirection && pos < 0.0f))
+            {
+                AZ::Interface<AzPhysics::SceneInterface>::Get()->EnableSimulationOfBody(m_sceneHandle, handle);
+                auto* body = azdynamic_cast<AzPhysics::RigidBody*>(sceneInterface->GetSimulatedBodyFromHandle(m_sceneHandle, handle));
+                if (body)
+                {
+                    pos = 0 ;
+                    auto transform = GetTransformFromSpline(m_splineConsPtr, pos);
+                    body->SetTransform(transform);
+                }
+            }
+        }
+
     }
 
 } // namespace WarehouseAutomation

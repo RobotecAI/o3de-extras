@@ -98,6 +98,7 @@ namespace WarehouseAutomation
         //! Despawn segments that are at the end of the spline
         void DespawnSegments();
 
+        void TeleportSegments();
         //! Spawn segments with given rate of spawning
         //! @param deltaTime the time since the last call of the function
         void SpawnSegments(float deltaTime);
@@ -106,6 +107,7 @@ namespace WarehouseAutomation
 
         AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneFinishSimHandler; //!< Handler called after every physics sub-step
         AZStd::deque<AZStd::pair<float, AzPhysics::SimulatedBodyHandle>> m_conveyorSegments; //!< Cache of created segments
+
         float m_textureOffset = 0.0f; //!< Current offset of the texture during animation
         AZ::ConstSplinePtr m_splineConsPtr{ nullptr }; //!< Pointer to the spline
         float m_splineLength = -1.0f; //!< Non-normalized spline length
