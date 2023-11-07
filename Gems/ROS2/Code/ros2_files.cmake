@@ -162,4 +162,8 @@ set(FILES
         Source/VehicleDynamics/WheelControllerComponent.cpp
         Source/VehicleDynamics/WheelControllerComponent.h
         Source/VehicleDynamics/WheelDynamicsData.h
+        Source/ImGui/Ros2ImGui.cpp
+        Source/ImGui/Ros2ImGui.h
+        Source/ImGui/ImGuiComponent.cpp
+        Source/ImGui/ImGuiComponent.h
         )
