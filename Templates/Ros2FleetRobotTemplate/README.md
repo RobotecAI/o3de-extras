@@ -18,7 +18,6 @@ to install all required dependencies and create your project with a template (ma
 ## Spawning robots
 
 The level contains spawn points configured to easily add more Proteus robots through ROS 2 calls.
-
 This is done with the [Spawner Component](https://development--o3deorg.netlify.app/docs/user-guide/interactivity/robotics/concepts-and-components-overview/#spawner).
 There are 4 spawn points already added in the level. You can use them all with the following service calls:
 
