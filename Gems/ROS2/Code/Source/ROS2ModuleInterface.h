@@ -43,6 +43,8 @@
 #include <VehicleDynamics/VehicleModelComponent.h>
 #include <VehicleDynamics/WheelControllerComponent.h>
 #include <ImGui/ImGuiComponent.h>
+#include <Georeference/GeoreferenceLevelComponent.h>
+
 namespace ROS2
 {
     class ROS2ModuleInterface : public AZ::Module
@@ -92,6 +94,7 @@ namespace ROS2
                     ROS2ContactSensorComponent::CreateDescriptor(),
                     FollowingCameraComponent::CreateDescriptor(),
                     ImGui::ImGuiComponent::CreateDescriptor(),
+                    GeoReferenceLevelComponent::CreateDescriptor(),
                 });
         }
 

@@ -9,7 +9,7 @@
 #include <AzCore/UnitTest/TestTypes.h>
 #include <AzTest/AzTest.h>
 
-#include <GNSS/GNSSFormatConversions.h>
+#include <Georeference/GNSSFormatConversions.h>
 
 namespace UnitTest
 {

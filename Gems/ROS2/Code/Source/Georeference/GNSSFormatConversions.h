@@ -13,6 +13,7 @@
 namespace ROS2::GNSS
 {
 
+
     //! Converts point in 1984 World Geodetic System (GS84) to Earth Centred Earth Fixed (ECEF)
     //! @param latitudeLongitudeAltitude - point's latitude, longitude and altitude as 3d vector.
     //!     latitude and longitude are in decimal degrees

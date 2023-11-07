@@ -6,7 +6,7 @@
  *
  */
 
-#include "GNSSFormatConversions.h"
+#include "Georeference/GNSSFormatConversions.h"
 
 constexpr double earthSemimajorAxis = 6378137.0f;
 constexpr double reciprocalFlattening = 1 / 298.257223563f;
