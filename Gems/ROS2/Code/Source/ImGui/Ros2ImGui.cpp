@@ -79,7 +79,8 @@ void Ros2ImGui::Draw(AZ::Entity * entity)
   }
   FilterChildComponents(childComponents);
   ImGui::Begin("Sensors");
-  ImGui::Text("Components of entity: %s", entity->GetName().c_str());
+  // TODO change names to topic based
+  // ImGui::Text("Components of entity: %s", entity->GetName().c_str());
   for (auto * component : childComponents) {
     ImGui::Text("Component: %s", component->RTTI_GetTypeName());
 
