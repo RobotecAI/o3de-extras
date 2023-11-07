@@ -12,18 +12,48 @@
 #include <imgui/imgui.h>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
+
+static std::unordered_map<AZ::ComponentId, bool> componentActiveState;
 
 auto controlSensorComponent = [](auto* sensorComponent, ImGuiContext& imguiContext, const std::string& uniqueId) {
-    std::string disableButtonLabel = "Disable Component##" + uniqueId;
-    if (ImGui::Button(disableButtonLabel.c_str())) {
-        sensorComponent->Deactivate();
+    // Directly access the static variable without capturing it.
+    if (componentActiveState.find(sensorComponent->GetId()) == componentActiveState.end()) {
+        componentActiveState[sensorComponent->GetId()] = true; // Initialize
     }
-    ImGui::SameLine();
+
+    bool isActive = componentActiveState[sensorComponent->GetId()];
+
+    // We use the component's ID to create a unique label for each button.
+    std::string disableButtonLabel = "Disable Component##" + uniqueId;
     std::string enableButtonLabel = "Enable Component##" + uniqueId;
-    if (ImGui::Button(enableButtonLabel.c_str())) {
-        sensorComponent->Activate();
+
+    // Disable the button if the component is already in the desired state.
+    if (isActive) {
+        if (ImGui::Button(disableButtonLabel.c_str())) {
+            sensorComponent->Deactivate();
+            componentActiveState[sensorComponent->GetId()] = false;
+        }
+    } else {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Grayed out
+        ImGui::Button(disableButtonLabel.c_str());
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
+    if (!isActive) {
+        if (ImGui::Button(enableButtonLabel.c_str())) {
+            sensorComponent->Activate();
+            componentActiveState[sensorComponent->GetId()] = true;
+        }
+    } else {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Grayed out
+        ImGui::Button(enableButtonLabel.c_str());
+        ImGui::PopStyleColor();
     }
 };
+
 
 
 Ros2ImGui::Ros2ImGui()
