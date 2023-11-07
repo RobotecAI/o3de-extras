@@ -13,12 +13,14 @@
 #include <string>
 #include <algorithm>
 
-auto controlSensorComponent = [](auto* sensorComponent, ImGuiContext& imguiContext) {
-    if (ImGui::Button("Disable Component")) {
+auto controlSensorComponent = [](auto* sensorComponent, ImGuiContext& imguiContext, const std::string& uniqueId) {
+    std::string disableButtonLabel = "Disable Component##" + uniqueId;
+    if (ImGui::Button(disableButtonLabel.c_str())) {
         sensorComponent->Deactivate();
     }
     ImGui::SameLine();
-    if (ImGui::Button("Enable Component")) {
+    std::string enableButtonLabel = "Enable Component##" + uniqueId;
+    if (ImGui::Button(enableButtonLabel.c_str())) {
         sensorComponent->Activate();
     }
 };
@@ -46,21 +48,23 @@ void Ros2ImGui::Draw(AZ::Entity * entity)
     return;
   }
   FilterChildComponents(childComponents);
-  ImGui::Begin("Components of:");
-  ImGui::Text("Parent Entity Name: %s", entity->GetName().c_str());
+  ImGui::Begin("Sensors");
+  ImGui::Text("Components of entity: %s", entity->GetName().c_str());
   for (auto * component : childComponents) {
     ImGui::Text("Component: %s", component->RTTI_GetTypeName());
-    // ImGui::Text(
-    //   "Component Type Id: %s",
-    //   component->RTTI_GetType().ToString<AZStd::string>().c_str());
 
-    auto * sensorComponentTickBased = azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::TickBasedSource> *>(component);
-    auto * sensorComponentPhysicsBased = azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::PhysicsBasedSource> *>(component);
+    auto * sensorComponentTickBased =
+      azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::TickBasedSource> *>(component);
+    auto * sensorComponentPhysicsBased =
+      azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::PhysicsBasedSource> *>(component);
+
+    // Generate a unique identifier for the ImGui button labels
+    const std::string uniqueId = std::to_string(reinterpret_cast<uintptr_t>(component));
 
     if (sensorComponentTickBased) {
-        controlSensorComponent(sensorComponentTickBased, *ImGui::GetCurrentContext());
+      controlSensorComponent(sensorComponentTickBased, *ImGui::GetCurrentContext(), uniqueId);
     } else if (sensorComponentPhysicsBased) {
-        controlSensorComponent(sensorComponentPhysicsBased, *ImGui::GetCurrentContext());
+      controlSensorComponent(sensorComponentPhysicsBased, *ImGui::GetCurrentContext(), uniqueId);
     }
 
     ImGui::Text("----");
