@@ -18,15 +18,6 @@ constexpr double secondEccentrictySquared =
 // Based on http://wiki.gis.com/wiki/index.php/Geodetic_system
 namespace ROS2::GNSS
 {
-    AZStd::array<double,3> FromAzVector3(const AZ::Vector3& vector3)
-    {
-        return { vector3.GetX(), vector3.GetY(), vector3.GetZ() };
-    }
-    AZ::Vector3 ToAzVector3(const AZStd::array<double,3>& array)
-    {
-        return {static_cast<float>(array[0]), static_cast<float>(array[1]), static_cast<float>(array[2])};
-    }
-
     double DegToRad(double degrees)
     {
         return degrees * M_PI / 180.0;
@@ -37,11 +28,11 @@ namespace ROS2::GNSS
         return radians * 180.0 / M_PI;
     }
 
-    AZStd::array<double,3> WGS84ToECEF(const AZStd::array<double,3>& latitudeLongitudeAltitude)
+    WGS::Vector3d WGS84ToECEF(const WGS::WGS84Coordinate& latitudeLongitudeAltitude)
     {
-        const double latitudeRad = DegToRad(latitudeLongitudeAltitude[0]);
-        const double longitudeRad = DegToRad(latitudeLongitudeAltitude[1]);
-        const double altitude = latitudeLongitudeAltitude[2];
+        const double latitudeRad = DegToRad(latitudeLongitudeAltitude.m_latitude);
+        const double longitudeRad = DegToRad(latitudeLongitudeAltitude.m_longitude);
+        const double& altitude = latitudeLongitudeAltitude.m_altitude;
 
         const double helper = std::sqrt(1.0f - firstEccentricitySquared * std::sin(latitudeRad) * std::sin(latitudeRad));
 
@@ -52,50 +43,48 @@ namespace ROS2::GNSS
         return { X, Y, Z };
     }
 
-    AZStd::array<double,3> ECEFToENU(const AZStd::array<double,3>& referenceLatitudeLongitudeAltitude, const AZStd::array<double,3>& ECEFPoint)
+    WGS::Vector3d ECEFToENU(const WGS::WGS84Coordinate& referenceLatitudeLongitudeAltitude, const WGS::Vector3d& ECEFPoint)
     {
-        const AZStd::array<double,3> referencePointInECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
-        const AZStd::array<double,3> pointToReferencePointECEF = {ECEFPoint[0] - referencePointInECEF[0],
-                                                                    ECEFPoint[1] - referencePointInECEF[1],
-                                                                    ECEFPoint[2] - referencePointInECEF[2]};
+        const WGS::Vector3d referencePointInECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
+        const WGS::Vector3d pointToReferencePointECEF = ECEFPoint - referencePointInECEF;
 
-        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[0]);
-        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[1]);
+        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude.m_latitude);
+        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude.m_longitude);
 
         return {
-            -sin(referenceLongitudeRad) * pointToReferencePointECEF[0] +
-                cos(referenceLongitudeRad) * pointToReferencePointECEF[1],
-            -sin(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF[0] -
-                sin(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF[1] +
-                cos(referenceLatitudeRad) * pointToReferencePointECEF[2],
-            cos(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF[0] +
-                cos(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF[1] +
-                sin(referenceLatitudeRad) * pointToReferencePointECEF[2],
+            -sin(referenceLongitudeRad) * pointToReferencePointECEF.m_x +
+                cos(referenceLongitudeRad) * pointToReferencePointECEF.m_y,
+            -sin(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF.m_x -
+                sin(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF.m_y +
+                cos(referenceLatitudeRad) * pointToReferencePointECEF.m_x,
+            cos(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF.m_x +
+                cos(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF.m_y +
+                sin(referenceLatitudeRad) * pointToReferencePointECEF.m_z
         };
     }
 
-    AZStd::array<double,3> ENUToECEF(const AZStd::array<double,3>& referenceLatitudeLongitudeAltitude, const AZStd::array<double,3>& ENUPoint)
+    WGS::Vector3d ENUToECEF(const WGS::WGS84Coordinate& referenceLatitudeLongitudeAltitude, const WGS::Vector3d& ENUPoint)
     {
-        AZStd::array<double,3> referenceECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
+        const auto referenceECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
 
-        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[0]);
-        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[1]);
-        const double& e = ENUPoint[0];
-        const double& n = ENUPoint[1];
-        const double& u = ENUPoint[2];
+        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude.m_latitude);
+        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude.m_longitude);
+        const double& e = ENUPoint.m_x;
+        const double& n = ENUPoint.m_y;
+        const double& u = ENUPoint.m_z;
 
         return { -std::sin(referenceLongitudeRad) * e - std::cos(referenceLongitudeRad) * std::sin(referenceLatitudeRad) * n +
-                     std::cos(referenceLongitudeRad) * std::cos(referenceLatitudeRad) * u + referenceECEF[0],
+                     std::cos(referenceLongitudeRad) * std::cos(referenceLatitudeRad) * u + referenceECEF.m_x,
                  std::cos(referenceLongitudeRad) * e - std::sin(referenceLongitudeRad) * std::sin(referenceLatitudeRad) * n +
-                     std::cos(referenceLatitudeRad) * std::sin(referenceLongitudeRad) * u + referenceECEF[1],
-                 std::cos(referenceLatitudeRad) * n + std::sin(referenceLatitudeRad) * u + referenceECEF[2] };
+                     std::cos(referenceLatitudeRad) * std::sin(referenceLongitudeRad) * u + referenceECEF.m_y,
+                 std::cos(referenceLatitudeRad) * n + std::sin(referenceLatitudeRad) * u + referenceECEF.m_z };
     }
 
-    AZStd::array<double,3> ECEFToWGS84(const AZStd::array<double,3>& ECFEPoint)
+    WGS::WGS84Coordinate ECEFToWGS84(const WGS::Vector3d& ECFEPoint)
     {
-        const double& x = ECFEPoint[0];
-        const double& y = ECFEPoint[1];
-        const double& z = ECFEPoint[2];
+        const double& x = ECFEPoint.m_x;
+        const double& y = ECFEPoint.m_y;
+        const double& z = ECFEPoint.m_z;
 
         const double radiusSquared = x * x + y * y;
         const double radius = std::sqrt(radiusSquared);

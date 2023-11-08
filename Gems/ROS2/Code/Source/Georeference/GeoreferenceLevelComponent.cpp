@@ -81,22 +81,21 @@ namespace ROS2
         AZ::EntityBus::Handler::BusDisconnect();
     }
 
-    GeoreferenceRequests::WGS84Coordinate GeoReferenceLevelComponent::ConvertFromLevelToWSG84(const AZ::Vector3& xyz)
+    WGS::WGS84Coordinate GeoReferenceLevelComponent::ConvertFromLevelToWSG84(const AZ::Vector3& xyz)
     {
         using namespace ROS2::GNSS;
         const auto enu = m_EnuOriginTransform.TransformPoint(xyz);
         const auto ecef =
-            ENUToECEF({ m_EnuOriginLatitude, m_EnuOriginLongitude, m_EnuOriginAltitude },
-                      FromAzVector3(enu));
+            ENUToECEF({ m_EnuOriginLatitude, m_EnuOriginLongitude, m_EnuOriginAltitude },enu);
         return ECEFToWGS84(ecef);
     }
 
-    AZ::Vector3 GeoReferenceLevelComponent::ConvertFromWSG84ToLevel(const GeoreferenceRequests::WGS84Coordinate& latLon)
+    AZ::Vector3 GeoReferenceLevelComponent::ConvertFromWSG84ToLevel(const WGS::WGS84Coordinate& latLon)
     {
         using namespace ROS2::GNSS;
         const auto ecef = WGS84ToECEF(latLon);
         const auto enu = ECEFToENU({ m_EnuOriginLatitude, m_EnuOriginLongitude, m_EnuOriginAltitude }, ecef);
-        return m_EnuOriginTransform.TransformPoint(ToAzVector3(enu));
+        return m_EnuOriginTransform.TransformPoint(enu.ToVector3f());
     };
 
     AZ::Quaternion GeoReferenceLevelComponent::ConvertFromLevelRotationToENU()

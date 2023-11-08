@@ -32,6 +32,7 @@ set(FILES
         Source/Frame/NamespaceConfiguration.cpp
         Source/Frame/ROS2FrameComponent.cpp
         Source/Frame/ROS2Transform.cpp
+        Source/Georeference/GeoreferenceStructures.cpp
         Source/Georeference/GeoreferenceLevelComponent.cpp
         Source/Georeference/GeoreferenceLevelComponent.h
         Source/Gripper/GripperActionServer.cpp

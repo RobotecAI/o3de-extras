@@ -37,8 +37,8 @@ namespace ROS2
         void OnEntityActivated(const AZ::EntityId& entityId) override;
 
         // GeoreferenceRequestsBus::Handler overrides ...
-        GeoreferenceRequests::WGS84Coordinate ConvertFromLevelToWSG84(const AZ::Vector3& xyz) override;
-        AZ::Vector3 ConvertFromWSG84ToLevel(const GeoreferenceRequests::WGS84Coordinate& latLon) override;
+        WGS::WGS84Coordinate ConvertFromLevelToWSG84(const AZ::Vector3& xyz) override;
+        AZ::Vector3 ConvertFromWSG84ToLevel(const WGS::WGS84Coordinate& latLon) override;
         AZ::Quaternion ConvertFromLevelRotationToENU() override;
 
         AZ::EntityId m_EnuOriginLocationEntityId; //!< EntityId of the entity that lays in the origin of the ENU coordinate system

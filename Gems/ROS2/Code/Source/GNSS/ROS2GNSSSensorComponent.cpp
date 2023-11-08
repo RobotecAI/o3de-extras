@@ -90,13 +90,13 @@ namespace ROS2
         AZ::Vector3 currentPosition{ 0.0f };
         AZ::TransformBus::EventResult(currentPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
 
-        GeoreferenceRequests::WGS84Coordinate currentPositionWGS84{ 0.0 };
+        WGS::WGS84Coordinate currentPositionWGS84;
         ROS2::GeoreferenceRequestsBus::BroadcastResult(
             currentPositionWGS84, &GeoreferenceRequests::ConvertFromLevelToWSG84, currentPosition);
 
-        m_gnssMsg.latitude = currentPositionWGS84[0];
-        m_gnssMsg.longitude = currentPositionWGS84[1];
-        m_gnssMsg.altitude = currentPositionWGS84[2];
+        m_gnssMsg.latitude = currentPositionWGS84.m_latitude;
+        m_gnssMsg.longitude = currentPositionWGS84.m_longitude;
+        m_gnssMsg.altitude = currentPositionWGS84.m_altitude;
 
         m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_SBAS_FIX;
         m_gnssMsg.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
