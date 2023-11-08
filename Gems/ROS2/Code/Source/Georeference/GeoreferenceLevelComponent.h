@@ -42,10 +42,7 @@ namespace ROS2
         AZ::Quaternion ConvertFromLevelRotationToENU() override;
 
         AZ::EntityId m_EnuOriginLocationEntityId; //!< EntityId of the entity that lays in the origin of the ENU coordinate system
-        double m_EnuOriginLatitude = 0.0; //!< Latitude of the origin of the ENU coordinate system
-        double m_EnuOriginLongitude = 0.0; //!< Longitude of the origin of the ENU coordinate system
-        double m_EnuOriginAltitude = 0.0; //!< Altitude of the origin of the ENU coordinate system
-
+        WGS::WGS84Coordinate m_OriginLocation; //!< Location of the entity that lays in the origin of the ENU coordinate system
         AZ::Transform m_EnuOriginTransform; //!< Transform of the entity that lays in the origin of the ENU coordinate system
     };
 

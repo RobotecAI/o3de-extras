@@ -11,6 +11,7 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Math/Vector3.h>
+#include <AzCore/Math/Quaternion.h>
 
 namespace ROS2
 {
@@ -21,7 +22,7 @@ namespace ROS2
 
         //! Function converts from Level's coordinate system to WSG84.
         //! @param xyz Vector3 in Level's coordinate system.
-        //! @return Vector3 in WSG84 coordinate system, where x is latitude, y is longitude and z is altitude.
+        //! @return Vector3 in WSG84 coordinate system as @class WGS::WGS84Coordinate.
         virtual WGS::WGS84Coordinate ConvertFromLevelToWSG84(const AZ::Vector3& xyz) = 0;
 
         //! Function converts from WSG84 coordinate system to Level's.

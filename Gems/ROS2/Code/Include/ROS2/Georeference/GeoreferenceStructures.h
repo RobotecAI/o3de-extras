@@ -7,7 +7,9 @@
 */
 #pragma once
 
+#include <AzCore/RTTI/RTTI.h>
 #include <AzCore/Math/Vector3.h>
+
 namespace ROS2::WGS
 {
 
@@ -15,11 +17,16 @@ namespace ROS2::WGS
     //! It is used to represent coordinates in WSG84 coordinate system.
     struct WGS84Coordinate
     {
-        WGS84Coordinate();
-        WGS84Coordinate(double latitude, double longitude, double altitude);
-        WGS84Coordinate(const AZ::Vector3& latLonAlt);
+        AZ_RTTI(WGS84Coordinate, "{577a5637-b31a-44c5-a33f-50df2922af2a}");
+        static void Reflect(AZ::ReflectContext* context);
 
-        AZ::Vector3 ToVector3f() const;
+        WGS84Coordinate();
+        virtual ~WGS84Coordinate() = default;
+
+        WGS84Coordinate(double latitude, double longitude, double altitude);
+        explicit WGS84Coordinate(const AZ::Vector3& latLonAlt);
+
+        [[nodiscard]] AZ::Vector3 ToVector3f() const;
 
         double m_latitude = 0.0; //!< Latitude in degrees.
         double m_longitude = 0.0; //!< Longitude in degrees.
@@ -31,9 +38,8 @@ namespace ROS2::WGS
     struct Vector3d{
         Vector3d() = default;
         Vector3d(double x, double y, double z);
-
-        Vector3d(const AZ::Vector3& xyz);
-        AZ::Vector3 ToVector3f() const;
+        explicit Vector3d(const AZ::Vector3& xyz);
+        [[nodiscard]] AZ::Vector3 ToVector3f() const;
 
         Vector3d operator+(Vector3d const& v) const;
         Vector3d operator-(Vector3d const& v) const;
