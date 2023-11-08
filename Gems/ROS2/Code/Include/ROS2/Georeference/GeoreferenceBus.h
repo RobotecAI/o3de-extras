@@ -17,15 +17,16 @@ namespace ROS2
     class GeoreferenceRequests
     {
     public:
+        using WGS84Coordinate = AZStd::array<double,3>;
         //! Function converts from Level's coordinate system to WSG84.
         //! @param xyz Vector3 in Level's coordinate system.
         //! @return Vector3 in WSG84 coordinate system, where x is latitude, y is longitude and z is altitude.
-        virtual AZ::Vector3 ConvertFromLevelToWSG84(const AZ::Vector3& xyz) = 0;
+        virtual WGS84Coordinate ConvertFromLevelToWSG84(const AZ::Vector3& xyz) = 0;
 
         //! Function converts from WSG84 coordinate system to Level's.
         //!  @param latLon Vector3 in WSG84 coordinate system, where x is latitude, y is longitude and z is altitude.
         //!  @return Vector3 in Level's coordinate system.
-        virtual AZ::Vector3 ConvertFromWSG84ToLevel(const AZ::Vector3& latLon) = 0;
+        virtual AZ::Vector3 ConvertFromWSG84ToLevel(const WGS84Coordinate& latLon) = 0;
 
         //! Function converts from Level's rotation to ENU (East-North-Up) rotation.
         //! Function is useful to fin georeference rotation of the level.

@@ -37,14 +37,14 @@ namespace ROS2
         void OnEntityActivated(const AZ::EntityId& entityId) override;
 
         // GeoreferenceRequestsBus::Handler overrides ...
-        AZ::Vector3 ConvertFromLevelToWSG84(const AZ::Vector3& xyz) override;
-        AZ::Vector3 ConvertFromWSG84ToLevel(const AZ::Vector3& latLon) override;
+        GeoreferenceRequests::WGS84Coordinate ConvertFromLevelToWSG84(const AZ::Vector3& xyz) override;
+        AZ::Vector3 ConvertFromWSG84ToLevel(const GeoreferenceRequests::WGS84Coordinate& latLon) override;
         AZ::Quaternion ConvertFromLevelRotationToENU() override;
 
         AZ::EntityId m_EnuOriginLocationEntityId; //!< EntityId of the entity that lays in the origin of the ENU coordinate system
-        float m_EnuOriginLatitude = 0.0; //!< Latitude of the origin of the ENU coordinate system
-        float m_EnuOriginLongitude = 0.0; //!< Longitude of the origin of the ENU coordinate system
-        float m_EnuOriginAltitude = 0.0; //!< Altitude of the origin of the ENU coordinate system
+        double m_EnuOriginLatitude = 0.0; //!< Latitude of the origin of the ENU coordinate system
+        double m_EnuOriginLongitude = 0.0; //!< Longitude of the origin of the ENU coordinate system
+        double m_EnuOriginAltitude = 0.0; //!< Altitude of the origin of the ENU coordinate system
 
         AZ::Transform m_EnuOriginTransform; //!< Transform of the entity that lays in the origin of the ENU coordinate system
     };

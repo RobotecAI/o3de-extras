@@ -8,100 +8,120 @@
 
 #include "Georeference/GNSSFormatConversions.h"
 
-constexpr double earthSemimajorAxis = 6378137.0f;
-constexpr double reciprocalFlattening = 1 / 298.257223563f;
-constexpr double earthSemiminorAxis = earthSemimajorAxis * (1.0f - reciprocalFlattening);
-constexpr double firstEccentricitySquared = 2 * reciprocalFlattening - reciprocalFlattening * reciprocalFlattening;
+constexpr double earthSemimajorAxis = 6378137.0;
+constexpr double reciprocalFlattening = 1.0 / 298.257223563;
+constexpr double earthSemiminorAxis = earthSemimajorAxis * (1.0 - reciprocalFlattening);
+constexpr double firstEccentricitySquared = 2.0 * reciprocalFlattening - reciprocalFlattening * reciprocalFlattening;
 constexpr double secondEccentrictySquared =
-    reciprocalFlattening * (2.0f - reciprocalFlattening) / ((1.0f - reciprocalFlattening) * (1.0f - reciprocalFlattening));
+    reciprocalFlattening * (2.0 - reciprocalFlattening) / ((1.0 - reciprocalFlattening) * (1.0 - reciprocalFlattening));
 
 // Based on http://wiki.gis.com/wiki/index.php/Geodetic_system
 namespace ROS2::GNSS
 {
-
-    AZ::Vector3 WGS84ToECEF(const AZ::Vector3& latitudeLongitudeAltitude)
+    AZStd::array<double,3> FromAzVector3(const AZ::Vector3& vector3)
     {
-        const double latitudeRad = AZ::DegToRad(latitudeLongitudeAltitude.GetX());
-        const double longitudeRad = AZ::DegToRad(latitudeLongitudeAltitude.GetY());
-        const double altitude = latitudeLongitudeAltitude.GetZ();
-
-        const double helper = AZStd::sqrt(1.0f - firstEccentricitySquared * AZStd::sin(latitudeRad) * AZStd::sin(latitudeRad));
-
-        const double X = (earthSemimajorAxis / helper + altitude) * AZStd::cos(latitudeRad) * AZStd::cos(longitudeRad);
-        const double Y = (earthSemimajorAxis / helper + altitude) * AZStd::cos(latitudeRad) * AZStd::sin(longitudeRad);
-        const double Z = (earthSemimajorAxis * (1.0f - firstEccentricitySquared) / helper + altitude) * AZStd::sin(latitudeRad);
-
-        return { static_cast<float>(X), static_cast<float>(Y), static_cast<float>(Z) };
+        return { vector3.GetX(), vector3.GetY(), vector3.GetZ() };
+    }
+    AZ::Vector3 ToAzVector3(const AZStd::array<double,3>& array)
+    {
+        return {static_cast<float>(array[0]), static_cast<float>(array[1]), static_cast<float>(array[2])};
     }
 
-    AZ::Vector3 ECEFToENU(const AZ::Vector3& referenceLatitudeLongitudeAltitude, const AZ::Vector3& ECEFPoint)
+    double DegToRad(double degrees)
     {
-        const AZ::Vector3 referencePointInECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
-        const AZ::Vector3 pointToReferencePointECEF = ECEFPoint - referencePointInECEF;
+        return degrees * M_PI / 180.0;
+    }
 
-        const float referenceLatitudeRad = AZ::DegToRad(referenceLatitudeLongitudeAltitude.GetX());
-        const float referenceLongitudeRad = AZ::DegToRad(referenceLatitudeLongitudeAltitude.GetY());
+    double RadToDeg(double radians)
+    {
+        return radians * 180.0 / M_PI;
+    }
+
+    AZStd::array<double,3> WGS84ToECEF(const AZStd::array<double,3>& latitudeLongitudeAltitude)
+    {
+        const double latitudeRad = DegToRad(latitudeLongitudeAltitude[0]);
+        const double longitudeRad = DegToRad(latitudeLongitudeAltitude[1]);
+        const double altitude = latitudeLongitudeAltitude[2];
+
+        const double helper = std::sqrt(1.0f - firstEccentricitySquared * std::sin(latitudeRad) * std::sin(latitudeRad));
+
+        const double X = (earthSemimajorAxis / helper + altitude) * std::cos(latitudeRad) * std::cos(longitudeRad);
+        const double Y = (earthSemimajorAxis / helper + altitude) * std::cos(latitudeRad) * std::sin(longitudeRad);
+        const double Z = (earthSemimajorAxis * (1.0 - firstEccentricitySquared) / helper + altitude) * std::sin(latitudeRad);
+
+        return { X, Y, Z };
+    }
+
+    AZStd::array<double,3> ECEFToENU(const AZStd::array<double,3>& referenceLatitudeLongitudeAltitude, const AZStd::array<double,3>& ECEFPoint)
+    {
+        const AZStd::array<double,3> referencePointInECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
+        const AZStd::array<double,3> pointToReferencePointECEF = {ECEFPoint[0] - referencePointInECEF[0],
+                                                                    ECEFPoint[1] - referencePointInECEF[1],
+                                                                    ECEFPoint[2] - referencePointInECEF[2]};
+
+        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[0]);
+        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[1]);
 
         return {
-            -AZStd::sin(referenceLongitudeRad) * pointToReferencePointECEF.GetX() +
-                AZStd::cos(referenceLongitudeRad) * pointToReferencePointECEF.GetY(),
-            -AZStd::sin(referenceLatitudeRad) * AZStd::cos(referenceLongitudeRad) * pointToReferencePointECEF.GetX() -
-                AZStd::sin(referenceLatitudeRad) * AZStd::sin(referenceLongitudeRad) * pointToReferencePointECEF.GetY() +
-                AZStd::cos(referenceLatitudeRad) * pointToReferencePointECEF.GetZ(),
-            AZStd::cos(referenceLatitudeRad) * AZStd::cos(referenceLongitudeRad) * pointToReferencePointECEF.GetX() +
-                AZStd::cos(referenceLatitudeRad) * AZStd::sin(referenceLongitudeRad) * pointToReferencePointECEF.GetY() +
-                AZStd::sin(referenceLatitudeRad) * pointToReferencePointECEF.GetZ(),
+            -sin(referenceLongitudeRad) * pointToReferencePointECEF[0] +
+                cos(referenceLongitudeRad) * pointToReferencePointECEF[1],
+            -sin(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF[0] -
+                sin(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF[1] +
+                cos(referenceLatitudeRad) * pointToReferencePointECEF[2],
+            cos(referenceLatitudeRad) * cos(referenceLongitudeRad) * pointToReferencePointECEF[0] +
+                cos(referenceLatitudeRad) * sin(referenceLongitudeRad) * pointToReferencePointECEF[1] +
+                sin(referenceLatitudeRad) * pointToReferencePointECEF[2],
         };
     }
 
-    AZ::Vector3 ENUToECEF(const AZ::Vector3& referenceLatitudeLongitudeAltitude, const AZ::Vector3& ENUPoint)
+    AZStd::array<double,3> ENUToECEF(const AZStd::array<double,3>& referenceLatitudeLongitudeAltitude, const AZStd::array<double,3>& ENUPoint)
     {
-        AZ::Vector3 referenceECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
+        AZStd::array<double,3> referenceECEF = WGS84ToECEF(referenceLatitudeLongitudeAltitude);
 
-        const float referenceLatitudeRad = AZ::DegToRad(referenceLatitudeLongitudeAltitude.GetX());
-        const float referenceLongitudeRad = AZ::DegToRad(referenceLatitudeLongitudeAltitude.GetY());
-        const float e = ENUPoint.GetX();
-        const float n = ENUPoint.GetY();
-        const float u = ENUPoint.GetZ();
+        const double referenceLatitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[0]);
+        const double referenceLongitudeRad = DegToRad(referenceLatitudeLongitudeAltitude[1]);
+        const double& e = ENUPoint[0];
+        const double& n = ENUPoint[1];
+        const double& u = ENUPoint[2];
 
-        return { -AZStd::sin(referenceLongitudeRad) * e - AZStd::cos(referenceLongitudeRad) * AZStd::sin(referenceLatitudeRad) * n +
-                     AZStd::cos(referenceLongitudeRad) * AZStd::cos(referenceLatitudeRad) * u + referenceECEF.GetX(),
-                 AZStd::cos(referenceLongitudeRad) * e - AZStd::sin(referenceLongitudeRad) * AZStd::sin(referenceLatitudeRad) * n +
-                     AZStd::cos(referenceLatitudeRad) * AZStd::sin(referenceLongitudeRad) * u + referenceECEF.GetY(),
-                 AZStd::cos(referenceLatitudeRad) * n + AZStd::sin(referenceLatitudeRad) * u + referenceECEF.GetZ() };
+        return { -std::sin(referenceLongitudeRad) * e - std::cos(referenceLongitudeRad) * std::sin(referenceLatitudeRad) * n +
+                     std::cos(referenceLongitudeRad) * std::cos(referenceLatitudeRad) * u + referenceECEF[0],
+                 std::cos(referenceLongitudeRad) * e - std::sin(referenceLongitudeRad) * std::sin(referenceLatitudeRad) * n +
+                     std::cos(referenceLatitudeRad) * std::sin(referenceLongitudeRad) * u + referenceECEF[1],
+                 std::cos(referenceLatitudeRad) * n + std::sin(referenceLatitudeRad) * u + referenceECEF[2] };
     }
 
-    AZ::Vector3 ECEFToWGS84(const AZ::Vector3& ECFEPoint)
+    AZStd::array<double,3> ECEFToWGS84(const AZStd::array<double,3>& ECFEPoint)
     {
-        const double x = ECFEPoint.GetX();
-        const double y = ECFEPoint.GetY();
-        const double z = ECFEPoint.GetZ();
+        const double& x = ECFEPoint[0];
+        const double& y = ECFEPoint[1];
+        const double& z = ECFEPoint[2];
 
         const double radiusSquared = x * x + y * y;
-        const double radius = AZStd::sqrt(radiusSquared);
+        const double radius = std::sqrt(radiusSquared);
 
         const double E2 = earthSemimajorAxis * earthSemimajorAxis - earthSemiminorAxis * earthSemiminorAxis;
-        const double F = 54.0f * earthSemiminorAxis * earthSemiminorAxis * z * z;
-        const double G = radiusSquared + (1.0f - firstEccentricitySquared) * z * z - firstEccentricitySquared * E2;
+        const double F = 54.0 * earthSemiminorAxis * earthSemiminorAxis * z * z;
+        const double G = radiusSquared + (1.0 - firstEccentricitySquared) * z * z - firstEccentricitySquared * E2;
         const double c = (firstEccentricitySquared * firstEccentricitySquared * F * radiusSquared) / (G * G * G);
-        const double s = AZStd::pow(1. + c + AZStd::sqrt(c * c + 2. * c), 1. / 3);
-        const double P = F / (3.0f * (s + 1.0f / s + 1.0f) * (s + 1.0f / s + 1.0f) * G * G);
-        const double Q = AZStd::sqrt(1.0f + 2.0f * firstEccentricitySquared * firstEccentricitySquared * P);
+        const double s = std::pow(1. + c + std::sqrt(c * c + 2. * c), 1. / 3);
+        const double P = F / (3.0 * (s + 1.0 / s + 1.0) * (s + 1.0 / s + 1.0) * G * G);
+        const double Q = std::sqrt(1.0 + 2.0 * firstEccentricitySquared * firstEccentricitySquared * P);
 
-        const double ro = -(firstEccentricitySquared * P * radius) / (1.0f + Q) +
-            AZStd::sqrt(
-                (earthSemimajorAxis * earthSemimajorAxis / 2.0f) * (1.0f + 1.0f / Q) -
-                ((1.0f - firstEccentricitySquared) * P * z * z) / (Q * (1.0f + Q)) - P * radiusSquared / 2.0f);
+        const double ro = -(firstEccentricitySquared * P * radius) / (1.0 + Q) +
+            std::sqrt(
+                (earthSemimajorAxis * earthSemimajorAxis / 2.0) * (1.0 + 1.0 / Q) -
+                ((1.0 - firstEccentricitySquared) * P * z * z) / (Q * (1.0 + Q)) - P * radiusSquared / 2.0);
         const double tmp = (radius - firstEccentricitySquared * ro) * (radius - firstEccentricitySquared * ro);
-        const double U = AZStd::sqrt(tmp + z * z);
-        const double V = AZStd::sqrt(tmp + (1.0f - firstEccentricitySquared) * z * z);
+        const double U = std::sqrt(tmp + z * z);
+        const double V = std::sqrt(tmp + (1.0 - firstEccentricitySquared) * z * z);
         const double zo = (earthSemiminorAxis * earthSemiminorAxis * z) / (earthSemimajorAxis * V);
 
-        const double latitude = AZStd::atan((z + secondEccentrictySquared * zo) / radius);
-        const double longitude = AZStd::atan2(y, x);
-        const double altitude = U * (1.0f - earthSemiminorAxis * earthSemiminorAxis / (earthSemimajorAxis * V));
+        const double latitude = std::atan((z + secondEccentrictySquared * zo) / radius);
+        const double longitude = std::atan2(y, x);
+        const double altitude = U * (1.0 - earthSemiminorAxis * earthSemiminorAxis / (earthSemimajorAxis * V));
 
-        return { AZ::RadToDeg(static_cast<float>(latitude)), AZ::RadToDeg(static_cast<float>(longitude)), static_cast<float>(altitude) };
+        return { RadToDeg(latitude), RadToDeg(longitude), altitude };
     }
 
 } // namespace ROS2::GNSS
