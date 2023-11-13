@@ -14,22 +14,18 @@
 namespace ROS2
 {
 
-enum class NoiseType
+enum class NoiseType // Placeholder for future noise types
 {
-  Gaussian,
-  StdDev,
-  Random
+  Gaussian
 };
 
 struct NoiseConfig
 {
   AZ_TYPE_INFO(NoiseConfig, "{A4D41EFF-49A1-4B72-A382-70734FD6CE03}");
   static void Reflect(AZ::ReflectContext * context);
-  double gaussianMin = -0.00005;
-  double gaussianMax = 0.00005;
-  double randomMin = -0.00002;
-  double randomMax = 0.00002;
-  double stddev = 0.00001;
+  double stddevX = 0.0001;
+  double stddevY = 0.0001;
+  double stddevZ = 0.0001;
 };
 
 class GNSSPostProcessing
@@ -40,22 +36,19 @@ public:
   GNSSPostProcessing();
   GNSSPostProcessing(NoiseConfig noiseConfig);
 
-
   virtual ~GNSSPostProcessing() = default;
 
-  void PostProcessGNSS(sensor_msgs::msg::NavSatFix & gnss) const;
+  void PostProcessGNSS(sensor_msgs::msg::NavSatFix & gnss);
 
-  double GaussianNoise(double value);
-  double StdDevNoise(double value);
-  double RandomNoise(double value);
+  double GaussianNoise(double value, double stddev);
 
 private:
   std::random_device rd;
   std::mt19937 gen;
   NoiseConfig noiseConfig{};
-  std::normal_distribution<> gaussianDist;
-  std::uniform_real_distribution<> randomDist;
-  std::normal_distribution<> stddevDist;
+  std::normal_distribution<> gaussianDistX;
+  std::normal_distribution<> gaussianDistY;
+  std::normal_distribution<> gaussianDistZ;
 };
 
 } // namespace ROS2

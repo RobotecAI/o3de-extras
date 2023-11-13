@@ -26,7 +26,7 @@ const char * GNSSMsgType = "sensor_msgs::msg::NavSatFix";
 void ROS2GNSSSensorComponent::Reflect(AZ::ReflectContext * context)
 {   
     NoiseConfig::Reflect(context);
-    
+
   if (auto * serialize = azrtti_cast<AZ::SerializeContext *>(context)) {
     serialize->Class<ROS2GNSSSensorComponent, SensorBaseType>()
     ->Version(4)
@@ -56,9 +56,7 @@ void ROS2GNSSSensorComponent::Reflect(AZ::ReflectContext * context)
       ->DataElement(
         AZ::Edit::UIHandlers::ComboBox, &ROS2GNSSSensorComponent::m_noiseType,
         "Noise Type", "The type of noise to apply")
-      ->EnumAttribute(NoiseType::Gaussian, "Gaussian")
-      ->EnumAttribute(NoiseType::StdDev, "Standard Deviation")
-      ->EnumAttribute(NoiseType::Random, "Random");
+      ->EnumAttribute(NoiseType::Gaussian, "Gaussian");
     }
   }
 }
@@ -168,19 +166,7 @@ void ROS2GNSSSensorComponent::ApplyPostProcessing(sensor_msgs::msg::NavSatFix & 
 
   switch (static_cast<NoiseType>(m_noiseType)) {
     case NoiseType::Gaussian:
-      gnss.latitude = m_gnssPostProcessing->GaussianNoise(gnss.latitude);
-      gnss.longitude = m_gnssPostProcessing->GaussianNoise(gnss.longitude);
-      gnss.altitude = m_gnssPostProcessing->GaussianNoise(gnss.altitude);
-      break;
-    case NoiseType::StdDev:
-      gnss.latitude = m_gnssPostProcessing->StdDevNoise(gnss.latitude);
-      gnss.longitude = m_gnssPostProcessing->StdDevNoise(gnss.longitude);
-      gnss.altitude = m_gnssPostProcessing->StdDevNoise(gnss.altitude);
-      break;
-    case NoiseType::Random:
-      gnss.latitude = m_gnssPostProcessing->RandomNoise(gnss.latitude);
-      gnss.longitude = m_gnssPostProcessing->RandomNoise(gnss.longitude);
-      gnss.altitude = m_gnssPostProcessing->RandomNoise(gnss.altitude);
+      m_gnssPostProcessing->PostProcessGNSS(gnss);
       break;
     default:
       break;
