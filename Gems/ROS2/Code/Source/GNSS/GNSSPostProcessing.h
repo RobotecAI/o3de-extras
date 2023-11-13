@@ -25,10 +25,11 @@ struct NoiseConfig
 {
   AZ_TYPE_INFO(NoiseConfig, "{A4D41EFF-49A1-4B72-A382-70734FD6CE03}");
   static void Reflect(AZ::ReflectContext * context);
-
-  double gaussianNoiseStdDevPct = 0.01; // Standard deviation as a percentage of the value
-  double randomNoiseRangePct = 0.01;      // Random noise range as a percentage of the value
-  double stddevNoisePct = 0.01;           // Standard deviation noise as a percentage of the value
+  double gaussianMin = -0.00005;
+  double gaussianMax = 0.00005;
+  double randomMin = -0.00002;
+  double randomMax = 0.00002;
+  double stddev = 0.00001;
 };
 
 class GNSSPostProcessing

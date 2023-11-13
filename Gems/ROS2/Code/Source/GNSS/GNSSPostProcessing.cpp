@@ -17,9 +17,11 @@ void NoiseConfig::Reflect(AZ::ReflectContext * context)
   if (AZ::SerializeContext * serialize = azrtti_cast<AZ::SerializeContext *>(context)) {
     serialize->Class<NoiseConfig>()
     ->Version(1)
-    ->Field("GaussianNoiseStdDevPct", &NoiseConfig::gaussianNoiseStdDevPct)
-    ->Field("RandomNoiseRangePct", &NoiseConfig::randomNoiseRangePct)
-    ->Field("StdDevNoisePct", &NoiseConfig::stddevNoisePct);
+    ->Field("GaussianMin", &NoiseConfig::gaussianMin)
+    ->Field("GaussianMax", &NoiseConfig::gaussianMax)
+    ->Field("RandomMin", &NoiseConfig::randomMin)
+    ->Field("RandomMax", &NoiseConfig::randomMax)
+    ->Field("StdDev", &NoiseConfig::stddev);
 
     serialize->Enum<NoiseType>()
     ->Version(1)
@@ -30,22 +32,20 @@ void NoiseConfig::Reflect(AZ::ReflectContext * context)
     if (AZ::EditContext * ec = serialize->GetEditContext()) {
       ec->Class<NoiseConfig>("GNSS Noise Configuration", "Configuration for GNSS noise")
       ->DataElement(
-        AZ::Edit::UIHandlers::Default, &NoiseConfig::gaussianNoiseStdDevPct,
-        "Gaussian Noise Std Dev Percentage",
-        "Standard deviation as a percentage of the value for Gaussian noise")
+        AZ::Edit::UIHandlers::Default, &NoiseConfig::gaussianMin, "Gaussian Min",
+        "Minimum value for Gaussian noise")
       ->DataElement(
-        AZ::Edit::UIHandlers::Default, &NoiseConfig::randomNoiseRangePct,
-        "Random Noise Range Percentage",
-        "Range as a percentage of the value for random noise")
+        AZ::Edit::UIHandlers::Default, &NoiseConfig::gaussianMax, "Gaussian Max",
+        "Maximum value for Gaussian noise")
       ->DataElement(
-        AZ::Edit::UIHandlers::Default, &NoiseConfig::stddevNoisePct,
-        "Std Dev Noise Percentage",
-        "Standard deviation as a percentage of the value for noise");
-
-      ec->Enum<NoiseType>("Noise Type", "The type of noise to apply")
-      ->Value("Gaussian", NoiseType::Gaussian)
-      ->Value("StdDev", NoiseType::StdDev)
-      ->Value("Random", NoiseType::Random);
+        AZ::Edit::UIHandlers::Default, &NoiseConfig::randomMin, "Random Min",
+        "Minimum value for random noise")
+      ->DataElement(
+        AZ::Edit::UIHandlers::Default, &NoiseConfig::randomMax, "Random Max",
+        "Maximum value for random noise")
+      ->DataElement(
+        AZ::Edit::UIHandlers::Default, &NoiseConfig::stddev, "Standard Deviation",
+        "Standard deviation for noise");
     }
   }
 }
@@ -53,36 +53,39 @@ void NoiseConfig::Reflect(AZ::ReflectContext * context)
 GNSSPostProcessing::GNSSPostProcessing()
 : gen(std::mt19937(rd()))
 {
-  gaussianDist = std::normal_distribution<>(0.0, 0.01);       // 1% standard deviation
-  stddevDist = std::normal_distribution<>(0.0, 0.01);       // 1% standard deviation
-  randomDist = std::uniform_real_distribution<>(-0.01, 0.01);       // +/-1% range
+  // Initialize distributions with default range values
+  gaussianDist = std::normal_distribution<>(noiseConfig.gaussianMin, noiseConfig.gaussianMax);
+  stddevDist = std::normal_distribution<>(0.0, noiseConfig.stddev);
+  randomDist = std::uniform_real_distribution<>(noiseConfig.randomMin, noiseConfig.randomMax);
 }
 
 GNSSPostProcessing::GNSSPostProcessing(NoiseConfig noiseConfig)
 : gen(std::mt19937(rd())), noiseConfig(noiseConfig)
 {
+  // Initialize distributions with noise configuration values
+  gaussianDist = std::normal_distribution<>(noiseConfig.gaussianMin, noiseConfig.gaussianMax);
+  stddevDist = std::normal_distribution<>(0.0, noiseConfig.stddev);
+  randomDist = std::uniform_real_distribution<>(noiseConfig.randomMin, noiseConfig.randomMax);
 }
 
 double GNSSPostProcessing::GaussianNoise(double value)
 {
-  // Apply Gaussian noise as a percentage of the current value
-  double noise = gaussianDist(gen) * value * noiseConfig.gaussianNoiseStdDevPct;
+  // Apply Gaussian noise using the configured range
+  double noise = gaussianDist(gen);
   return value + noise;
 }
 
 double GNSSPostProcessing::RandomNoise(double value)
 {
-  // Apply random noise within a range based on a percentage of the current value
-  double range = value * noiseConfig.randomNoiseRangePct;
-  std::uniform_real_distribution<> localRandomDist(-range, range);
-  double noise = localRandomDist(gen);
+  // Apply random noise using the configured range
+  double noise = randomDist(gen);
   return value + noise;
 }
 
 double GNSSPostProcessing::StdDevNoise(double value)
 {
-  // Apply standard deviation noise as a percentage of the current value
-  double noise = stddevDist(gen) * value * noiseConfig.stddevNoisePct;
+  // Apply noise based on standard deviation
+  double noise = stddevDist(gen);
   return value + noise;
 }
 

@@ -24,7 +24,9 @@ const char * GNSSMsgType = "sensor_msgs::msg::NavSatFix";
 }
 
 void ROS2GNSSSensorComponent::Reflect(AZ::ReflectContext * context)
-{
+{   
+    NoiseConfig::Reflect(context);
+    
   if (auto * serialize = azrtti_cast<AZ::SerializeContext *>(context)) {
     serialize->Class<ROS2GNSSSensorComponent, SensorBaseType>()
     ->Version(4)
