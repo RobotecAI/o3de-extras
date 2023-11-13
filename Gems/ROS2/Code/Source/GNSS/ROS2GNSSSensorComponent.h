@@ -33,10 +33,16 @@ namespace ROS2
         void Activate() override;
         void Deactivate() override;
         //////////////////////////////////////////////////////////////////////////
+        //! Returns true if the sensor has a fix, false otherwise.
+        bool GetFixState();
+        void SetFixState(bool isFix);
+        void ToggleFixLoss(); 
 
     private:
         ///! Requests gnss message publication.
         void FrequencyTick();
+
+        //! Changes the message
 
         //! Returns current entity position.
         //! @return Current entity position.
@@ -44,6 +50,7 @@ namespace ROS2
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
         sensor_msgs::msg::NavSatFix m_gnssMsg;
+        bool m_isFix = true;
     };
 
 } // namespace ROS2
