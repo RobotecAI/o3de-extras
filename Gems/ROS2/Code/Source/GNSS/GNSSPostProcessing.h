@@ -16,9 +16,19 @@ namespace ROS2
 
 enum class NoiseType
 {
-    Gaussian,
-    StdDev,
-    Random
+  Gaussian,
+  StdDev,
+  Random
+};
+
+struct NoiseConfig
+{
+  AZ_TYPE_INFO(NoiseConfig, "{A4D41EFF-49A1-4B72-A382-70734FD6CE03}");
+  static void Reflect(AZ::ReflectContext * context);
+
+  double gaussianNoiseStdDevPct = 0.01; // Standard deviation as a percentage of the value
+  double randomNoiseRangePct = 0.01;      // Random noise range as a percentage of the value
+  double stddevNoisePct = 0.01;           // Standard deviation noise as a percentage of the value
 };
 
 class GNSSPostProcessing
@@ -27,10 +37,12 @@ public:
   AZ_TYPE_INFO(GNSSPostProcessing, "{7291A82E-A394-4CB6-965E-E3C65667A437}");
 
   GNSSPostProcessing();
+  GNSSPostProcessing(NoiseConfig noiseConfig);
+
 
   virtual ~GNSSPostProcessing() = default;
 
-  void PostProcessGNSS(sensor_msgs::msg::NavSatFix& gnss) const;
+  void PostProcessGNSS(sensor_msgs::msg::NavSatFix & gnss) const;
 
   double GaussianNoise(double value);
   double StdDevNoise(double value);
@@ -39,9 +51,10 @@ public:
 private:
   std::random_device rd;
   std::mt19937 gen;
+  NoiseConfig noiseConfig{};
   std::normal_distribution<> gaussianDist;
-  double stddevNoise;
   std::uniform_real_distribution<> randomDist;
+  std::normal_distribution<> stddevDist;
 };
 
 } // namespace ROS2

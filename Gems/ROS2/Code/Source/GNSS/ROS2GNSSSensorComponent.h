@@ -18,53 +18,54 @@
 
 namespace ROS2
 {
-    //! Global Navigation Satellite Systems (GNSS) sensor component class
-    //! It provides NavSatFix data of sensor's position in GNSS frame which is defined by GNSS origin offset
-    //! Offset is provided as latitude [deg], longitude [deg], altitude [m] of o3de global frame
-    //! It is assumed that o3de global frame overlaps with ENU coordinate system
-    class ROS2GNSSSensorComponent
-        : public ROS2SensorComponentBase<TickBasedSource>
-        , public GNSSPostProcessingRequestBus::Handler
-    {
-    public:
-        AZ_COMPONENT(ROS2GNSSSensorComponent, "{55B4A299-7FA3-496A-88F0-764C75B0E9A7}", SensorBaseType);
-        ROS2GNSSSensorComponent();
-        ROS2GNSSSensorComponent(const SensorConfiguration& sensorConfiguration);
-        ~ROS2GNSSSensorComponent() = default;
-        static void Reflect(AZ::ReflectContext* context);
-        //////////////////////////////////////////////////////////////////////////
-        // Component overrides
-        void Activate() override;
-        void Deactivate() override;
-        //////////////////////////////////////////////////////////////////////////
-        //! Returns true if the sensor has a fix, false otherwise.
-        bool GetFixState();
-        void SetFixState(bool isFix);
-        void ToggleFixLoss(); 
+//! Global Navigation Satellite Systems (GNSS) sensor component class
+//! It provides NavSatFix data of sensor's position in GNSS frame which is defined by GNSS origin offset
+//! Offset is provided as latitude [deg], longitude [deg], altitude [m] of o3de global frame
+//! It is assumed that o3de global frame overlaps with ENU coordinate system
+class ROS2GNSSSensorComponent
+  : public ROS2SensorComponentBase<TickBasedSource>,
+  public GNSSPostProcessingRequestBus::Handler
+{
+public:
+  AZ_COMPONENT(ROS2GNSSSensorComponent, "{55B4A299-7FA3-496A-88F0-764C75B0E9A7}", SensorBaseType);
+  ROS2GNSSSensorComponent();
+  ROS2GNSSSensorComponent(const SensorConfiguration & sensorConfiguration);
+  ~ROS2GNSSSensorComponent() = default;
+  static void Reflect(AZ::ReflectContext * context);
+  //////////////////////////////////////////////////////////////////////////
+  // Component overrides
+  void Activate() override;
+  void Deactivate() override;
+  //////////////////////////////////////////////////////////////////////////
+  //! Returns true if the sensor has a fix, false otherwise.
+  bool GetFixState();
+  void SetFixState(bool isFix);
+  void ToggleFixLoss();
 
-    private:
-        ///! Requests gnss message publication.
-        void FrequencyTick();
-        void UpdateGnssMessage();
+private:
+  ///! Requests gnss message publication.
+  void FrequencyTick();
+  void UpdateGnssMessage();
 
-        //! Changes the message
+  //! Changes the message
 
-        //! Returns current entity position.
-        //! @return Current entity position.
-        [[nodiscard]] AZ::Transform GetCurrentPose() const;
+  //! Returns current entity position.
+  //! @return Current entity position.
+  [[nodiscard]] AZ::Transform GetCurrentPose() const;
 
-        //! GNSSPostProcessingRequestBus::Handler overrides
-        void ApplyPostProcessing(sensor_msgs::msg::NavSatFix& gnss) override;
+  //! GNSSPostProcessingRequestBus::Handler overrides
+  void ApplyPostProcessing(sensor_msgs::msg::NavSatFix & gnss) override;
 
-        AZ::Crc32 OnPostProcessingChanged() const;
-        bool IsPostProcessingApplied() const;
+  AZ::Crc32 OnPostProcessingChanged() const;
+  bool IsPostProcessingApplied() const;
 
-        std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
-        sensor_msgs::msg::NavSatFix m_gnssMsg;
-        bool m_isFix = true;
-        bool m_applyPostProcessing = false;
-        NoiseType m_noiseType;
-        AZStd::unique_ptr<GNSSPostProcessing> m_gnssPostProcessing;
-    };
+  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
+  sensor_msgs::msg::NavSatFix m_gnssMsg;
+  bool m_isFix = true;
+  bool m_applyPostProcessing = false;
+  NoiseType m_noiseType;
+  AZStd::unique_ptr<GNSSPostProcessing> m_gnssPostProcessing;
+  NoiseConfig m_noiseConfig{};
+};
 
 } // namespace ROS2
