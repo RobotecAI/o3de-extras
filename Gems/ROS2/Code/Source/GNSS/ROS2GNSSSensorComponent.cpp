@@ -84,25 +84,50 @@ namespace ROS2
         m_gnssPublisher.reset();
     }
 
+    bool ROS2GNSSSensorComponent::GetFixState()
+    {
+        return m_isFix;
+    }
+
+    void ROS2GNSSSensorComponent::SetFixState(bool isFix)
+    {
+        m_isFix = isFix;
+    }
+
+    void ROS2GNSSSensorComponent::ToggleFixLoss()
+    {
+        m_isFix = !m_isFix;
+    }
+
     void ROS2GNSSSensorComponent::FrequencyTick()
     {
+        if (!m_isFix)
+        {
+            // Simulate fix loss
+            m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_NO_FIX;
+            m_gnssMsg.latitude = std::numeric_limits<double>::quiet_NaN();
+            m_gnssMsg.longitude = std::numeric_limits<double>::quiet_NaN();
+            m_gnssMsg.altitude = std::numeric_limits<double>::quiet_NaN();
+        }
+        else
+        {
+            // Normal operation, publish current position
+            AZ::Vector3 currentPosition{ 0.0f };
+            AZ::TransformBus::EventResult(currentPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
 
-        AZ::Vector3 currentPosition{ 0.0f };
-        AZ::TransformBus::EventResult(currentPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
+            WGS::WGS84Coordinate currentPositionWGS84;
+            ROS2::GeoreferenceRequestsBus::BroadcastResult(
+                currentPositionWGS84, &GeoreferenceRequests::ConvertFromLevelToWSG84, currentPosition);
 
-        WGS::WGS84Coordinate currentPositionWGS84;
-        ROS2::GeoreferenceRequestsBus::BroadcastResult(
-            currentPositionWGS84, &GeoreferenceRequests::ConvertFromLevelToWSG84, currentPosition);
-
-        m_gnssMsg.latitude = currentPositionWGS84.m_latitude;
-        m_gnssMsg.longitude = currentPositionWGS84.m_longitude;
-        m_gnssMsg.altitude = currentPositionWGS84.m_altitude;
-
-        m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_SBAS_FIX;
-        m_gnssMsg.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
+            m_gnssMsg.latitude = currentPositionWGS84.m_latitude;
+            m_gnssMsg.longitude = currentPositionWGS84.m_longitude;
+            m_gnssMsg.altitude = currentPositionWGS84.m_altitude;
+            m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_SBAS_FIX;
+            m_gnssMsg.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
+        }
 
         m_gnssPublisher->publish(m_gnssMsg);
-    }
+    }   
 
 
 } // namespace ROS2
