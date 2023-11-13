@@ -9,161 +9,165 @@
 #include <ROS2/Sensor/Events/PhysicsBasedSource.h>
 #include <ROS2/Sensor/Events/TickBasedSource.h>
 
-#include <imgui/imgui.h>
 #include <string>
 #include <algorithm>
-#include <unordered_map>
 
-static std::unordered_map<AZ::ComponentId, bool> componentActiveState;
-
-auto controlSensorComponent = [](auto* sensorComponent, ImGuiContext& imguiContext, const std::string& uniqueId) {
-    // Directly access the static variable without capturing it.
-    if (componentActiveState.find(sensorComponent->GetId()) == componentActiveState.end()) {
-        componentActiveState[sensorComponent->GetId()] = true; // Initialize
+namespace ROS2
+{
+    Ros2ImGui::Ros2ImGui()
+    {
     }
 
-    bool isActive = componentActiveState[sensorComponent->GetId()];
+    Ros2ImGui::~Ros2ImGui()
+    {
+    }
 
-    // We use the component's ID to create a unique label for each button.
-    std::string disableButtonLabel = "Disable Component##" + uniqueId;
-    std::string enableButtonLabel = "Enable Component##" + uniqueId;
-
-    // Disable the button if the component is already in the desired state.
-    if (isActive) {
-        if (ImGui::Button(disableButtonLabel.c_str())) {
-            sensorComponent->Deactivate();
-            componentActiveState[sensorComponent->GetId()] = false;
+    void Ros2ImGui::Draw(AZ::Entity* entity)
+    {
+        if (!entity)
+        {
+            AZ_Error("Ros2ImGui", false, "Invalid entity provided to Draw method.");
+            return;
         }
-    } else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Grayed out
-        ImGui::Button(disableButtonLabel.c_str());
-        ImGui::PopStyleColor();
-    }
 
-    ImGui::SameLine();
-
-    if (!isActive) {
-        if (ImGui::Button(enableButtonLabel.c_str())) {
-            sensorComponent->Activate();
-            componentActiveState[sensorComponent->GetId()] = true;
+        auto childComponents = GetComponents(entity->GetId());
+        if (childComponents.empty())
+        {
+            AZ_Error("Ros2ImGui", false, "No child components found for the entity.");
+            return;
         }
-    } else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Grayed out
-        ImGui::Button(enableButtonLabel.c_str());
-        ImGui::PopStyleColor();
-    }
-};
 
+        FilterChildComponents(childComponents);
+        ImGui::Begin("Sensors");
+        ImGui::Text("Link: %s", entity->GetName().c_str());
 
+        for (auto* component : childComponents)
+        {
+            ImGui::Text("Component: %s", component->RTTI_GetTypeName());
+            
+            if (auto* gnssSensor = azrtti_cast<ROS2GNSSSensorComponent *>(component)) {
+            std::string uniqueId = std::to_string(reinterpret_cast<uintptr_t>(component));
+            DrawSensorComponentControls(gnssSensor, uniqueId);
+            } else if (IsTickBasedSensorComponent(component)) {
+                auto* sensorComponent = azrtti_cast<ROS2SensorComponentBase<TickBasedSource>*>(component);
+                if (sensorComponent) {
+                    std::string uniqueId = std::to_string(reinterpret_cast<uintptr_t>(component));
+                    DrawSensorComponentControls(sensorComponent, uniqueId);
+                }
+            } else if (IsPhysicsBasedSensorComponent(component)) {
+                auto* sensorComponent = azrtti_cast<ROS2SensorComponentBase<PhysicsBasedSource>*>(component);
+                if (sensorComponent) {
+                    std::string uniqueId = std::to_string(reinterpret_cast<uintptr_t>(component));
+                    DrawSensorComponentControls(sensorComponent, uniqueId);
+                }
+            }
 
-Ros2ImGui::Ros2ImGui()
-{
-}
+            ImGui::Text("----");
+        }
 
-Ros2ImGui::~Ros2ImGui()
-{
-}
-
-void Ros2ImGui::Draw(AZ::Entity * entity)
-{
-  if (!entity) {
-    AZ_Error("Draw", false, "Invalid entity!");
-    return;
-  }
-
-  auto childComponents = GetComponents(entity->GetId());
-//   entity->FindComponents()
-  if (childComponents.empty()) {
-    AZ_Error("Draw", false, "Invalid child components!");
-    return;
-  }
-  FilterChildComponents(childComponents);
-  ImGui::Begin("Sensors");
-  // TODO change names to topic based
-  ImGui::Text("Link: %s", entity->GetName().c_str());
-  for (auto * component : childComponents) {
-    ImGui::Text("Component: %s", component->RTTI_GetTypeName());
-
-    auto * sensorComponentTickBased =
-      azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::TickBasedSource> *>(component);
-    auto * sensorComponentPhysicsBased =
-      azrtti_cast<ROS2::ROS2SensorComponentBase<ROS2::PhysicsBasedSource> *>(component);
-
-    // Generate a unique identifier for the ImGui button labels
-    const std::string uniqueId = std::to_string(reinterpret_cast<uintptr_t>(component));
-
-    if (sensorComponentTickBased) {
-      controlSensorComponent(sensorComponentTickBased, *ImGui::GetCurrentContext(), uniqueId);
-    } else if (sensorComponentPhysicsBased) {
-      controlSensorComponent(sensorComponentPhysicsBased, *ImGui::GetCurrentContext(), uniqueId);
+        ImGui::End();
     }
 
-    ImGui::Text("----");
-  }
-  ImGui::End();
-}
+    // Private methods implementation
 
-// Private
+    AZStd::vector<AZ::Component*> Ros2ImGui::GetComponents(AZ::EntityId entityId)
+    {
+        AZStd::vector<AZ::Component*> components;
+        AZ::Entity* entity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, entityId);
+        if (entity)
+        {
+            components = entity->GetComponents();
+        }
+        else
+        {
+            AZ_Error("Ros2ImGui", false, "Could not find entity with ID: %llu", static_cast<unsigned long long>(entityId));
+        }
+        return components;
+    }
 
-AZStd::vector<AZ::Component *> Ros2ImGui::GetComponents(AZ::EntityId entityId)
-{
-  AZStd::vector<AZ::Component *> components;
-  AZ::Entity * entity = nullptr;
-  AZ::ComponentApplicationBus::BroadcastResult(
-    entity,
-    &AZ::ComponentApplicationRequests::FindEntity,
-    entityId);
-  if (!entity) {
-    AZ_Error("GetComponents", false, "Invalid entity!");
-    return components;
-  }
+    void Ros2ImGui::FilterChildComponents(AZStd::vector<AZ::Component*>& components)
+    {
+        components.erase(std::remove_if(components.begin(), components.end(), [this](AZ::Component* component)
+        {
+            return !IsSensorComponent(component) || IsImGuiComponent(component);
+        }), components.end());
+    }
 
-  AZ::Entity::ComponentArrayType entityComponents = entity->GetComponents();
-  for (auto * component : entityComponents) {
-    components.push_back(component);
-  }
-  return components;
-}
+    bool Ros2ImGui::EndsWith(const std::string& value, const std::string& ending) const
+    {
+        if (ending.size() > value.size()) return false;
+        return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+    }
 
+    bool Ros2ImGui::IsSensorComponent(const AZ::Component* component) const
+    {
+        std::string typeName = component->RTTI_GetTypeName();
+        return EndsWith(typeName, "SensorComponent");
+    }
 
-AZ::TransformInterface * Ros2ImGui::GetEntityTransformInterface(const AZ::Entity * entity)
-{
-  if (!entity) {
-    AZ_Error("GetEntityTransformInterface", false, "Invalid entity!");
-    return nullptr;
-  }
+    bool Ros2ImGui::IsImGuiComponent(const AZ::Component* component) const
+    {
+        std::string typeName = component->RTTI_GetTypeName();
+        return EndsWith(typeName, "ImGuiComponent");
+    }
 
-  auto * interface =
-    ::ROS2::Utils::GetGameOrEditorComponent<AzFramework::TransformComponent>(entity);
+    bool Ros2ImGui::IsTickBasedSensorComponent(const AZ::Component* component) const
+    {
+        const auto sensorComponent = azrtti_cast<const ROS2SensorComponentBase<TickBasedSource>*>(component);
+        if (sensorComponent) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-  return interface;
-}
+    bool Ros2ImGui::IsPhysicsBasedSensorComponent(const AZ::Component* component) const
+    {
+        const auto sensorComponent = azrtti_cast<const ROS2SensorComponentBase<PhysicsBasedSource>*>(component);
+        if (sensorComponent) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-void Ros2ImGui::FilterChildComponents(AZStd::vector<AZ::Component *> & components)
-{
-  // remove the components that typeName does not end with "SensorComponent"
-  components.erase(
-    std::remove_if(
-      components.begin(),
-      components.end(),
-      [](AZ::Component * component) {
-        std::string typeName = component->RTTI_GetTypeName();         // Convert to std::string
-        std::string suffix = "SensorComponent";
-        // Check if the type name ends with "SensorComponent"
-        return !(typeName.rfind(suffix) == typeName.size() - suffix.size());
-      }),
-    components.end());
+    void Ros2ImGui::ToggleFixLoss(ROS2GNSSSensorComponent* gnssSensor) 
+    {
+        gnssSensor->ToggleFixLoss();
+    }
 
-  // Remove also the ImGuiComponent
-  components.erase(
-    std::remove_if(
-      components.begin(),
-      components.end(),
-      [](AZ::Component * component) {
-        std::string typeName = component->RTTI_GetTypeName();         // Convert to std::string
-        std::string suffix = "ImGuiComponent";
-        // Check if the type name ends with "ImGuiComponent"
-        return typeName.rfind(suffix) == typeName.size() - suffix.size();
-      }),
-    components.end());
-}
+    void Ros2ImGui::DrawSensorComponentControls(ROS2GNSSSensorComponent* gnssSensor, const std::string& uniqueId) 
+    {
+        AZ::ComponentId componentId = gnssSensor->GetId();
+        if (componentActiveState.find(componentId) == componentActiveState.end()) {
+            componentActiveState[componentId] = true;
+        }
+
+        bool& isActive = componentActiveState[componentId]; 
+        std::string label = "Component##" + uniqueId;
+        ToggleComponentState(gnssSensor, label, isActive);
+
+        const bool isFix = gnssSensor->GetFixState();
+        std::string buttonLabel = isFix ? "Lose Fix##" : "Recover Fix##";
+        buttonLabel += uniqueId;
+
+        // Check if the component is active
+        if (!isActive) {
+            // Change the button's appearance to look disabled
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            
+            // When the button is clicked, it won't do anything
+            ImGui::Button(buttonLabel.c_str());
+            
+            // Restore the button's appearance
+            ImGui::PopStyleVar();
+        } else {
+            // If the component is active, button works normally
+            if (ImGui::Button(buttonLabel.c_str())) {
+                ToggleFixLoss(gnssSensor);
+            }
+        }
+    }
+
+} // namespace ROS2
