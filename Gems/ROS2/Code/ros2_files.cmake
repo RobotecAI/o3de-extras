@@ -45,6 +45,8 @@ set(FILES
         Source/Gripper/FingerGripperComponent.cpp
         Source/Georeference/GNSSFormatConversions.cpp
         Source/Georeference/GNSSFormatConversions.h
+        Source/GNSS/GNSSPostProcessing.cpp
+        Source/GNSS/GNSSPostProcessing.h
         Source/GNSS/ROS2GNSSSensorComponent.cpp
         Source/GNSS/ROS2GNSSSensorComponent.h
         Source/Imu/ImuSensorConfiguration.cpp

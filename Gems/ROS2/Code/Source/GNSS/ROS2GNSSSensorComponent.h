@@ -13,14 +13,18 @@
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
-;
+#include <ROS2/GNSS/GNSSPostProcessingRequestBus.h>
+#include "GNSSPostProcessing.h"
+
 namespace ROS2
 {
     //! Global Navigation Satellite Systems (GNSS) sensor component class
     //! It provides NavSatFix data of sensor's position in GNSS frame which is defined by GNSS origin offset
     //! Offset is provided as latitude [deg], longitude [deg], altitude [m] of o3de global frame
     //! It is assumed that o3de global frame overlaps with ENU coordinate system
-    class ROS2GNSSSensorComponent : public ROS2SensorComponentBase<TickBasedSource>
+    class ROS2GNSSSensorComponent
+        : public ROS2SensorComponentBase<TickBasedSource>
+        , public GNSSPostProcessingRequestBus::Handler
     {
     public:
         AZ_COMPONENT(ROS2GNSSSensorComponent, "{55B4A299-7FA3-496A-88F0-764C75B0E9A7}", SensorBaseType);
@@ -41,6 +45,7 @@ namespace ROS2
     private:
         ///! Requests gnss message publication.
         void FrequencyTick();
+        void UpdateGnssMessage();
 
         //! Changes the message
 
@@ -48,9 +53,18 @@ namespace ROS2
         //! @return Current entity position.
         [[nodiscard]] AZ::Transform GetCurrentPose() const;
 
+        //! GNSSPostProcessingRequestBus::Handler overrides
+        void ApplyPostProcessing(sensor_msgs::msg::NavSatFix& gnss) override;
+
+        AZ::Crc32 OnPostProcessingChanged() const;
+        bool IsPostProcessingApplied() const;
+
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
         sensor_msgs::msg::NavSatFix m_gnssMsg;
         bool m_isFix = true;
+        bool m_applyPostProcessing = false;
+        NoiseType m_noiseType;
+        AZStd::unique_ptr<GNSSPostProcessing> m_gnssPostProcessing;
     };
 
 } // namespace ROS2
