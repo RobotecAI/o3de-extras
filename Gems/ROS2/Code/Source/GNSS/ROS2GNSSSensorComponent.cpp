@@ -13,6 +13,7 @@
 #include <ROS2/Utilities/ROS2Names.h>
 
 #include "Georeference/GNSSFormatConversions.h"
+#include <ROS2/GNSS/GNSSPostProcessingRequestBus.h>
 #include <ROS2/Georeference/GeoreferenceBus.h>
 
 namespace ROS2
@@ -113,7 +114,8 @@ namespace ROS2
         {
             // Normal operation, publish current position
             AZ::Vector3 currentPosition{ 0.0f };
-            AZ::TransformBus::EventResult(currentPosition, GetEntityId(), &AZ::TransformBus::Events::GetWorldTranslation);
+            const auto entityId = GetEntityId();
+            AZ::TransformBus::EventResult(currentPosition, entityId, &AZ::TransformBus::Events::GetWorldTranslation);
 
             WGS::WGS84Coordinate currentPositionWGS84;
             ROS2::GeoreferenceRequestsBus::BroadcastResult(
@@ -124,10 +126,17 @@ namespace ROS2
             m_gnssMsg.altitude = currentPositionWGS84.m_altitude;
             m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_SBAS_FIX;
             m_gnssMsg.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
+
+            bool registeredPostProcessingSupport = false;
+            GNSSPostProcessingRequestBus::EventResult(registeredPostProcessingSupport, entityId, &GNSSPostProcessingRequests::IsReady);
+            if (registeredPostProcessingSupport)
+            {
+                GNSSPostProcessingRequestBus::Event(entityId, &GNSSPostProcessingRequests::ApplyPostProcessing, m_gnssMsg);
+            }
         }
 
         m_gnssPublisher->publish(m_gnssMsg);
-    }   
+    }
 
     void ROS2GNSSSensorComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
     {

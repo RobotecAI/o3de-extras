@@ -30,7 +30,10 @@ namespace ROS2
 
         //! Apply post-processing function, if any implementations to the bus are in the entity.
         //! @param gnss standard gnss message passed as a reference. It will be changed through post-processing.
-        virtual void ApplyPostProcessing(sensor_msgs::msg::NavSatFix & gnss) = 0;
+        virtual void ApplyPostProcessing(sensor_msgs::msg::NavSatFix& gnss) = 0;
+
+        //! Query whether registered postprocessing is ready.
+        virtual bool IsReady() = 0;
 
     protected:
         ~GNSSPostProcessingRequests() = default;
