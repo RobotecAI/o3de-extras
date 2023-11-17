@@ -127,12 +127,7 @@ namespace ROS2
             m_gnssMsg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_SBAS_FIX;
             m_gnssMsg.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
 
-            bool registeredPostProcessingSupport = false;
-            GNSSPostProcessingRequestBus::EventResult(registeredPostProcessingSupport, entityId, &GNSSPostProcessingRequests::IsReady);
-            if (registeredPostProcessingSupport)
-            {
-                GNSSPostProcessingRequestBus::Event(entityId, &GNSSPostProcessingRequests::ApplyPostProcessing, m_gnssMsg);
-            }
+            GNSSPostProcessingRequestBus::Event(entityId, &GNSSPostProcessingRequests::ApplyPostProcessing, m_gnssMsg);
         }
 
         m_gnssPublisher->publish(m_gnssMsg);
