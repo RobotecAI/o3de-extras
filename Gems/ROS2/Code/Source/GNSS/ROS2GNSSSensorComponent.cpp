@@ -129,5 +129,9 @@ namespace ROS2
         m_gnssPublisher->publish(m_gnssMsg);
     }   
 
+    void ROS2GNSSSensorComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    {
+        provided.push_back(AZ_CRC_CE("ROS2GNSSSensor"));
+    }
 
 } // namespace ROS2
