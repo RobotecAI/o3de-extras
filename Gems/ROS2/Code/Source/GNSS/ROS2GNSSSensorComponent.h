@@ -13,6 +13,8 @@
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
+#include <std_srvs/srv/set_bool.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace ROS2
 {
@@ -51,6 +53,8 @@ namespace ROS2
         [[nodiscard]] AZ::Transform GetCurrentPose() const;
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
+        rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr m_setFixService;
+
         sensor_msgs::msg::NavSatFix m_gnssMsg;
         bool m_isFix = true;
     };

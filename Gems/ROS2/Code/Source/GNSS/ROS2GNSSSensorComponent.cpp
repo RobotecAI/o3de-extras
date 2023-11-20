@@ -16,6 +16,8 @@
 #include <ROS2/GNSS/GNSSPostProcessingRequestBus.h>
 #include <ROS2/Georeference/GeoreferenceBus.h>
 
+#include <string>
+
 namespace ROS2
 {
     namespace
@@ -63,6 +65,17 @@ namespace ROS2
 
         const auto publisherConfig = m_sensorConfiguration.m_publishersConfigurations[GNSSMsgType];
         const auto fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
+
+        const std::string service_name = std::string(fullTopic.data()) + "/set_fix";
+
+        m_setFixService = ros2Node->create_service<std_srvs::srv::SetBool>(
+            service_name,
+            [this](const std_srvs::srv::SetBool::Request::SharedPtr request, std_srvs::srv::SetBool::Response::SharedPtr response)
+            {
+                SetFixState(request->data);
+                response->success = true;
+            });
+
         m_gnssPublisher = ros2Node->create_publisher<sensor_msgs::msg::NavSatFix>(fullTopic.data(), publisherConfig.GetQoS());
 
         m_gnssMsg.header.frame_id = "gnss_frame_id";
