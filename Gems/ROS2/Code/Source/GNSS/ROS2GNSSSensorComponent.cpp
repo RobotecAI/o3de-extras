@@ -67,7 +67,7 @@ namespace ROS2
         const AZStd::string service_name = AZStd::string(fullTopic.data()) + "/set_fix";
 
         m_setFixService = ros2Node->create_service<std_srvs::srv::SetBool>(
-            service_name,
+            service_name.data(),
             [this](const std_srvs::srv::SetBool::Request::SharedPtr request, std_srvs::srv::SetBool::Response::SharedPtr response)
             {
                 SetFixState(request->data);
