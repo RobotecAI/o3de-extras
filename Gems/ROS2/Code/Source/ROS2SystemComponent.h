@@ -16,6 +16,7 @@
 #include <ROS2/ROS2Bus.h>
 #include <builtin_interfaces/msg/time.hpp>
 #include <memory>
+#include <rclcpp/executors/multi_threaded_executor.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -84,7 +85,7 @@ namespace ROS2
         void InitClock();
 
         std::shared_ptr<rclcpp::Node> m_ros2Node;
-        AZStd::shared_ptr<rclcpp::executors::SingleThreadedExecutor> m_executor;
+        AZStd::shared_ptr<rclcpp::executors::MultiThreadedExecutor> m_executor;
         AZStd::unique_ptr<tf2_ros::TransformBroadcaster> m_dynamicTFBroadcaster;
         AZStd::unique_ptr<tf2_ros::StaticTransformBroadcaster> m_staticTFBroadcaster;
         AZStd::unique_ptr<SimulationClock> m_simulationClock;

@@ -25,6 +25,8 @@
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzCore/std/string/string_view.h>
 #include <AzFramework/API/ApplicationAPI.h>
+#include <rclcpp/executor_options.hpp>
+#include <rclcpp/executors/multi_threaded_executor.hpp>
 
 namespace ROS2
 {
@@ -136,7 +138,7 @@ namespace ROS2
         InitClock();
         m_simulationClock->Activate();
         m_ros2Node = std::make_shared<rclcpp::Node>("o3de_ros2_node");
-        m_executor = AZStd::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+        m_executor = AZStd::make_shared<rclcpp::executors::MultiThreadedExecutor>(rclcpp::ExecutorOptions(), 16);
         m_executor->add_node(m_ros2Node);
 
         m_staticTFBroadcaster = AZStd::make_unique<tf2_ros::StaticTransformBroadcaster>(m_ros2Node);
@@ -199,7 +201,6 @@ namespace ROS2
         if (rclcpp::ok())
         {
             m_simulationClock->Tick();
-            m_executor->spin_some();
         }
     }
 
