@@ -7,6 +7,7 @@
  */
 
 #include "ROS2ContactSensorComponent.h"
+#include "AzFramework/Physics/SimulatedBodies/RigidBody.h"
 #include <AzFramework/Physics/Collision/CollisionEvents.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBody.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
@@ -70,15 +71,45 @@ namespace ROS2
         const auto fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
         m_contactsPublisher = ros2Node->create_publisher<gazebo_msgs::msg::ContactsState>(fullTopic.data(), publisherConfig.GetQoS());
 
+        AzPhysics::SceneInterface* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        AzPhysics::SceneHandle defaultSceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
         m_onCollisionBeginHandler = AzPhysics::SimulatedBodyEvents::OnCollisionBegin::Handler(
-            [this]([[maybe_unused]] AzPhysics::SimulatedBodyHandle bodyHandle, const AzPhysics::CollisionEvent& event)
+            [this, defaultSceneHandle, sceneInterface](
+                [[maybe_unused]] AzPhysics::SimulatedBodyHandle bodyHandle, const AzPhysics::CollisionEvent& event)
             {
+                auto* body = azdynamic_cast<AzPhysics::RigidBody*>(
+                    sceneInterface->GetSimulatedBodyFromHandle(defaultSceneHandle, event.m_body2->m_bodyHandle));
+                if (body)
+                {
+                    std::cout << "Collision detected" << std::endl;
+                    auto vel = body->GetLinearVelocity();
+                    if (vel.GetLength() < 2.)
+                    {
+                        body->ApplyLinearImpulse({ -0.1, 0., 0. });
+                    }
+                }
+                else
+                {
+                    std::cout << "Collision detected but no body" << std::endl;
+                }
                 AddNewContact(event);
             });
 
         m_onCollisionPersistHandler = AzPhysics::SimulatedBodyEvents::OnCollisionPersist::Handler(
-            [this]([[maybe_unused]] AzPhysics::SimulatedBodyHandle bodyHandle, const AzPhysics::CollisionEvent& event)
+            [this, defaultSceneHandle, sceneInterface](
+                [[maybe_unused]] AzPhysics::SimulatedBodyHandle bodyHandle, const AzPhysics::CollisionEvent& event)
             {
+                auto* body = azdynamic_cast<AzPhysics::RigidBody*>(
+                    sceneInterface->GetSimulatedBodyFromHandle(defaultSceneHandle, event.m_body2->m_bodyHandle));
+                if (body)
+                {
+                    std::cout << "Collision persists" << std::endl;
+                    auto vel = body->GetLinearVelocity();
+                    if (vel.GetLength() < 2.)
+                    {
+                        body->ApplyLinearImpulse({ -0.1, 0., 0. });
+                    }
+                }
                 AddNewContact(event);
             });
 
