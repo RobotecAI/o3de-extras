@@ -5,9 +5,10 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+
 #pragma once
 
-#include "AzCore/Component/Component.h"
+#include <AzCore/Component/Component.h>
 #include <AzCore/RTTI/TypeInfoSimple.h>
 #include <ROS2/Camera/CameraPostProcessingRequestBus.h>
 
@@ -21,33 +22,31 @@ namespace ROS2
         mono16,
     };
 
-    struct EncodingConvertData
+    struct EncodingConverion
     {
-        AZ_TYPE_INFO(EncodingConvertData, "{db361adc-b339-4a4e-a10b-c6bf6791eda6}");
+        AZ_TYPE_INFO(EncodingConverion, "{db361adc-b339-4a4e-a10b-c6bf6791eda6}");
         static void Reflect(AZ::ReflectContext* context);
-        AZ::Outcome<void, AZStd::string> ValidateInputEncoding(void* newValue, const AZ::Uuid& valueType);
-        AZ::Outcome<void, AZStd::string> ValidateOutputEncoding(void* newValue, const AZ::Uuid& valueType);
 
-        ImageEncoding encodingIn = ImageEncoding::rgba8;
-        ImageEncoding encodingOut = ImageEncoding::rgb8;
-
-        bool operator==(const ROS2::EncodingConvertData& rhs) const
+        bool operator==(const ROS2::EncodingConverion& rhs) const
         {
             return encodingIn == rhs.encodingIn && encodingOut == rhs.encodingOut;
         }
+
+        ImageEncoding encodingIn = ImageEncoding::rgba8;
+        ImageEncoding encodingOut = ImageEncoding::rgb8;
     };
 
     //! Change image format
-    class ROS2ImageFormatConvertComponent
+    class ROS2ImageEncodingConvertComponent
         : public AZ::Component
         , public CameraPostProcessingRequestBus::Handler
     {
     public:
-        AZ_COMPONENT(ROS2ImageFormatConvertComponent, "12449810-d179-44f1-8f72-22d8d3fa4460");
+        AZ_COMPONENT(ROS2ImageEncodingConvertComponent, "12449810-d179-44f1-8f72-22d8d3fa4460");
         static void Reflect(AZ::ReflectContext* context);
 
-        ROS2ImageFormatConvertComponent() = default;
-        ~ROS2ImageFormatConvertComponent() override = default;
+        ROS2ImageEncodingConvertComponent() = default;
+        ~ROS2ImageEncodingConvertComponent() override = default;
 
         void Activate() override;
         void Deactivate() override;
@@ -59,7 +58,7 @@ namespace ROS2
         AZ::Outcome<void, AZStd::string> ValidateEncodingConversion(void* newValue, const AZ::Uuid& valueType);
 
     private:
-        AZ::u16 m_priority = CameraPostProcessingRequests::DEFAULT_PRIORITY;
-        EncodingConvertData m_encodingConvertData;
+        AZ::u8 m_priority = CameraPostProcessingRequests::DEFAULT_PRIORITY;
+        EncodingConverion m_encodingConvertData;
     };
 } // namespace ROS2
