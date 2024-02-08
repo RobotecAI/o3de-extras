@@ -15,15 +15,14 @@
                 {
                     "Name": "OutputColor",
                     "SlotType": "Output",
-                    "ScopeAttachmentUsage": "RenderTarget"
+                    "ScopeAttachmentUsage": "Shader"
                 }
             ],
             "PassData": {
                 "$type": "FullscreenTrianglePassData",
                 "ShaderAsset": {
                     "FilePath": "Passes/ShaderExample/ExampleEffect.shader" // Our shader
-                },
-                "BindViewSrg": true
+                }
             }
         }
     }

@@ -5,14 +5,9 @@
 #include <Atom/Features/Pipeline/Forward/ForwardPassOutput.azsli>
 #include <Atom/Features/SrgSemantics.azsli>
 
-ShaderResourceGroup MyMaterialSrg : SRG_PerDraw
-{
-}
-
 struct VertexShaderInput
 {
     float3 m_position : POSITION;
-    float3 m_color : COLOR;
 };
 
 struct VertexShaderOutput
@@ -30,17 +25,7 @@ VertexShaderOutput MainVS(VertexShaderInput IN)
     return OUT;
 }
 
-ForwardPassOutput MainPS(VertexShaderOutput IN)
+ForwardPassOutput MainPS(ForwardPassOutput IN)
 {
-    float currentTime = SceneSrg::m_time;
-    ForwardPassOutput OUT;
-
-    // OUT.m_diffuseColor = float4(0,0,0,1); // Subsurface scattering is disabled
-    // OUT.m_specularColor = float4(0.0, 0.0, 0.0, 0.0);   // Disable specular lighting
-
-    // OUT.m_diffuseColor.x=sin(currentTime); 
-    float3 color = float3(0.5, 0.5, 0.5);
-    OUT.m_diffuseColor = float4(color, 1.0);
-
-    return OUT;
+    return IN;
 }
