@@ -367,14 +367,35 @@
                 },
 
                 {
+                    "Name": "ExamplePass",
+                    "TemplateName": "ExamplePassTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputColor",
+                            "AttachmentRef": {
+                                "Pass": "PostProcessPass",
+                                "Attachment": "Output"
+                            }
+                        },
+                        {
+                            "LocalSlot": "OutputColor",
+                            "AttachmentRef": {
+                                "Pass": "PipelineGlobal",
+                                "Attachment": "PipelineOutput"
+                            }
+                        }
+                    ]
+
+                },
+                {
                     "Name": "CopyToSwapChain",
                     "TemplateName": "FullscreenCopyTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "Input",
                             "AttachmentRef": {
-                                "Pass": "PostProcessPass",
-                                "Attachment": "Output"
+                                "Pass": "ExamplePass",
+                                "Attachment": "OutputColor"
                             }
                         },
                         {

@@ -19,6 +19,10 @@
             {
                 "Name": "PipelineRenderToTextureROSDepth",
                 "Path": "Passes/PipelineRenderToTextureROSDepth.pass"
+            },
+            {
+                "Name": "ExamplePassTemplate",
+                "Path": "Passes/ShaderExample/ExampleEffect.pass"
             }
         ]
     }
