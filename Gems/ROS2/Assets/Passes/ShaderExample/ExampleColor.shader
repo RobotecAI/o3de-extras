@@ -1,5 +1,5 @@
 {
-    "Source" : "ExampleEffect.azsl",
+    "Source" : "ExampleColor.azsl",
  
     "DepthStencilState" : { 
         "Depth" : { "Enable" : false }

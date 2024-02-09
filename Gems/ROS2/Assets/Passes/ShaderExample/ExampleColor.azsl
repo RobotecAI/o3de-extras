@@ -1,8 +1,6 @@
 #pragma once
 
 #include <viewsrg.srgi>
-#include <Atom/Features/PBR/DefaultObjectSrg.azsli>
-#include <Atom/Features/Pipeline/Forward/ForwardPassOutput.azsli>
 #include <Atom/Features/SrgSemantics.azsli>
 
 #define THREADS 16

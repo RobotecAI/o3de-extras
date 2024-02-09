@@ -4,7 +4,7 @@
     "ClassName": "PassAsset",
     "ClassData": {
         "PassTemplate": {
-            "Name": "ExamplePassTemplate", // The name of our template
+            "Name": "ExampleColorPassTemplate", // The name of our template
             "PassClass": "ComputePass", // The pass class to use
             "Slots": [
                 {
@@ -54,7 +54,7 @@
             "PassData": {
                 "$type": "ComputePassData",
                 "ShaderAsset": {
-                    "FilePath": "Passes/ShaderExample/ExampleEffect.shader" // Our shader
+                    "FilePath": "Passes/ShaderExample/ExampleColor.shader" // Our shader
                 },
                 "Make Fullscreen Pass": true
             }
