@@ -7,10 +7,10 @@
 
    "ProgramSettings": {
         "EntryPoints": [
-            {
-                "name": "MainVS",
-                "type": "Vertex"
-            }
+        {
+            "name" : "MainCS",
+            "type" : "Compute"
+        }
         ]
     },
 

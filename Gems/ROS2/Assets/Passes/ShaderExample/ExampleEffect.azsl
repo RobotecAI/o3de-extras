@@ -5,27 +5,21 @@
 #include <Atom/Features/Pipeline/Forward/ForwardPassOutput.azsli>
 #include <Atom/Features/SrgSemantics.azsli>
 
-struct VertexShaderInput
+#define THREADS 16
+
+ShaderResourceGroup PassSRG : SRG_PerPass
 {
-    float3 m_position : POSITION;
+    Texture2D<float4> m_color;
+    RWTexture2D<float4> m_outputColor;
 };
 
-struct VertexShaderOutput
+[numthreads(THREADS, THREADS, 1)]
+void MainCS(uint3 dID: SV_DispatchThreadID)
 {
-    float4 m_position : SV_Position;
-};
+    uint2 targetPixel = dID.xy;
 
-VertexShaderOutput MainVS(VertexShaderInput IN)
-{
-    VertexShaderOutput OUT;
+    float4 color = PassSRG::m_color[targetPixel];
+    color.x = 1.0 - color.x;
 
-    float3 worldPosition = mul(ObjectSrg::GetWorldMatrix(), float4(IN.m_position, 1)).xyz;
-    OUT.m_position = mul(ViewSrg::m_viewProjectionMatrix, float4(worldPosition, 1.0));   
-  
-    return OUT;
-}
-
-ForwardPassOutput MainPS(ForwardPassOutput IN)
-{
-    return IN;
+    PassSRG::m_outputColor[targetPixel] = color;
 }

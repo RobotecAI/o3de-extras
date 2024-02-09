@@ -376,13 +376,6 @@
                                 "Pass": "PostProcessPass",
                                 "Attachment": "Output"
                             }
-                        },
-                        {
-                            "LocalSlot": "OutputColor",
-                            "AttachmentRef": {
-                                "Pass": "PipelineGlobal",
-                                "Attachment": "PipelineOutput"
-                            }
                         }
                     ]
 

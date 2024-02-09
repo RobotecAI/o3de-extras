@@ -5,24 +5,58 @@
     "ClassData": {
         "PassTemplate": {
             "Name": "ExamplePassTemplate", // The name of our template
-            "PassClass": "FullScreenTriangle", // The pass class to use
+            "PassClass": "ComputePass", // The pass class to use
             "Slots": [
                 {
                     "Name": "InputColor",
                     "SlotType": "Input",
+                    "ShaderInputName": "m_color",
                     "ScopeAttachmentUsage": "Shader"
                 },
                 {
                     "Name": "OutputColor",
                     "SlotType": "Output",
+                    "ShaderInputName": "m_outputColor",
                     "ScopeAttachmentUsage": "Shader"
                 }
             ],
+            "ImageAttachments": [
+                {
+                    "Name": "OutputColorAttachment",
+                    "Lifetime": "Transient",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "InputColor"
+                        }
+                    },
+                    "FormatSource": {
+                        "Pass": "This",
+                        "Attachment": "InputColor"
+                    },
+                    "ImageDescriptor": {
+                        "BindFlags": [
+                            "Color",
+                            "ShaderReadWrite"
+                        ]
+                    }
+                }
+            ],
+            "Connections": [
+                {
+                    "LocalSlot": "OutputColor",
+                    "AttachmentRef": {
+                        "Pass": "This",
+                        "Attachment": "OutputColorAttachment"
+                    }
+                }
+            ],
             "PassData": {
-                "$type": "FullscreenTrianglePassData",
+                "$type": "ComputePassData",
                 "ShaderAsset": {
                     "FilePath": "Passes/ShaderExample/ExampleEffect.shader" // Our shader
-                }
+                },
+                "Make Fullscreen Pass": true
             }
         }
     }
