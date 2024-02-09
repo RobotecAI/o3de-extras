@@ -1,0 +1,20 @@
+#pragma once
+
+#include <viewsrg.srgi>
+#include <Atom/Features/SrgSemantics.azsli>
+
+#define THREADS 16
+
+ShaderResourceGroup PassSRG : SRG_PerPass
+{
+    Texture2D<float> m_depth;
+    RWTexture2D<float> m_outputDepth;
+};
+
+[numthreads(THREADS, THREADS, 1)]
+void MainCS(uint3 dID: SV_DispatchThreadID)
+{
+    uint2 targetPixel = dID.xy;
+
+    PassSRG::m_outputDepth[targetPixel] = 1.0f;
+}

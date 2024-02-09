@@ -365,10 +365,9 @@
                         }
                     ]
                 },
-
                 {
                     "Name": "ExamplePass",
-                    "TemplateName": "ExamplePassTemplate",
+                    "TemplateName": "ExampleColorPassTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "InputColor",
@@ -378,7 +377,6 @@
                             }
                         }
                     ]
-
                 },
                 {
                     "Name": "CopyToSwapChain",

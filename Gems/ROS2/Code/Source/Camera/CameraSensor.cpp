@@ -255,49 +255,15 @@ namespace ROS2
     };
 
     CameraRGBDSensor::CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId)
-        : CameraColorSensor(cameraSensorDescription, entityId)
+        : CameraSensor(cameraSensorDescription, entityId)
+        , m_depthSensor(cameraSensorDescription, entityId)
+        , m_colorSensor(cameraSensorDescription, entityId)
     {
-    }
-
-    void CameraRGBDSensor::ReadBackDepth(AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback)
-    {
-        AZ::Render::FrameCaptureOutcome captureOutcome;
-        AZStd::vector<AZStd::string> passHierarchy{ m_pipelineName, "DepthPrePass" };
-        AZ::Render::FrameCaptureRequestBus::BroadcastResult(
-            captureOutcome,
-            &AZ::Render::FrameCaptureRequestBus::Events::CapturePassAttachmentWithCallback,
-            callback,
-            passHierarchy,
-            AZStd::string("DepthLinear"),
-            AZ::RPI::PassAttachmentReadbackOption::Output);
     }
 
     void CameraRGBDSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)
     {
-        auto imagePublisher = m_cameraPublishers.GetImagePublisher(CameraSensorDescription::CameraChannelType::DEPTH);
-        auto infoPublisher = m_cameraPublishers.GetInfoPublisher(CameraSensorDescription::CameraChannelType::DEPTH);
-        if (!imagePublisher || !infoPublisher)
-        {
-            AZ_Error("CameraRGBDSensor::RequestMessagePublication", false, "Missing publisher for the Camera sensor");
-            return;
-        }
-
-        auto infoMessage = Internal::CreateCameraInfoMessage(m_cameraSensorDescription, header);
-        // Process the Depth part.
-        ReadBackDepth(
-            [header, imagePublisher, infoPublisher, infoMessage, entityId = m_entityId](
-                const AZ::RPI::AttachmentReadback::ReadbackResult& result)
-            {
-                if (result.m_state != AZ::RPI::AttachmentReadback::ReadbackState::Success)
-                {
-                    return;
-                }
-                auto imageMessage = Internal::CreateImageMessageFromReadBackResult(entityId, result, header);
-                imagePublisher->publish(imageMessage);
-                infoPublisher->publish(infoMessage);
-            });
-
-        // Process the Color part.
-        CameraSensor::RequestMessagePublication(cameraPose, header);
+        m_depthSensor.RequestMessagePublication(cameraPose, header);
+        m_colorSensor.RequestMessagePublication(cameraPose, header);
     }
 } // namespace ROS2

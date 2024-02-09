@@ -90,7 +90,7 @@ namespace ROS2
     };
 
     //! Implementation of camera sensors that runs pipeline which produces color image and readbacks a depth image from pipeline
-    class CameraRGBDSensor : public CameraColorSensor
+    class CameraRGBDSensor : public CameraSensor
     {
     public:
         CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
@@ -99,6 +99,7 @@ namespace ROS2
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
     private:
-        void ReadBackDepth(AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback);
+        CameraDepthSensor m_depthSensor;
+        CameraColorSensor m_colorSensor;
     };
 } // namespace ROS2

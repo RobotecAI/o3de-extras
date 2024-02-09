@@ -23,6 +23,10 @@
             {
                 "Name": "ExampleColorPassTemplate",
                 "Path": "Passes/ShaderExample/ExampleColor.pass"
+            },
+            {
+                "Name": "ExampleDepthPassTemplate",
+                "Path": "Passes/ShaderExample/ExampleDepth.pass"
             }
         ]
     }

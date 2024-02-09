@@ -64,14 +64,27 @@
                     ]
                 },
                 {
+                    "Name": "ExamplePass",
+                    "TemplateName": "ExamplePassDepthTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepth",
+                            "AttachmentRef": {
+                                "Pass": "DepthPrePass",
+                                "Attachment": "DepthLinear"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "CopyToSwapChain",
                     "TemplateName": "FullscreenCopyTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "Input",
                             "AttachmentRef": {
-                                "Pass": "DepthPrePass",
-                                "Attachment": "DepthLinear"
+                                "Pass": "ExamplePass",
+                                "Attachment": "OutputDepth"
                             }
                         },
                         {

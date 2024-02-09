@@ -1,0 +1,63 @@
+{
+    "Type": "JsonSerialization",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "ExampleColorPassTemplate", // The name of our template
+            "PassClass": "ComputePass", // The pass class to use
+            "Slots": [
+                {
+                    "Name": "InputDepth",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_depth",
+                    "ScopeAttachmentUsage": "Shader"
+                },
+                {
+                    "Name": "OutputDepth",
+                    "SlotType": "Output",
+                    "ShaderInputName": "m_outputDepth",
+                    "ScopeAttachmentUsage": "Shader"
+                }
+            ],
+            "ImageAttachments": [
+                {
+                    "Name": "OutputDepthAttachment",
+                    "Lifetime": "Transient",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "InputDepth"
+                        }
+                    },
+                    "FormatSource": {
+                        "Pass": "This",
+                        "Attachment": "InputDepth"
+                    },
+                    "ImageDescriptor": {
+                        "BindFlags": [
+                            "DepthStencil",
+                            "ShaderReadWrite"
+                        ]
+                    }
+                }
+            ],
+            "Connections": [
+                {
+                    "LocalSlot": "OutputDepth",
+                    "AttachmentRef": {
+                        "Pass": "This",
+                        "Attachment": "OutputDepthAttachment"
+                    }
+                }
+            ],
+            "PassData": {
+                "$type": "ComputePassData",
+                "ShaderAsset": {
+                    "FilePath": "Passes/ShaderExample/ExampleDepth.shader" // Our shader
+                },
+                "Make Fullscreen Pass": true
+            }
+        }
+    }
+}
