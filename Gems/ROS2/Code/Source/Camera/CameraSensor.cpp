@@ -266,4 +266,14 @@ namespace ROS2
         m_depthSensor.RequestMessagePublication(cameraPose, header);
         m_colorSensor.RequestMessagePublication(cameraPose, header);
     }
+
+    AZStd::string CameraRGBDSensor::GetPipelineTemplateName() const
+    {
+        return "PipelineRenderToTextureROSColor";
+    };
+
+    CameraSensorDescription::CameraChannelType CameraRGBDSensor::GetChannelType() const
+    {
+        return CameraSensorDescription::CameraChannelType::RGB;
+    };
 } // namespace ROS2

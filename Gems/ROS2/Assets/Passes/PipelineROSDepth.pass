@@ -65,7 +65,7 @@
                 },
                 {
                     "Name": "ExamplePass",
-                    "TemplateName": "ExamplePassDepthTemplate",
+                    "TemplateName": "ExampleDepthPassTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "InputDepth",

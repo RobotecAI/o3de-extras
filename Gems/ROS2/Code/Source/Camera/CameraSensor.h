@@ -99,6 +99,10 @@ namespace ROS2
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
     private:
+        AZStd::string GetPipelineTemplateName() const override;
+        CameraSensorDescription::CameraChannelType GetChannelType() const override;
+
+    private:
         CameraDepthSensor m_depthSensor;
         CameraColorSensor m_colorSensor;
     };
