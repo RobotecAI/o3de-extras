@@ -26,6 +26,10 @@ namespace ROS2
     class CameraSensor
     {
     public:
+        static AZStd::string GetRequestName(int frameId, AZStd::string_view passName)
+        {
+            return AZStd::string::format("%d_%s", frameId, passName.data());
+        }
         //! Initializes rendering pipeline for the camera sensor.
         //! @param cameraSensorDescription - camera sensor description used to create camera pipeline.
         //! @param entityId - entityId for the owning sensor component.
@@ -42,6 +46,25 @@ namespace ROS2
         //! Get the camera sensor description
         [[nodiscard]] const CameraSensorDescription& GetCameraSensorDescription() const;
 
+        uint32_t& GetFrameIndex()
+        {
+            return m_frameIndex;
+        }
+
+        void ResetProcessing()
+        {
+            AZStd::lock_guard<AZStd::mutex> lock(m_activeRequestsMutex);
+            if (!m_activeRequests.empty())
+            {
+                AZ_Error("CameraSensor", false, "Resetting camera sensor with active requests");
+                for (const auto& request : m_activeRequests)
+                {
+                    AZ_Error("CameraSensor", false, " ->  %s", request.c_str());
+                }
+            }
+            m_activeRequests.clear();
+        }
+
     private:
         AZStd::vector<AZStd::string> m_passHierarchy;
         AZ::RPI::ViewPtr m_view;
@@ -53,11 +76,14 @@ namespace ROS2
             const = 0; //! Type of returned data eg Color, Depth, Optical flow
 
     protected:
+        void CheckIfAllRequestsAreFinished(const uint32_t userId, const AZStd::string& channelName);
         CameraSensorDescription m_cameraSensorDescription;
         CameraPublishers m_cameraPublishers;
         AZ::EntityId m_entityId;
         AZ::RPI::RenderPipelinePtr m_pipeline;
         AZStd::string m_pipelineName;
+        AZStd::shared_ptr<AZ::RPI::AttachmentReadback> m_readbackRGB;
+        uint32_t m_frameIndex = 0;
 
         //! Request a frame from the rendering pipeline
         //! @param cameraPose - current camera pose from which the rendering should take place
@@ -68,6 +94,8 @@ namespace ROS2
 
         //! Read and setup Atom Passes
         void SetupPasses();
+        AZStd::mutex m_activeRequestsMutex;
+        AZStd::set<AZStd::string> m_activeRequests;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces depth image
@@ -103,5 +131,6 @@ namespace ROS2
 
     private:
         void ReadBackDepth(AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback);
+        AZStd::shared_ptr<AZ::RPI::AttachmentReadback> m_readbackDepth;
     };
 } // namespace ROS2

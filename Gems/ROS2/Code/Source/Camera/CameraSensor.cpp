@@ -21,6 +21,8 @@
 #include <AzFramework/Scene/SceneSystemInterface.h>
 #include <PostProcess/PostProcessFeatureProcessor.h>
 
+#include <Atom/RPI.Public/Pass/PassFilter.h>
+#include <Atom/RPI.Public/Pass/PassSystemInterface.h>
 #include <sensor_msgs/distortion_models.hpp>
 
 namespace ROS2
@@ -122,6 +124,7 @@ namespace ROS2
 
     void CameraSensor::SetupPasses()
     {
+        m_readbackRGB = AZStd::make_shared<AZ::RPI::AttachmentReadback>(AZ::RHI::ScopeId{ "AttachmentReadback" });
         AZ_TracePrintf("CameraSensor", "Initializing pipeline for %s\n", m_cameraSensorDescription.m_cameraName.c_str());
 
         const AZ::Name viewName = AZ::Name("MainCamera");
@@ -187,22 +190,19 @@ namespace ROS2
         const AZ::Transform inverse = (cameraPose * AtomToRos).GetInverse();
         m_view->SetWorldToViewMatrix(AZ::Matrix4x4::CreateFromQuaternionAndTranslation(inverse.GetRotation(), inverse.GetTranslation()));
 
-        AZ::Render::FrameCaptureOutcome captureOutcome;
-
         m_pipeline->AddToRenderTickOnce();
-        AZ::Render::FrameCaptureRequestBus::BroadcastResult(
-            captureOutcome,
-            &AZ::Render::FrameCaptureRequestBus::Events::CapturePassAttachmentWithCallback,
-            callback,
-            m_passHierarchy,
-            AZStd::string("Output"),
-            AZ::RPI::PassAttachmentReadbackOption::Output);
 
-        AZ_Error(
-            "CameraSensor",
-            captureOutcome.IsSuccess(),
-            "Frame capture initialization failed. %s",
-            captureOutcome.GetError().m_errorMessage.c_str());
+        AZ::RPI::PassFilter passFilter = AZ::RPI::PassFilter::CreateWithPassHierarchy(m_passHierarchy);
+        AZ::RPI::Pass* pass = AZ::RPI::PassSystemInterface::Get()->FindFirstPass(passFilter);
+        AZ_Assert(pass, "Pass not found in the pass hierarchy");
+        m_readbackRGB->SetCallback(callback);
+        m_readbackRGB->SetUserIdentifier(m_frameIndex);
+        AZStd::unique_lock<AZStd::mutex> lock(m_activeRequestsMutex);
+
+        m_activeRequests.clear();
+        m_activeRequests.insert(GetRequestName(m_frameIndex, "Color"));
+        bool isOk = pass->ReadbackAttachment(m_readbackRGB, 0, AZ::Name("Output"), AZ::RPI::PassAttachmentReadbackOption::Output);
+        AZ_Error("CameraSensor", isOk, "Frame capture initialization failed.");
     }
 
     const CameraSensorDescription& CameraSensor::GetCameraSensorDescription() const
@@ -210,6 +210,18 @@ namespace ROS2
         return m_cameraSensorDescription;
     }
 
+    void CameraSensor::CheckIfAllRequestsAreFinished(const uint32_t userId, const AZStd::string& channelName)
+    {
+        const AZStd::string requestName = CameraSensor::GetRequestName(userId, channelName);
+        AZ_Printf("CameraSensor", "Processing frame  %s\n", requestName.c_str());
+
+        AZStd::unique_lock<AZStd::mutex> lock(m_activeRequestsMutex);
+        m_activeRequests.erase(requestName);
+        if (m_activeRequests.empty())
+        {
+            AZ_Printf("CameraSensor", "All requests are done for frame %d\n", userId);
+        }
+    }
     void CameraSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)
     {
         auto imagePublisher = m_cameraPublishers.GetImagePublisher(GetChannelType());
@@ -223,7 +235,7 @@ namespace ROS2
         auto infoMessage = Internal::CreateCameraInfoMessage(m_cameraSensorDescription, header);
         RequestFrame(
             cameraPose,
-            [header, imagePublisher, infoPublisher, infoMessage, entityId = m_entityId](
+            [this, header, imagePublisher, infoPublisher, infoMessage, entityId = m_entityId](
                 const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
                 if (result.m_state != AZ::RPI::AttachmentReadback::ReadbackState::Success)
@@ -234,6 +246,7 @@ namespace ROS2
                 auto imageMessage = Internal::CreateImageMessageFromReadBackResult(entityId, result, header);
                 imagePublisher->publish(imageMessage);
                 infoPublisher->publish(infoMessage);
+                CheckIfAllRequestsAreFinished(result.m_userIdentifier, "Color");
             });
     }
 
@@ -272,19 +285,21 @@ namespace ROS2
     CameraRGBDSensor::CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId)
         : CameraColorSensor(cameraSensorDescription, entityId)
     {
+        m_readbackDepth = AZStd::make_shared<AZ::RPI::AttachmentReadback>(AZ::RHI::ScopeId{ "DepthReadback" });
     }
 
     void CameraRGBDSensor::ReadBackDepth(AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback)
     {
-        AZ::Render::FrameCaptureOutcome captureOutcome;
-        AZStd::vector<AZStd::string> passHierarchy{ m_pipelineName, "DepthPrePass" };
-        AZ::Render::FrameCaptureRequestBus::BroadcastResult(
-            captureOutcome,
-            &AZ::Render::FrameCaptureRequestBus::Events::CapturePassAttachmentWithCallback,
-            callback,
-            passHierarchy,
-            AZStd::string("DepthLinear"),
-            AZ::RPI::PassAttachmentReadbackOption::Output);
+        const AZStd::vector<AZStd::string> passHierarchy{ m_pipelineName, "DepthPrePass" };
+        AZ::RPI::PassFilter passFilter = AZ::RPI::PassFilter::CreateWithPassHierarchy(passHierarchy);
+        AZ::RPI::Pass* pass = AZ::RPI::PassSystemInterface::Get()->FindFirstPass(passFilter);
+        AZ_Assert(pass, "Pass not found in the pass hierarchy");
+        m_readbackDepth->SetCallback(callback);
+        m_readbackDepth->SetUserIdentifier(m_frameIndex);
+        AZStd::unique_lock<AZStd::mutex> lock(m_activeRequestsMutex);
+        m_activeRequests.insert(GetRequestName(m_frameIndex, "Depth"));
+        bool isOk = pass->ReadbackAttachment(m_readbackDepth, 0, AZ::Name("DepthLinear"), AZ::RPI::PassAttachmentReadbackOption::Output);
+        AZ_Error("CameraSensor", isOk, "Frame capture initialization failed.");
     }
 
     void CameraRGBDSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)
@@ -300,7 +315,7 @@ namespace ROS2
         auto infoMessage = Internal::CreateCameraInfoMessage(m_cameraSensorDescription, header);
         // Process the Depth part.
         ReadBackDepth(
-            [header, imagePublisher, infoPublisher, infoMessage, entityId = m_entityId](
+            [this, header, imagePublisher, infoPublisher, infoMessage, entityId = m_entityId](
                 const AZ::RPI::AttachmentReadback::ReadbackResult& result)
             {
                 if (result.m_state != AZ::RPI::AttachmentReadback::ReadbackState::Success)
@@ -310,6 +325,7 @@ namespace ROS2
                 auto imageMessage = Internal::CreateImageMessageFromReadBackResult(entityId, result, header);
                 imagePublisher->publish(imageMessage);
                 infoPublisher->publish(infoMessage);
+                CheckIfAllRequestsAreFinished(result.m_userIdentifier, "Depth");
             });
 
         // Process the Color part.

@@ -119,6 +119,8 @@ namespace ROS2
         std_msgs::msg::Header messageHeader;
         messageHeader.stamp = timestamp;
         messageHeader.frame_id = m_frameName.c_str();
+        m_cameraSensor->ResetProcessing();
+        m_cameraSensor->GetFrameIndex()++;
         m_cameraSensor->RequestMessagePublication(transform, messageHeader);
     }
 

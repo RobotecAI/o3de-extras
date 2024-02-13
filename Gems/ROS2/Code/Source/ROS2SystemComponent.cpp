@@ -28,7 +28,7 @@
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzCore/std/string/string_view.h>
 #include <AzFramework/API/ApplicationAPI.h>
-
+#include <Source/System/PhysXSystem.h>
 namespace ROS2
 {
     constexpr AZStd::string_view EnablePhysicsSteadyClockConfigurationKey = "/O3DE/ROS2/SteadyClock";
@@ -100,12 +100,13 @@ namespace ROS2
     void ROS2SystemComponent::Init()
     {
         rclcpp::init(0, 0);
-        
-        // handle signals, e.g. via `Ctrl+C` hotkey or `kill` command 
-        auto handler = [](int sig){
+
+        // handle signals, e.g. via `Ctrl+C` hotkey or `kill` command
+        auto handler = [](int sig)
+        {
             rclcpp::shutdown(); // shutdown rclcpp
             std::raise(sig); // shutdown o3de
-            };
+        };
         signal(SIGINT, handler);
         signal(SIGTERM, handler);
     }
