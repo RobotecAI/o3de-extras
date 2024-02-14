@@ -375,6 +375,13 @@
                                 "Pass": "PostProcessPass",
                                 "Attachment": "Output"
                             }
+                        },
+                        {
+                            "LocalSlot": "InputDepth",
+                            "AttachmentRef": {
+                                "Pass": "DepthPrePass",
+                                "Attachment": "DepthLinear"
+                            }
                         }
                     ]
                 },
@@ -386,7 +393,7 @@
                             "LocalSlot": "Input",
                             "AttachmentRef": {
                                 "Pass": "ExamplePass",
-                                "Attachment": "OutputColor"
+                                "Attachment": "Output"
                             }
                         },
                         {

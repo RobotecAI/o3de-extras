@@ -84,7 +84,7 @@
                             "LocalSlot": "Input",
                             "AttachmentRef": {
                                 "Pass": "ExamplePass",
-                                "Attachment": "OutputDepth"
+                                "Attachment": "Output"
                             }
                         },
                         {

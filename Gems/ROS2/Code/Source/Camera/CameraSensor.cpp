@@ -139,8 +139,7 @@ namespace ROS2
 
         m_scene->AddRenderPipeline(m_pipeline);
 
-        m_passHierarchy.push_back(m_pipelineName);
-        m_passHierarchy.push_back("CopyToSwapChain");
+        m_passHierarchy = { m_pipelineName };
 
         m_pipeline->SetDefaultView(m_view);
         const AZ::RPI::ViewPtr targetView = m_scene->GetDefaultRenderPipeline()->GetDefaultView();
@@ -188,11 +187,6 @@ namespace ROS2
             captureOutcome.IsSuccess(),
             "Frame capture initialization failed. %s",
             captureOutcome.GetError().m_errorMessage.c_str());
-    }
-
-    const CameraSensorDescription& CameraSensor::GetCameraSensorDescription() const
-    {
-        return m_cameraSensorDescription;
     }
 
     void CameraSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)

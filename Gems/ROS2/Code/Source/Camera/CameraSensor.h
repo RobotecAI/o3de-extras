@@ -36,9 +36,6 @@ namespace ROS2
         //! @param header - header with filled message information (frame, timestamp, seq)
         virtual void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header);
 
-        //! Get the camera sensor description
-        [[nodiscard]] const CameraSensorDescription& GetCameraSensorDescription() const;
-
     private:
         AZStd::vector<AZStd::string> m_passHierarchy;
         AZ::RPI::ViewPtr m_view;
