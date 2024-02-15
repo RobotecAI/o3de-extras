@@ -7,12 +7,12 @@
  */
 #pragma once
 
+#include "AzCore/Component/EntityId.h"
 #include "CameraSensorConfiguration.h"
-#include <ROS2/Sensor/SensorConfiguration.h>
-
 #include <AzCore/Math/Matrix4x4.h>
 #include <AzCore/std/containers/array.h>
 #include <AzCore/std/string/string.h>
+#include <ROS2/Sensor/SensorConfiguration.h>
 
 namespace ROS2
 {
@@ -27,20 +27,15 @@ namespace ROS2
         };
 
         //! Constructor to create the description
-        //! @param cameraName - name of the camera; used to differentiate cameras in a multi-camera setup.
-        //! @param effectiveNamespace - namespace for camera frames and topics.
+        //! @param entityId - entityId for the owning sensor component.
         //! @param configuration - configuration structure for the camera, defining its characteristics.
         //! @param sensorConfiguration - generic configuration for this sensor.
         CameraSensorDescription(
-            const AZStd::string& cameraName,
-            const AZStd::string& effectiveNamespace,
-            const CameraSensorConfiguration& configuration,
-            const SensorConfiguration& sensorConfiguration);
+            const AZ::EntityId& entityId, const CameraSensorConfiguration& configuration, const SensorConfiguration& sensorConfiguration);
 
         const CameraSensorConfiguration m_cameraConfiguration; //!< Configuration of the camera.
         const SensorConfiguration m_sensorConfiguration; //!< Generic sensor configuration.
-        const AZStd::string m_cameraName; //!< Camera name to differentiate cameras in a multi-camera setup.
-        const AZStd::string m_cameraNamespace; //!< Effective camera namespace for frames and topics.
+        const AZ::EntityId m_entityId;
 
         const AZ::Matrix4x4 m_viewToClipMatrix; //!< Camera view to clip space transform matrix; derived from other parameters.
         const AZ::Matrix3x3 m_cameraIntrinsics; //!< Camera intrinsics; derived from other parameters.

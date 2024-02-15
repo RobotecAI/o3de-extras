@@ -7,8 +7,13 @@
  */
 #pragma once
 
+#include "Atom/RPI.Public/Pass/AttachmentReadback.h"
+#include "AzCore/Component/EntityId.h"
+#include "Camera/CameraSensorDescription.h"
 #include "CameraPublishers.h"
 #include <Atom/Feature/Utils/FrameCaptureBus.h>
+#include <Atom/RPI.Public/Pass/AttachmentReadback.h>
+#include <Atom/RPI.Reflect/System/RenderPipelineDescriptor.h>
 #include <AzCore/std/containers/span.h>
 #include <ROS2/ROS2GemUtilities.h>
 #include <rclcpp/publisher.hpp>
@@ -18,89 +23,89 @@
 
 namespace ROS2
 {
-    //! Class to create camera sensor using Atom renderer
-    //! It creates dedicated rendering pipeline for each camera
     class CameraSensor
     {
     public:
-        //! Initializes rendering pipeline for the camera sensor.
-        //! @param cameraSensorDescription - camera sensor description used to create camera pipeline.
-        //! @param entityId - entityId for the owning sensor component.
-        CameraSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
-
-        //! Deinitializes rendering pipeline for the camera sensor
-        virtual ~CameraSensor();
+        CameraSensor() = default;
+        virtual ~CameraSensor() = default;
 
         //! Publish Image Message frame from rendering pipeline
         //! @param cameraPose - current camera pose from which the rendering should take place
         //! @param header - header with filled message information (frame, timestamp, seq)
-        virtual void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header);
+        virtual void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) = 0;
+    };
 
-    private:
-        AZStd::vector<AZStd::string> m_passHierarchy;
-        AZ::RPI::ViewPtr m_view;
-        AZ::RPI::Scene* m_scene = nullptr;
-        const AZ::Transform AtomToRos{ AZ::Transform::CreateFromQuaternion(
-            AZ::Quaternion::CreateFromMatrix3x3(AZ::Matrix3x3::CreateFromRows({ 1, 0, 0 }, { 0, -1, 0 }, { 0, 0, -1 }))) };
-        virtual AZStd::string GetPipelineTemplateName() const = 0; //! Returns name of pass template to use in pipeline
-        virtual CameraSensorDescription::CameraChannelType GetChannelType()
-            const = 0; //! Type of returned data eg Color, Depth, Optical flow
+    //! Class to create camera sensor using Atom renderer
+    //! It creates dedicated rendering pipeline for each camera
+    class CameraSensorInternal
+    {
+    public:
+        using AttachmentReadbackCallback = AZ::RPI::AttachmentReadback::CallbackFunction;
 
-    protected:
-        CameraSensorDescription m_cameraSensorDescription;
-        CameraPublishers m_cameraPublishers;
-        AZ::EntityId m_entityId;
-        AZ::RPI::RenderPipelinePtr m_pipeline;
-        AZStd::string m_pipelineName;
+        //! Initializes rendering pipeline for the camera sensor.
+        //! @param cameraSensorDescription - camera sensor description used to create camera pipeline.
+        //! @param entityId - entityId for the owning sensor component.
+        CameraSensorInternal(const CameraSensorDescription& cameraSensorDescription);
 
-        //! Request a frame from the rendering pipeline
-        //! @param cameraPose - current camera pose from which the rendering should take place
-        //! @param callback - callback function object that will be called when capture is ready.
-        //!                   It's argument is readback structure containing, among other things, a captured image
-        void RequestFrame(
-            const AZ::Transform& cameraPose, AZStd::function<void(const AZ::RPI::AttachmentReadback::ReadbackResult& result)> callback);
+        //! Deinitializes rendering pipeline for the camera sensor
+        virtual ~CameraSensorInternal();
+
+        // void RequestFrameForChannel(const std_msgs::msg::Header& header, CameraSensorDescription::CameraChannelType channelType);
+        void RequestColorFrame(const std_msgs::msg::Header& header);
+        void RequestDepthFrame(const std_msgs::msg::Header& header);
+
+        void RenderFrame(const AZ::Transform& cameraPose);
 
         //! Read and setup Atom Passes
-        void SetupPasses();
+        void SetupPasses(const AZ::RPI::RenderPipelineDescriptor& pipelineDesc);
+
+    private:
+        AttachmentReadbackCallback CreateAttachmentReadbackCallback(
+            const std_msgs::msg::Header& header, CameraSensorDescription::CameraChannelType channelType);
+
+    private:
+        AZ::RPI::ViewPtr m_view;
+        AZ::RPI::Scene* m_scene = nullptr;
+        AZStd::string m_pipelineName;
+
+        CameraSensorDescription m_cameraSensorDescription;
+        CameraPublishers m_cameraPublishers;
+        AZ::RPI::RenderPipelinePtr m_pipeline;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces depth image
     class CameraDepthSensor : public CameraSensor
     {
     public:
-        CameraDepthSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
+        CameraDepthSensor(const CameraSensorDescription& cameraSensorDescription);
+
+        void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
     private:
-        AZStd::string GetPipelineTemplateName() const override;
-        CameraSensorDescription::CameraChannelType GetChannelType() const override;
+        CameraSensorInternal m_cameraSensorInternal;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces color image
     class CameraColorSensor : public CameraSensor
     {
     public:
-        CameraColorSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
+        CameraColorSensor(const CameraSensorDescription& cameraSensorDescription);
+
+        void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
     private:
-        AZStd::string GetPipelineTemplateName() const override;
-        CameraSensorDescription::CameraChannelType GetChannelType() const override;
+        CameraSensorInternal m_cameraSensorInternal;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces color image and readbacks a depth image from pipeline
     class CameraRGBDSensor : public CameraSensor
     {
     public:
-        CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription, const AZ::EntityId& entityId);
+        CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription);
 
-        // CameraSensor overrides
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
     private:
-        AZStd::string GetPipelineTemplateName() const override;
-        CameraSensorDescription::CameraChannelType GetChannelType() const override;
-
-    private:
-        CameraDepthSensor m_depthSensor;
-        CameraColorSensor m_colorSensor;
+        CameraSensorInternal m_cameraSensorInternal;
     };
 } // namespace ROS2

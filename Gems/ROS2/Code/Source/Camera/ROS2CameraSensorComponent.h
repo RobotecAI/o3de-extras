@@ -61,9 +61,8 @@ namespace ROS2
         template<typename CameraType>
         void SetImageSource()
         {
-            const auto cameraName = GetCameraNameFromFrame(GetEntity());
-            const CameraSensorDescription description{ cameraName, GetNamespace(), m_cameraConfiguration, m_sensorConfiguration };
-            m_cameraSensor = AZStd::make_shared<CameraType>(description, GetEntityId());
+            const CameraSensorDescription description{ GetEntityId(), m_cameraConfiguration, m_sensorConfiguration };
+            m_cameraSensor = AZStd::make_shared<CameraType>(description);
         }
         //! Retrieve camera name from ROS2FrameComponent's FrameID.
         //! @param entity pointer entity that has ROS2FrameComponent.

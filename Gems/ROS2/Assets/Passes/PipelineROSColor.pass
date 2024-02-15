@@ -366,33 +366,13 @@
                     ]
                 },
                 {
-                    "Name": "ExamplePass",
-                    "TemplateName": "ExampleColorPassTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "InputColor",
-                            "AttachmentRef": {
-                                "Pass": "PostProcessPass",
-                                "Attachment": "Output"
-                            }
-                        },
-                        {
-                            "LocalSlot": "InputDepth",
-                            "AttachmentRef": {
-                                "Pass": "DepthPrePass",
-                                "Attachment": "DepthLinear"
-                            }
-                        }
-                    ]
-                },
-                {
                     "Name": "CopyToSwapChain",
                     "TemplateName": "FullscreenCopyTemplate",
                     "Connections": [
                         {
                             "LocalSlot": "Input",
                             "AttachmentRef": {
-                                "Pass": "ExamplePass",
+                                "Pass": "PostProcessPass",
                                 "Attachment": "Output"
                             }
                         },

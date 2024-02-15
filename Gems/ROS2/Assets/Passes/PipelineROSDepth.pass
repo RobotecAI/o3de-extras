@@ -62,39 +62,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "Name": "ExamplePass",
-                    "TemplateName": "ExampleDepthPassTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "InputDepth",
-                            "AttachmentRef": {
-                                "Pass": "DepthPrePass",
-                                "Attachment": "DepthLinear"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "Name": "CopyToSwapChain",
-                    "TemplateName": "FullscreenCopyTemplate",
-                    "Connections": [
-                        {
-                            "LocalSlot": "Input",
-                            "AttachmentRef": {
-                                "Pass": "ExamplePass",
-                                "Attachment": "Output"
-                            }
-                        },
-                        {
-                            "LocalSlot": "Output",
-                            "AttachmentRef": {
-                                "Pass": "PipelineGlobal",
-                                "Attachment": "PipelineOutput"
-                            }
-                        }
-                    ]
                 }
             ]
         }
