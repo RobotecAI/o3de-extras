@@ -7,18 +7,13 @@
  */
 #pragma once
 
-#include "Atom/RPI.Public/Pass/AttachmentReadback.h"
 #include "AzCore/Component/EntityId.h"
-#include "Camera/CameraSensorDescription.h"
-#include "CameraPublishers.h"
+#include "Camera/CameraPublishers.h"
 #include <Atom/Feature/Utils/FrameCaptureBus.h>
 #include <Atom/RPI.Public/Pass/AttachmentReadback.h>
 #include <Atom/RPI.Reflect/System/RenderPipelineDescriptor.h>
 #include <AzCore/std/containers/span.h>
 #include <ROS2/ROS2GemUtilities.h>
-#include <rclcpp/publisher.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
 #include <std_msgs/msg/header.hpp>
 
 namespace ROS2
@@ -45,7 +40,7 @@ namespace ROS2
         //! Initializes rendering pipeline for the camera sensor.
         //! @param cameraSensorDescription - camera sensor description used to create camera pipeline.
         //! @param entityId - entityId for the owning sensor component.
-        CameraSensorInternal(const CameraSensorDescription& cameraSensorDescription);
+        explicit CameraSensorInternal(AZ::EntityId entityId);
 
         //! Deinitializes rendering pipeline for the camera sensor
         virtual ~CameraSensorInternal();
@@ -61,23 +56,22 @@ namespace ROS2
 
     private:
         AttachmentReadbackCallback CreateAttachmentReadbackCallback(
-            const std_msgs::msg::Header& header, CameraSensorDescription::CameraChannelType channelType);
+            const std_msgs::msg::Header& header, CameraPublishers::CameraChannelType channelType);
 
-    private:
         AZ::RPI::ViewPtr m_view;
         AZ::RPI::Scene* m_scene = nullptr;
         AZStd::string m_pipelineName;
 
-        CameraSensorDescription m_cameraSensorDescription;
         CameraPublishers m_cameraPublishers;
         AZ::RPI::RenderPipelinePtr m_pipeline;
+        AZ::EntityId m_entityId;
     };
 
     //! Implementation of camera sensors that runs pipeline which produces depth image
     class CameraDepthSensor : public CameraSensor
     {
     public:
-        CameraDepthSensor(const CameraSensorDescription& cameraSensorDescription);
+        explicit CameraDepthSensor(AZ::EntityId entityId);
 
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
@@ -89,7 +83,7 @@ namespace ROS2
     class CameraColorSensor : public CameraSensor
     {
     public:
-        CameraColorSensor(const CameraSensorDescription& cameraSensorDescription);
+        explicit CameraColorSensor(AZ::EntityId entityId);
 
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 
@@ -101,7 +95,7 @@ namespace ROS2
     class CameraRGBDSensor : public CameraSensor
     {
     public:
-        CameraRGBDSensor(const CameraSensorDescription& cameraSensorDescription);
+        explicit CameraRGBDSensor(AZ::EntityId entityId);
 
         void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) override;
 

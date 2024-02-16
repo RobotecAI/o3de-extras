@@ -10,7 +10,8 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Interface/Interface.h>
-#include <AzCore/Math/Matrix4x4.h>
+#include <AzCore/Math/Matrix3x3.h>
+#include <ROS2/Camera/CameraSensorConfiguration.h>
 
 namespace ROS2
 {
@@ -28,16 +29,26 @@ namespace ROS2
         //! where:
         //!  - fx, fy : the focal lengths in meters
         //!  - cx, cy : principal point in pixels.
-        virtual AZ::Matrix3x3 GetCameraMatrix() const = 0;
+        [[nodiscard]] virtual AZ::Matrix3x3 GetCameraMatrix() const = 0;
 
         //! Returns the width of the camera sensor in pixels
-        virtual int GetWidth() const = 0;
+        [[nodiscard]] virtual int GetWidth() const = 0;
 
         //! Returns the height of the camera sensor in pixels
-        virtual int GetHeight() const = 0;
+        [[nodiscard]] virtual int GetHeight() const = 0;
 
         //! Returns the vertical field of view of the camera in degrees
-        virtual float GetVerticalFOV() const = 0;
+        [[nodiscard]] virtual float GetVerticalFOV() const = 0;
+
+        [[nodiscard]] virtual bool IsColorCameraEnabled() const = 0;
+
+        [[nodiscard]] virtual bool IsDepthCameraEnabled() const = 0;
+
+        [[nodiscard]] virtual float GetNearClipDistance() const = 0;
+
+        [[nodiscard]] virtual float GetFarClipDistance() const = 0;
+
+        [[nodiscard]] virtual CameraSensorConfiguration GetCameraSensorConfiguration() const = 0;
     };
 
     using CameraCalibrationRequestBus = AZ::EBus<CameraCalibrationRequest>;

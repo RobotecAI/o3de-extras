@@ -7,9 +7,14 @@
  */
 
 #include "CameraPublishers.h"
+#include "AzCore/Component/EntityId.h"
+#include "Camera/ROS2CameraSensorComponent.h"
 #include "CameraConstants.h"
 #include "CameraSensor.h"
+#include <AzCore/Component/Entity.h>
+#include <ROS2/Camera/CameraCalibrationRequestBus.h>
 #include <ROS2/Communication/TopicConfiguration.h>
+#include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/Sensor/SensorConfiguration.h>
 #include <ROS2/Utilities/ROS2Names.h>
@@ -18,7 +23,7 @@ namespace ROS2
 {
     namespace Internal
     {
-        using TopicConfigurations = AZStd::unordered_map<CameraSensorDescription::CameraChannelType, TopicConfiguration>;
+        using TopicConfigurations = AZStd::unordered_map<CameraPublishers::CameraChannelType, TopicConfiguration>;
 
         TopicConfiguration GetTopicConfiguration(const SensorConfiguration& sensorConfiguration, const AZStd::string& key)
         {
@@ -28,44 +33,36 @@ namespace ROS2
         }
 
         template<typename CameraType>
-        TopicConfigurations GetCameraTopicConfiguration([[maybe_unused]] const SensorConfiguration& sensorConfiguration)
-        {
-            AZ_Error("GetCameraTopicConfiguration", false, "Invalid camera template type!");
-            return TopicConfigurations();
-        }
+        TopicConfigurations GetCameraTopicConfiguration([[maybe_unused]] const SensorConfiguration& sensorConfiguration);
 
         template<typename CameraType>
-        TopicConfigurations GetCameraInfoTopicConfiguration([[maybe_unused]] const SensorConfiguration& sensorConfiguration)
-        {
-            AZ_Error("GetCameraInfoTopicConfiguration", false, "Invalid camera template type!");
-            return TopicConfigurations();
-        }
+        TopicConfigurations GetCameraInfoTopicConfiguration([[maybe_unused]] const SensorConfiguration& sensorConfiguration);
 
         template<>
         TopicConfigurations GetCameraTopicConfiguration<CameraColorSensor>(const SensorConfiguration& sensorConfiguration)
         {
-            return { { CameraSensorDescription::CameraChannelType::RGB,
+            return { { CameraPublishers::CameraChannelType::RGB,
                        GetTopicConfiguration(sensorConfiguration, CameraConstants::ColorImageConfig) } };
         }
 
         template<>
         TopicConfigurations GetCameraInfoTopicConfiguration<CameraColorSensor>(const SensorConfiguration& sensorConfiguration)
         {
-            return { { CameraSensorDescription::CameraChannelType::RGB,
+            return { { CameraPublishers::CameraChannelType::RGB,
                        GetTopicConfiguration(sensorConfiguration, CameraConstants::ColorInfoConfig) } };
         }
 
         template<>
         TopicConfigurations GetCameraTopicConfiguration<CameraDepthSensor>(const SensorConfiguration& sensorConfiguration)
         {
-            return { { CameraSensorDescription::CameraChannelType::DEPTH,
+            return { { CameraPublishers::CameraChannelType::DEPTH,
                        GetTopicConfiguration(sensorConfiguration, CameraConstants::DepthImageConfig) } };
         }
 
         template<>
         TopicConfigurations GetCameraInfoTopicConfiguration<CameraDepthSensor>(const SensorConfiguration& sensorConfiguration)
         {
-            return { { CameraSensorDescription::CameraChannelType::DEPTH,
+            return { { CameraPublishers::CameraChannelType::DEPTH,
                        GetTopicConfiguration(sensorConfiguration, CameraConstants::DepthInfoConfig) } };
         }
 
@@ -73,8 +70,8 @@ namespace ROS2
         template<typename PublishedData>
         void AddPublishersFromConfiguration(
             const AZStd::string& cameraNamespace,
-            const TopicConfigurations configurations,
-            AZStd::unordered_map<CameraSensorDescription::CameraChannelType, std::shared_ptr<rclcpp::Publisher<PublishedData>>>& publishers)
+            const TopicConfigurations& configurations,
+            AZStd::unordered_map<CameraPublishers::CameraChannelType, std::shared_ptr<rclcpp::Publisher<PublishedData>>>& publishers)
         {
             for (const auto& [channel, configuration] : configurations)
             {
@@ -92,37 +89,47 @@ namespace ROS2
         //! @param infoPublishers publishers of camera_info messages for each image topic.
         template<typename CameraType>
         void AddCameraPublishers(
-            const CameraSensorDescription& cameraDescription,
-            AZStd::unordered_map<CameraSensorDescription::CameraChannelType, CameraPublishers::ImagePublisherPtrType>& imagePublishers,
-            AZStd::unordered_map<CameraSensorDescription::CameraChannelType, CameraPublishers::CameraInfoPublisherPtrType>& infoPublishers)
+            const AZ::EntityId& entityId,
+            AZStd::unordered_map<CameraPublishers::CameraChannelType, CameraPublishers::ImagePublisherPtrType>& imagePublishers,
+            AZStd::unordered_map<CameraPublishers::CameraChannelType, CameraPublishers::CameraInfoPublisherPtrType>& infoPublishers)
         {
-            const auto cameraImagePublisherConfigs = GetCameraTopicConfiguration<CameraType>(cameraDescription.m_sensorConfiguration);
-            AddPublishersFromConfiguration(cameraDescription.m_cameraNamespace, cameraImagePublisherConfigs, imagePublishers);
-            const auto cameraInfoPublisherConfigs = GetCameraInfoTopicConfiguration<CameraType>(cameraDescription.m_sensorConfiguration);
-            AddPublishersFromConfiguration(cameraDescription.m_cameraNamespace, cameraInfoPublisherConfigs, infoPublishers);
+            AZ::Entity* entity = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->FindEntity(entityId);
+            auto sensorConfiguration = entity->FindComponent<ROS2CameraSensorComponent>()->GetSensorConfiguration();
+
+            auto* frame = entity->FindComponent<ROS2FrameComponent>();
+            auto ros2Namespace = frame->GetNamespace();
+            const auto cameraImagePublisherConfigs = GetCameraTopicConfiguration<CameraType>(sensorConfiguration);
+            AddPublishersFromConfiguration(ros2Namespace, cameraImagePublisherConfigs, imagePublishers);
+            const auto cameraInfoPublisherConfigs = GetCameraInfoTopicConfiguration<CameraType>(sensorConfiguration);
+            AddPublishersFromConfiguration(ros2Namespace, cameraInfoPublisherConfigs, infoPublishers);
         }
     } // namespace Internal
 
-    CameraPublishers::CameraPublishers(const CameraSensorDescription& cameraDescription)
+    CameraPublishers::CameraPublishers(AZ::EntityId entityId)
     {
-        if (cameraDescription.m_cameraConfiguration.m_colorCamera)
+        bool colorCamera = false;
+        bool depthCamera = false;
+        CameraCalibrationRequestBus::EventResult(colorCamera, entityId, &CameraCalibrationRequest::IsColorCameraEnabled);
+        CameraCalibrationRequestBus::EventResult(depthCamera, entityId, &CameraCalibrationRequest::IsDepthCameraEnabled);
+
+        if (colorCamera)
         {
-            Internal::AddCameraPublishers<CameraColorSensor>(cameraDescription, m_imagePublishers, m_infoPublishers);
+            Internal::AddCameraPublishers<CameraColorSensor>(entityId, m_imagePublishers, m_infoPublishers);
         }
 
-        if (cameraDescription.m_cameraConfiguration.m_depthCamera)
+        if (depthCamera)
         {
-            Internal::AddCameraPublishers<CameraDepthSensor>(cameraDescription, m_imagePublishers, m_infoPublishers);
+            Internal::AddCameraPublishers<CameraDepthSensor>(entityId, m_imagePublishers, m_infoPublishers);
         }
     }
 
-    CameraPublishers::ImagePublisherPtrType CameraPublishers::GetImagePublisher(CameraSensorDescription::CameraChannelType type)
+    CameraPublishers::ImagePublisherPtrType CameraPublishers::GetImagePublisher(CameraChannelType type)
     {
         AZ_Error("GetImagePublisher", m_imagePublishers.count(type) == 1, "No publisher of this type, logic error!");
         return m_imagePublishers.at(type);
     }
 
-    CameraPublishers::CameraInfoPublisherPtrType CameraPublishers::GetInfoPublisher(CameraSensorDescription::CameraChannelType type)
+    CameraPublishers::CameraInfoPublisherPtrType CameraPublishers::GetInfoPublisher(CameraChannelType type)
     {
         AZ_Error("GetInfoPublisher", m_infoPublishers.count(type) == 1, "No publisher of this type, logic error!");
         return m_infoPublishers.at(type);

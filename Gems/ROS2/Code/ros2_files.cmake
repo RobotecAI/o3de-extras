@@ -14,10 +14,7 @@ set(FILES
         Source/Camera/CameraPublishers.h
         Source/Camera/CameraSensor.cpp
         Source/Camera/CameraSensor.h
-        Source/Camera/CameraSensorDescription.cpp
-        Source/Camera/CameraSensorDescription.h
         Source/Camera/CameraSensorConfiguration.cpp
-        Source/Camera/CameraSensorConfiguration.h
         Source/Camera/ROS2CameraSensorComponent.cpp
         Source/Camera/ROS2CameraSensorComponent.h
         Source/Camera/ROS2CameraSystemComponent.cpp

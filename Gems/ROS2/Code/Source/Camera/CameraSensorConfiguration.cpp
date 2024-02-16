@@ -6,15 +6,15 @@
  *
  */
 
-#include "CameraSensorConfiguration.h"
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
+#include <ROS2/Camera/CameraSensorConfiguration.h>
 
 namespace ROS2
 {
     void CameraSensorConfiguration::Reflect(AZ::ReflectContext* context)
     {
-        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<CameraSensorConfiguration>()
                 ->Version(2)

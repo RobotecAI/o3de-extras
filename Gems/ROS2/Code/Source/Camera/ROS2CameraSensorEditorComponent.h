@@ -11,9 +11,8 @@
 #include <AzFramework/Entity/EntityDebugDisplayBus.h>
 #include <AzToolsFramework/API/ComponentEntitySelectionBus.h>
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
-
-#include "CameraSensorConfiguration.h"
 #include <ROS2/Camera/CameraCalibrationRequestBus.h>
+#include <ROS2/Camera/CameraSensorConfiguration.h>
 #include <ROS2/Frame/NamespaceConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>
 #include <ROS2/Sensor/SensorConfiguration.h>
@@ -46,17 +45,19 @@ namespace ROS2
         void BuildGameEntity(AZ::Entity* gameEntity) override;
 
         // CameraCalibrationRequestBus::Handler overrides
-        AZ::Matrix3x3 GetCameraMatrix() const override;
-        int GetWidth() const override;
-        int GetHeight() const override;
-        float GetVerticalFOV() const override;
+        [[nodiscard]] AZ::Matrix3x3 GetCameraMatrix() const override;
+        [[nodiscard]] int GetWidth() const override;
+        [[nodiscard]] int GetHeight() const override;
+        [[nodiscard]] float GetVerticalFOV() const override;
+        [[nodiscard]] bool IsColorCameraEnabled() const override;
+        [[nodiscard]] bool IsDepthCameraEnabled() const override;
+        [[nodiscard]] float GetNearClipDistance() const override;
+        [[nodiscard]] float GetFarClipDistance() const override;
+        [[nodiscard]] CameraSensorConfiguration GetCameraSensorConfiguration() const override;
 
     private:
         // EntityDebugDisplayEventBus::Handler overrides
         void DisplayEntityViewport(const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay) override;
-
-        AZStd::pair<AZStd::string, TopicConfiguration> MakeTopicConfigurationPair(
-            const AZStd::string& topic, const AZStd::string& messageType, const AZStd::string& configName) const;
 
         SensorConfiguration m_sensorConfiguration;
         CameraSensorConfiguration m_cameraSensorConfiguration;

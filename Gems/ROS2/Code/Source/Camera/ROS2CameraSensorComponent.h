@@ -7,19 +7,17 @@
  */
 #pragma once
 
-#include <rclcpp/publisher.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
-
+#include "CameraSensor.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/std/containers/vector.h>
-
-#include "CameraSensor.h"
-#include "CameraSensorConfiguration.h"
 #include <ROS2/Camera/CameraCalibrationRequestBus.h>
+#include <ROS2/Camera/CameraSensorConfiguration.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/Sensor/Events/TickBasedSource.h>
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
+#include <rclcpp/publisher.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
 namespace ROS2
 {
@@ -54,25 +52,17 @@ namespace ROS2
         int GetWidth() const override;
         int GetHeight() const override;
         float GetVerticalFOV() const override;
+        bool IsColorCameraEnabled() const override;
+        bool IsDepthCameraEnabled() const override;
+        float GetNearClipDistance() const override;
+        float GetFarClipDistance() const override;
+        CameraSensorConfiguration GetCameraSensorConfiguration() const override;
 
     private:
-        //! Helper that adds an image source.
-        //! @tparam CameraType type of camera sensor (eg 'CameraColorSensor')
-        template<typename CameraType>
-        void SetImageSource()
-        {
-            const CameraSensorDescription description{ GetEntityId(), m_cameraConfiguration, m_sensorConfiguration };
-            m_cameraSensor = AZStd::make_shared<CameraType>(description);
-        }
-        //! Retrieve camera name from ROS2FrameComponent's FrameID.
-        //! @param entity pointer entity that has ROS2FrameComponent.
-        [[nodiscard]] AZStd::string GetCameraNameFromFrame(const AZ::Entity* entity) const;
-
         ///! Requests message publication from camera sensor.
         void FrequencyTick();
 
         CameraSensorConfiguration m_cameraConfiguration;
-        AZStd::string m_frameName;
         AZStd::shared_ptr<CameraSensor> m_cameraSensor;
     };
 } // namespace ROS2

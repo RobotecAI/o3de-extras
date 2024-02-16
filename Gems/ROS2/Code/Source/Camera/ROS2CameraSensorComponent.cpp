@@ -7,6 +7,7 @@
  */
 
 #include "ROS2CameraSensorComponent.h"
+#include "Camera/CameraSensor.h"
 #include "CameraUtilities.h"
 #include <ROS2/Frame/ROS2FrameComponent.h>
 
@@ -24,7 +25,7 @@ namespace ROS2
         CameraSensorConfiguration::Reflect(context);
 
         auto* serialize = azrtti_cast<AZ::SerializeContext*>(context);
-        if (serialize)
+        if (serialize != nullptr)
         {
             serialize->Class<ROS2CameraSensorComponent, SensorBaseType>()->Version(5)->Field(
                 "CameraSensorConfig", &ROS2CameraSensorComponent::m_cameraConfiguration);
@@ -33,23 +34,21 @@ namespace ROS2
 
     void ROS2CameraSensorComponent::Activate()
     {
+        // Enable bus first, sensor can use parameters from the bus.
+        ROS2::CameraCalibrationRequestBus::Handler::BusConnect(GetEntityId());
+
         if (m_cameraConfiguration.m_colorCamera && m_cameraConfiguration.m_depthCamera)
         {
-            SetImageSource<CameraRGBDSensor>();
+            m_cameraSensor = AZStd::make_unique<CameraRGBDSensor>(GetEntityId());
         }
         else if (m_cameraConfiguration.m_colorCamera)
         {
-            SetImageSource<CameraColorSensor>();
+            m_cameraSensor = AZStd::make_unique<CameraColorSensor>(GetEntityId());
         }
         else if (m_cameraConfiguration.m_depthCamera)
         {
-            SetImageSource<CameraDepthSensor>();
+            m_cameraSensor = AZStd::make_unique<CameraDepthSensor>(GetEntityId());
         }
-
-        const auto* component = GetEntity()->FindComponent<ROS2FrameComponent>();
-        AZ_Assert(component, "Entity has no ROS2FrameComponent");
-        m_frameName = component->GetFrameID();
-        ROS2::CameraCalibrationRequestBus::Handler::BusConnect(GetEntityId());
 
         StartSensor(
             m_sensorConfiguration.m_frequency,
@@ -91,6 +90,31 @@ namespace ROS2
         return m_cameraConfiguration.m_verticalFieldOfViewDeg;
     }
 
+    bool ROS2CameraSensorComponent::IsColorCameraEnabled() const
+    {
+        return m_cameraConfiguration.m_colorCamera;
+    }
+
+    bool ROS2CameraSensorComponent::IsDepthCameraEnabled() const
+    {
+        return m_cameraConfiguration.m_depthCamera;
+    }
+
+    float ROS2CameraSensorComponent::GetNearClipDistance() const
+    {
+        return m_cameraConfiguration.m_nearClipDistance;
+    }
+
+    float ROS2CameraSensorComponent::GetFarClipDistance() const
+    {
+        return m_cameraConfiguration.m_farClipDistance;
+    }
+
+    CameraSensorConfiguration ROS2CameraSensorComponent::GetCameraSensorConfiguration() const
+    {
+        return m_cameraConfiguration;
+    }
+
     void ROS2CameraSensorComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
         required.push_back(AZ_CRC("ROS2Frame"));
@@ -118,20 +142,7 @@ namespace ROS2
 
         std_msgs::msg::Header messageHeader;
         messageHeader.stamp = timestamp;
-        messageHeader.frame_id = m_frameName.c_str();
+        messageHeader.frame_id = GetFrameID().c_str();
         m_cameraSensor->RequestMessagePublication(transform, messageHeader);
-    }
-
-    AZStd::string ROS2CameraSensorComponent::GetCameraNameFromFrame(const AZ::Entity* entity) const
-    {
-        const auto* component = GetEntity()->FindComponent<ROS2FrameComponent>();
-        AZ_Assert(component, "Entity %s has no ROS2CameraSensorComponent", entity->GetName().c_str());
-        if (component)
-        {
-            AZStd::string cameraName = component->GetFrameID();
-            AZStd::replace(cameraName.begin(), cameraName.end(), '/', '_');
-            return cameraName;
-        }
-        return AZStd::string{};
     }
 } // namespace ROS2

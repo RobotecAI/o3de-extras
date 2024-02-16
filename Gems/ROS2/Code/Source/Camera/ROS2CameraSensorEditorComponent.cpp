@@ -15,6 +15,19 @@
 
 namespace ROS2
 {
+    namespace
+    {
+        AZStd::pair<AZStd::string, TopicConfiguration> MakeTopicConfigurationPair(
+            const AZStd::string& topic, const AZStd::string& messageType, const AZStd::string& configName)
+        {
+            TopicConfiguration config;
+            config.m_topic = topic;
+            config.m_type = messageType;
+            return AZStd::make_pair(configName, config);
+        }
+
+    } // namespace
+
     ROS2CameraSensorEditorComponent::ROS2CameraSensorEditorComponent()
     {
         m_sensorConfiguration.m_frequency = 10;
@@ -123,6 +136,31 @@ namespace ROS2
         return m_cameraSensorConfiguration.m_verticalFieldOfViewDeg;
     };
 
+    bool ROS2CameraSensorEditorComponent::IsColorCameraEnabled() const
+    {
+        return m_cameraSensorConfiguration.m_colorCamera;
+    };
+
+    bool ROS2CameraSensorEditorComponent::IsDepthCameraEnabled() const
+    {
+        return m_cameraSensorConfiguration.m_depthCamera;
+    };
+
+    float ROS2CameraSensorEditorComponent::GetNearClipDistance() const
+    {
+        return m_cameraSensorConfiguration.m_nearClipDistance;
+    };
+
+    float ROS2CameraSensorEditorComponent::GetFarClipDistance() const
+    {
+        return m_cameraSensorConfiguration.m_farClipDistance;
+    };
+
+    CameraSensorConfiguration ROS2CameraSensorEditorComponent::GetCameraSensorConfiguration() const
+    {
+        return m_cameraSensorConfiguration;
+    };
+
     void ROS2CameraSensorEditorComponent::DisplayEntityViewport(
         [[maybe_unused]] const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay)
     {
@@ -197,15 +235,6 @@ namespace ROS2
         debugDisplay.PopMatrix();
 
         debugDisplay.SetState(stateBefore);
-    }
-
-    AZStd::pair<AZStd::string, TopicConfiguration> ROS2CameraSensorEditorComponent::MakeTopicConfigurationPair(
-        const AZStd::string& topic, const AZStd::string& messageType, const AZStd::string& configName) const
-    {
-        TopicConfiguration config;
-        config.m_topic = topic;
-        config.m_type = messageType;
-        return AZStd::make_pair(configName, config);
     }
 
 } // namespace ROS2

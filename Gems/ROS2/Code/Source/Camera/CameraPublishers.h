@@ -7,10 +7,8 @@
  */
 #pragma once
 
-#include "CameraSensorDescription.h"
-
+#include "AzCore/Component/EntityId.h"
 #include <AzCore/std/containers/unordered_map.h>
-
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/msg/image.hpp>
@@ -23,19 +21,26 @@ namespace ROS2
     class CameraPublishers
     {
     public:
+        //! Type of camera channel.
+        enum class CameraChannelType
+        {
+            RGB = 0,
+            DEPTH = 1,
+        };
+
         //! ROS2 image publisher type.
         using ImagePublisherPtrType = std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>>;
 
         //! ROS2 camera sensor publisher type.
         using CameraInfoPublisherPtrType = std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>>;
 
-        CameraPublishers(const CameraSensorDescription& cameraDescription);
+        explicit CameraPublishers(AZ::EntityId entityId);
 
-        ImagePublisherPtrType GetImagePublisher(CameraSensorDescription::CameraChannelType type);
-        CameraInfoPublisherPtrType GetInfoPublisher(CameraSensorDescription::CameraChannelType type);
+        ImagePublisherPtrType GetImagePublisher(CameraChannelType type);
+        CameraInfoPublisherPtrType GetInfoPublisher(CameraChannelType type);
 
     private:
-        AZStd::unordered_map<CameraSensorDescription::CameraChannelType, ImagePublisherPtrType> m_imagePublishers;
-        AZStd::unordered_map<CameraSensorDescription::CameraChannelType, CameraInfoPublisherPtrType> m_infoPublishers;
+        AZStd::unordered_map<CameraChannelType, ImagePublisherPtrType> m_imagePublishers;
+        AZStd::unordered_map<CameraChannelType, CameraInfoPublisherPtrType> m_infoPublishers;
     };
 } // namespace ROS2
