@@ -37,17 +37,22 @@ namespace ROS2
         //! Returns the height of the camera sensor in pixels
         [[nodiscard]] virtual int GetHeight() const = 0;
 
-        //! Returns the vertical field of view of the camera in degrees
+        //! Returns the vertical field of view of the camera in degrees.
         [[nodiscard]] virtual float GetVerticalFOV() const = 0;
 
+        //! Returns true if publishing color images in enabled.
         [[nodiscard]] virtual bool IsColorCameraEnabled() const = 0;
 
+        //! Returns true if publishing depth images in enabled.
         [[nodiscard]] virtual bool IsDepthCameraEnabled() const = 0;
 
+        //! Returns the near clip distance of the camera in meters.
         [[nodiscard]] virtual float GetNearClipDistance() const = 0;
 
+        //! Returns the far clip distance of the camera in meters.
         [[nodiscard]] virtual float GetFarClipDistance() const = 0;
 
+        //! Returns aggregated camera sensor configuration.
         [[nodiscard]] virtual CameraSensorConfiguration GetCameraSensorConfiguration() const = 0;
     };
 

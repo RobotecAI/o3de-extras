@@ -6,24 +6,20 @@
  *
  */
 #include "CameraSensor.h"
-#include "AzCore/Component/Entity.h"
-#include "AzCore/Debug/Trace.h"
-#include "Camera/CameraPublishers.h"
+#include "CameraPublishers.h"
 #include "CameraUtilities.h"
-#include <Atom/RPI.Public/Base.h>
+#include <Atom/Feature/Utils/FrameCaptureBus.h>
 #include <Atom/RPI.Public/FeatureProcessorFactory.h>
-#include <Atom/RPI.Public/Pass/PassFactory.h>
 #include <Atom/RPI.Public/Pass/PassSystemInterface.h>
 #include <Atom/RPI.Public/Pass/Specific/RenderToTexturePass.h>
 #include <Atom/RPI.Public/RPISystemInterface.h>
 #include <Atom/RPI.Public/RenderPipeline.h>
 #include <Atom/RPI.Public/Scene.h>
-#include <AzCore/Math/MatrixUtils.h>
-#include <AzFramework/Components/TransformComponent.h>
-#include <AzFramework/Scene/SceneSystemInterface.h>
+#include <Atom/RPI.Reflect/System/RenderPipelineDescriptor.h>
 #include <PostProcess/PostProcessFeatureProcessor.h>
 #include <ROS2/Camera/CameraCalibrationRequestBus.h>
 #include <ROS2/Camera/CameraPostProcessingRequestBus.h>
+#include <ROS2/Utilities/ROS2Conversions.h>
 #include <sensor_msgs/distortion_models.hpp>
 
 namespace ROS2
@@ -46,9 +42,8 @@ namespace ROS2
         };
 
         //! Create a CameraImage message from the read-back result and a header.
-        auto CreateImageMessageFromReadBackResult(
+        sensor_msgs::msg::Image CreateImageMessageFromReadBackResult(
             const AZ::EntityId& entityId, const AZ::RPI::AttachmentReadback::ReadbackResult& result, const std_msgs::msg::Header& header)
-            -> sensor_msgs::msg::Image
         {
             const AZ::RHI::ImageDescriptor& descriptor = result.m_imageDescriptor;
             const auto format = descriptor.m_format;
@@ -66,54 +61,72 @@ namespace ROS2
         }
 
         //! Prepare a CameraInfo message from sensor description and a header.
-        auto CreateCameraInfoMessage(const AZ::EntityId& entityId, const std_msgs::msg::Header& header) -> sensor_msgs::msg::CameraInfo
+        sensor_msgs::msg::CameraInfo CreateCameraInfoMessage(const AZ::EntityId& entityId, const std_msgs::msg::Header& header)
         {
             sensor_msgs::msg::CameraInfo cameraInfo;
             CameraCalibrationRequestBus::EventResult(cameraInfo.width, entityId, &CameraCalibrationRequest::GetWidth);
             CameraCalibrationRequestBus::EventResult(cameraInfo.height, entityId, &CameraCalibrationRequest::GetHeight);
-            AZ::Matrix3x3 cameraIntrinsics;
-            CameraCalibrationRequestBus::EventResult(cameraIntrinsics, entityId, &CameraCalibrationRequest::GetCameraMatrix);
             cameraInfo.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
 
-            [[maybe_unused]] constexpr size_t expectedMatrixSize = 9;
-            AZ_Assert(cameraInfo.k.size() == expectedMatrixSize, "camera matrix should have %d elements", expectedMatrixSize);
-            cameraInfo.k = { cameraIntrinsics.GetElement(0, 0),
-                             0,
-                             cameraIntrinsics.GetElement(0, 2),
-                             0,
-                             cameraIntrinsics.GetElement(1, 1),
-                             cameraIntrinsics.GetElement(1, 2),
-                             0,
-                             0,
-                             1 };
+            AZ::Matrix3x3 cameraIntrinsics;
+            CameraCalibrationRequestBus::EventResult(cameraIntrinsics, entityId, &CameraCalibrationRequest::GetCameraMatrix);
+            cameraInfo.k = ROS2Conversions::ToROS2Matrix(cameraIntrinsics);
+
             cameraInfo.p = { cameraInfo.k[0], cameraInfo.k[1], cameraInfo.k[2], 0, cameraInfo.k[3], cameraInfo.k[4], cameraInfo.k[5], 0,
                              cameraInfo.k[6], cameraInfo.k[7], cameraInfo.k[8], 0 };
             cameraInfo.header = header;
             return cameraInfo;
         }
 
-        auto GetCameraName(AZ::EntityId entityId) -> AZStd::string
+        //! Generate unique name for camera sensor.
+        //! Uses the entity name to generate a human friendly name for the camera sensor.
+        //! EntityId is also used to make the name unique.
+        AZStd::string GetCameraName(AZ::EntityId entityId)
         {
             AZStd::string entityName = AZ::Interface<AZ::ComponentApplicationRequests>::Get()->GetEntityName(entityId);
-            entityName.replace(entityName.begin(), entityName.end(), '/', '_');
-            entityName.replace(entityName.begin(), entityName.end(), ' ', '_');
-
-            AZStd::string cameraName = AZStd::string::format("camera_%s[%s]", entityName.c_str(), entityId.ToString().c_str());
+            AZStd::string cameraName = AZStd::string::format("%s[%s]", entityName.c_str(), entityId.ToString().c_str());
             return cameraName;
+        }
+
+        AZ::RPI::RenderPipelineDescriptor CreateDepthPipelineDescriptor(AZ::EntityId entityId)
+        {
+            AZ::RPI::RenderPipelineDescriptor pipelineDesc;
+            pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSDepth";
+            pipelineDesc.m_mainViewTagName = "MainCamera";
+            pipelineDesc.m_name = AZStd::string::format("ROS_DepthPipeline_%s", GetCameraName(entityId).c_str());
+            pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
+            return pipelineDesc;
+        }
+
+        AZ::RPI::RenderPipelineDescriptor CreateColorPipelineDescriptor(AZ::EntityId entityId)
+        {
+            AZ::RPI::RenderPipelineDescriptor pipelineDesc;
+            pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSColor";
+            pipelineDesc.m_mainViewTagName = "MainCamera";
+            pipelineDesc.m_name = AZStd::string::format("ROS_ColorPipeline_%s", GetCameraName(entityId).c_str());
+            pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
+            return pipelineDesc;
+        }
+
+        AZ::RPI::RenderPipelineDescriptor CreateRGBDPipelineDescriptor(AZ::EntityId entityId)
+        {
+            AZ::RPI::RenderPipelineDescriptor pipelineDesc;
+            pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSColor";
+            pipelineDesc.m_mainViewTagName = "MainCamera";
+            pipelineDesc.m_name = AZStd::string::format("ROS_RGBDPipeline_%s", GetCameraName(entityId).c_str());
+            pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
+            return pipelineDesc;
         }
 
     } // namespace Internal
 
-    CameraSensorInternal::CameraSensorInternal(AZ::EntityId entityId)
+    CameraSensorInternal::CameraSensorInternal(AZ::EntityId entityId, const AZ::RPI::RenderPipelineDescriptor& pipelineDesc)
         : m_cameraPublishers(entityId)
         , m_entityId(entityId)
     {
-    }
+        AZ_Assert(CameraCalibrationRequestBus::HasHandlers(entityId), "Camera sensor entity does not have a camera calibration component");
 
-    void CameraSensorInternal::SetupPasses(const AZ::RPI::RenderPipelineDescriptor& pipelineDesc)
-    {
         const AZ::Name viewName = AZ::Name("MainCamera");
-
         CameraSensorConfiguration configuration;
         CameraCalibrationRequestBus::EventResult(configuration, m_entityId, &CameraCalibrationRequest::GetCameraSensorConfiguration);
 
@@ -239,16 +252,8 @@ namespace ROS2
     }
 
     CameraDepthSensor::CameraDepthSensor(AZ::EntityId entityId)
-        : m_cameraSensorInternal(entityId)
+        : m_cameraSensorInternal(entityId, Internal::CreateDepthPipelineDescriptor(entityId))
     {
-        auto cameraName = Internal::GetCameraName(entityId);
-
-        AZ::RPI::RenderPipelineDescriptor pipelineDesc;
-        pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSDepth";
-        pipelineDesc.m_mainViewTagName = "MainCamera";
-        pipelineDesc.m_name = AZStd::string::format("ROSDepthPipeline_%s", cameraName.c_str());
-        pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
-        m_cameraSensorInternal.SetupPasses(pipelineDesc);
     }
 
     void CameraDepthSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)
@@ -258,16 +263,8 @@ namespace ROS2
     }
 
     CameraColorSensor::CameraColorSensor(AZ::EntityId entityId)
-        : m_cameraSensorInternal(entityId)
+        : m_cameraSensorInternal(entityId, Internal::CreateColorPipelineDescriptor(entityId))
     {
-        auto cameraName = Internal::GetCameraName(entityId);
-
-        AZ::RPI::RenderPipelineDescriptor pipelineDesc;
-        pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSColor";
-        pipelineDesc.m_mainViewTagName = "MainCamera";
-        pipelineDesc.m_name = AZStd::string::format("ROSColorPipeline_%s", cameraName.c_str());
-        pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
-        m_cameraSensorInternal.SetupPasses(pipelineDesc);
     }
 
     void CameraColorSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)
@@ -277,16 +274,8 @@ namespace ROS2
     }
 
     CameraRGBDSensor::CameraRGBDSensor(AZ::EntityId entityId)
-        : m_cameraSensorInternal(entityId)
+        : m_cameraSensorInternal(entityId, Internal::CreateRGBDPipelineDescriptor(entityId))
     {
-        auto cameraName = Internal::GetCameraName(entityId);
-
-        AZ::RPI::RenderPipelineDescriptor pipelineDesc;
-        pipelineDesc.m_rootPassTemplate = "PipelineRenderToTextureROSColor";
-        pipelineDesc.m_mainViewTagName = "MainCamera";
-        pipelineDesc.m_name = AZStd::string::format("ROSRGBDPipeline_%s", cameraName.c_str());
-        pipelineDesc.m_renderSettings.m_multisampleState = AZ::RPI::RPISystemInterface::Get()->GetApplicationMultisampleState();
-        m_cameraSensorInternal.SetupPasses(pipelineDesc);
     }
 
     void CameraRGBDSensor::RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header)

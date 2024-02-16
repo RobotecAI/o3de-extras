@@ -7,29 +7,14 @@
  */
 #pragma once
 
-#include "AzCore/Component/EntityId.h"
 #include "Camera/CameraPublishers.h"
-#include <Atom/Feature/Utils/FrameCaptureBus.h>
 #include <Atom/RPI.Public/Pass/AttachmentReadback.h>
 #include <Atom/RPI.Reflect/System/RenderPipelineDescriptor.h>
-#include <AzCore/std/containers/span.h>
-#include <ROS2/ROS2GemUtilities.h>
-#include <std_msgs/msg/header.hpp>
+#include <AzCore/Component/EntityId.h>
+#include <ROS2/Camera/CameraSensorRequestBus.h>
 
 namespace ROS2
 {
-    class CameraSensor
-    {
-    public:
-        CameraSensor() = default;
-        virtual ~CameraSensor() = default;
-
-        //! Publish Image Message frame from rendering pipeline
-        //! @param cameraPose - current camera pose from which the rendering should take place
-        //! @param header - header with filled message information (frame, timestamp, seq)
-        virtual void RequestMessagePublication(const AZ::Transform& cameraPose, const std_msgs::msg::Header& header) = 0;
-    };
-
     //! Class to create camera sensor using Atom renderer
     //! It creates dedicated rendering pipeline for each camera
     class CameraSensorInternal
@@ -40,19 +25,16 @@ namespace ROS2
         //! Initializes rendering pipeline for the camera sensor.
         //! @param cameraSensorDescription - camera sensor description used to create camera pipeline.
         //! @param entityId - entityId for the owning sensor component.
-        explicit CameraSensorInternal(AZ::EntityId entityId);
+        explicit CameraSensorInternal(AZ::EntityId entityId, const AZ::RPI::RenderPipelineDescriptor& pipelineDesc);
 
         //! Deinitializes rendering pipeline for the camera sensor
-        virtual ~CameraSensorInternal();
+        ~CameraSensorInternal();
 
         // void RequestFrameForChannel(const std_msgs::msg::Header& header, CameraSensorDescription::CameraChannelType channelType);
         void RequestColorFrame(const std_msgs::msg::Header& header);
         void RequestDepthFrame(const std_msgs::msg::Header& header);
 
         void RenderFrame(const AZ::Transform& cameraPose);
-
-        //! Read and setup Atom Passes
-        void SetupPasses(const AZ::RPI::RenderPipelineDescriptor& pipelineDesc);
 
     private:
         AttachmentReadbackCallback CreateAttachmentReadbackCallback(

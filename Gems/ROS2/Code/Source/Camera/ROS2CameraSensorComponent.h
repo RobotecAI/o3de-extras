@@ -7,11 +7,11 @@
  */
 #pragma once
 
-#include "CameraSensor.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/std/containers/vector.h>
 #include <ROS2/Camera/CameraCalibrationRequestBus.h>
 #include <ROS2/Camera/CameraSensorConfiguration.h>
+#include <ROS2/Camera/CameraSensorRequestBus.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/Sensor/Events/TickBasedSource.h>
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
@@ -31,6 +31,7 @@ namespace ROS2
     class ROS2CameraSensorComponent
         : public ROS2SensorComponentBase<TickBasedSource>
         , public CameraCalibrationRequestBus::Handler
+        , public CameraSensorRequestBus::Handler
     {
     public:
         ROS2CameraSensorComponent() = default;
@@ -58,11 +59,15 @@ namespace ROS2
         float GetFarClipDistance() const override;
         CameraSensorConfiguration GetCameraSensorConfiguration() const override;
 
+        // CameraSensorRequestBus::Handler overrides ...
+        CameraSensorPtr GetCameraSensor() override;
+        void SetCameraSensor(CameraSensorPtr cameraSensor) override;
+
     private:
         ///! Requests message publication from camera sensor.
         void FrequencyTick();
 
         CameraSensorConfiguration m_cameraConfiguration;
-        AZStd::shared_ptr<CameraSensor> m_cameraSensor;
+        CameraSensorPtr m_cameraSensor;
     };
 } // namespace ROS2

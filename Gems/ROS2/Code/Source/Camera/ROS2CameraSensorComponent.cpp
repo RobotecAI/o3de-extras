@@ -115,6 +115,16 @@ namespace ROS2
         return m_cameraConfiguration;
     }
 
+    CameraSensorRequests::CameraSensorPtr ROS2CameraSensorComponent::GetCameraSensor()
+    {
+        return m_cameraSensor;
+    }
+
+    void ROS2CameraSensorComponent::SetCameraSensor(CameraSensorRequests::CameraSensorPtr cameraSensor)
+    {
+        m_cameraSensor = cameraSensor;
+    }
+
     void ROS2CameraSensorComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
         required.push_back(AZ_CRC("ROS2Frame"));

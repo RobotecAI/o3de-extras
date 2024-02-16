@@ -25,7 +25,6 @@ namespace ROS2
             config.m_type = messageType;
             return AZStd::make_pair(configName, config);
         }
-
     } // namespace
 
     ROS2CameraSensorEditorComponent::ROS2CameraSensorEditorComponent()

@@ -125,7 +125,11 @@ namespace ROS2
 
             if (!rigidBody)
             {
-                AZ_Error("ROS2ImuSensorComponent", false, "Entity %s does not have a rigid body - stopping Imu sensor.", entityId.ToString().c_str());
+                AZ_Error(
+                    "ROS2ImuSensorComponent",
+                    false,
+                    "Entity %s does not have a rigid body - stopping Imu sensor.",
+                    entityId.ToString().c_str());
                 StopSensor();
                 return;
             }
@@ -177,14 +181,14 @@ namespace ROS2
             m_acceleration -= inv.TransformVector(gravity);
         }
         m_imuMsg.linear_acceleration = ROS2Conversions::ToROS2Vector3(m_acceleration);
-        m_imuMsg.linear_acceleration_covariance = ROS2Conversions::ToROS2Covariance(m_linearAccelerationCovariance);
+        m_imuMsg.linear_acceleration_covariance = ROS2Conversions::ToROS2Matrix(m_linearAccelerationCovariance);
         m_imuMsg.angular_velocity = ROS2Conversions::ToROS2Vector3(angularRateFiltered);
-        m_imuMsg.angular_velocity_covariance = ROS2Conversions::ToROS2Covariance(m_angularVelocityCovariance);
+        m_imuMsg.angular_velocity_covariance = ROS2Conversions::ToROS2Matrix(m_angularVelocityCovariance);
 
         if (m_imuConfiguration.m_absoluteRotation)
         {
             m_imuMsg.orientation = ROS2Conversions::ToROS2Quaternion(rigidbody->GetTransform().GetRotation());
-            m_imuMsg.orientation_covariance = ROS2Conversions::ToROS2Covariance(m_orientationCovariance);
+            m_imuMsg.orientation_covariance = ROS2Conversions::ToROS2Matrix(m_orientationCovariance);
         }
         m_imuMsg.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         this->m_imuPublisher->publish(m_imuMsg);
