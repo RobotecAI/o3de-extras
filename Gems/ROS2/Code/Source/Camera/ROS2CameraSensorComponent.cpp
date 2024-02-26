@@ -9,6 +9,7 @@
 #include "ROS2CameraSensorComponent.h"
 #include "Camera/CameraSensor.h"
 #include "CameraUtilities.h"
+#include "ROS2/Camera/CameraSensorRequestBus.h"
 #include <ROS2/Frame/ROS2FrameComponent.h>
 
 namespace ROS2
@@ -35,7 +36,7 @@ namespace ROS2
     void ROS2CameraSensorComponent::Activate()
     {
         // Enable bus first, sensor can use parameters from the bus.
-        ROS2::CameraCalibrationRequestBus::Handler::BusConnect(GetEntityId());
+        CameraCalibrationRequestBus::Handler::BusConnect(GetEntityId());
 
         if (m_cameraConfiguration.m_colorCamera && m_cameraConfiguration.m_depthCamera)
         {
@@ -50,6 +51,7 @@ namespace ROS2
             m_cameraSensor = AZStd::make_unique<CameraDepthSensor>(GetEntityId());
         }
 
+        CameraSensorRequestBus::Handler::BusConnect(GetEntityId());
         StartSensor(
             m_sensorConfiguration.m_frequency,
             [this]([[maybe_unused]] auto&&... args)
@@ -66,7 +68,8 @@ namespace ROS2
     {
         StopSensor();
         m_cameraSensor.reset();
-        ROS2::CameraCalibrationRequestBus::Handler::BusDisconnect(GetEntityId());
+        CameraSensorRequestBus::Handler::BusDisconnect(GetEntityId());
+        CameraCalibrationRequestBus::Handler::BusDisconnect(GetEntityId());
     }
 
     AZ::Matrix3x3 ROS2CameraSensorComponent::GetCameraMatrix() const
