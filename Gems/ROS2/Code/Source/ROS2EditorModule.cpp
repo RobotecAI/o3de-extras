@@ -18,6 +18,8 @@
 
 #include <QtCore/qglobal.h>
 
+#include <AiAssetBuilder/AiInfoAssetBuilderSystemComponent.h>
+
 void InitROS2Resources()
 {
     // Registration of Qt (ROS2.qrc) resources
@@ -46,17 +48,17 @@ namespace ROS2
                   ROS2SpawnPointEditorComponent::CreateDescriptor(),
                   SdfAssetBuilderSystemComponent::CreateDescriptor(),
                   JointsManipulationEditorComponent::CreateDescriptor(),
-                  GeoReferenceLevelEditorComponent::CreateDescriptor() });
+                  GeoReferenceLevelEditorComponent::CreateDescriptor(),
+                  AiInfoAssetBuilderSystemComponent::CreateDescriptor() });
         }
 
         AZ::ComponentTypeList GetRequiredSystemComponents() const override
         {
-            return AZ::ComponentTypeList{
-                azrtti_typeid<ROS2EditorSystemComponent>(),
-                azrtti_typeid<LidarRegistrarEditorSystemComponent>(),
-                azrtti_typeid<ROS2RobotImporterEditorSystemComponent>(),
-                azrtti_typeid<SdfAssetBuilderSystemComponent>(),
-            };
+            return AZ::ComponentTypeList{ azrtti_typeid<ROS2EditorSystemComponent>(),
+                                          azrtti_typeid<LidarRegistrarEditorSystemComponent>(),
+                                          azrtti_typeid<ROS2RobotImporterEditorSystemComponent>(),
+                                          azrtti_typeid<SdfAssetBuilderSystemComponent>(),
+                                          azrtti_typeid<AiInfoAssetBuilderSystemComponent>() };
         }
     };
 } // namespace ROS2

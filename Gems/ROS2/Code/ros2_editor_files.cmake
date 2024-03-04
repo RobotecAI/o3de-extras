@@ -83,4 +83,8 @@ set(FILES
     Source/SdfAssetBuilder/SdfAssetBuilderSettings.h
     Source/SdfAssetBuilder/SdfAssetBuilderSystemComponent.cpp
     Source/SdfAssetBuilder/SdfAssetBuilderSystemComponent.h
+        Source/AiAssetBuilder/AiInfoAssetBuilder.cpp
+        Source/AiAssetBuilder/AiInfoAssetBuilder.h
+        Source/AiAssetBuilder/AiInfoAssetBuilderSystemComponent.cpp
+        Source/AiAssetBuilder/AiInfoAssetBuilderSystemComponent.h
 )
