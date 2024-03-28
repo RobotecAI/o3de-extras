@@ -261,7 +261,8 @@
                     "$type": "EditorEntitySortComponent",
                     "Id": 5269735565457263604,
                     "Child Entity Order": [
-                        "Entity_[41557998601191]"
+                        "Entity_[41557998601191]",
+                        "Entity_[98858586930750]"
                     ]
                 },
                 "Component_[5324226478596329467]": {
@@ -345,6 +346,85 @@
                         "SolverPositionIterations": 40,
                         "SolverVelocityIterations": 10
                     }
+                }
+            }
+        },
+        "Entity_[98858586930750]": {
+            "Id": "Entity_[98858586930750]",
+            "Name": "info",
+            "Components": {
+                "EditorAxisAlignedBoxShapeComponent": {
+                    "$type": "EditorAxisAlignedBoxShapeComponent",
+                    "Id": 13534206884689048877,
+                    "AxisAlignedBoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                0.6755567789077759,
+                                1.1369948387145996,
+                                1.9659757614135742
+                            ],
+                            "TranslationOffset": [
+                                0.010600030422210693,
+                                -0.019865840673446655,
+                                0.9851396083831787
+                            ]
+                        }
+                    }
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 5946807877024758299
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 6538727645410202178
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 14692135936681008036
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 4077288369641443053
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 11596032117429885127
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 77603860509724486
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 6915621409598247097
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 14959329508627522608
+                },
+                "PrefabInfoEditorComponent": {
+                    "$type": "PrefabInfoEditorComponent",
+                    "Id": 15945264967506136999,
+                    "Description": "Shelves on wheels. Shelves edges should be put at least 1 m apart along x axis and 0.5 m apart along y axis.",
+                    "AnchorTransformEntityId": "",
+                    "Aabb": {
+                        "min": [
+                            -0.327178955078125,
+                            -0.5883632898330688,
+                            0.0021517276763916016
+                        ],
+                        "max": [
+                            0.34837913513183594,
+                            0.5486316680908203,
+                            1.9681274890899658
+                        ]
+                    }
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 3399769095602196648,
+                    "Parent Entity": "Entity_[58382014962770]"
                 }
             }
         }

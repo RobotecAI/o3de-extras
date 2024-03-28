@@ -237,15 +237,50 @@
                     "Id": 3937996073827386159,
                     "Child Entity Order": [
                         "Entity_[72075592595902]",
-                        "Instance_[71491477043646]/ContainerEntity",
-                        "",
-                        ""
+                        "Instance_[71491477043646]/ContainerEntity"
                     ]
                 },
                 "Component_[6485857306406049964]": {
                     "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
                     "Id": 6485857306406049964,
                     "Parent Entity": "ContainerEntity"
+                },
+                "EditorAxisAlignedBoxShapeComponent": {
+                    "$type": "EditorAxisAlignedBoxShapeComponent",
+                    "Id": 11236033466813704039,
+                    "AxisAlignedBoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                1.0,
+                                3.12188458442688,
+                                5.015216827392578
+                            ],
+                            "TranslationOffset": [
+                                0.0,
+                                0.00881725549697876,
+                                2.4837770462036133
+                            ]
+                        }
+                    }
+                },
+                "PrefabInfoEditorComponent": {
+                    "$type": "PrefabInfoEditorComponent",
+                    "Id": 7593083003196012669,
+                    "Name": "Storage_rack1",
+                    "Description": "Small rack with boxes accessible from longer side of the rack. Small racks edges should be put at least 2 m apart along x axis and 1 m apart along y axis.",
+                    "AnchorTransformEntityId": "",
+                    "Aabb": {
+                        "min": [
+                            -0.5,
+                            -1.5521249771118164,
+                            -0.02383136749267578
+                        ],
+                        "max": [
+                            0.5,
+                            1.5697598457336426,
+                            4.991385459899902
+                        ]
+                    }
                 }
             }
         },
@@ -643,7 +678,7 @@
                 {
                     "op": "replace",
                     "path": "/ContainerEntity/Components/Component_[11645621937081874484]/Transform Data/Rotate/2",
-                    "value": 0.9132558107376099
+                    "value": 0.91325581073761
                 }
             ]
         },
@@ -919,6 +954,16 @@
                     "op": "replace",
                     "path": "/ContainerEntity/Components/Component_[15832779900574876777]/Parent Entity",
                     "value": "../Entity_[72084182530494]"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Asset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Configuration/PhysicsAsset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
                 }
             ]
         },

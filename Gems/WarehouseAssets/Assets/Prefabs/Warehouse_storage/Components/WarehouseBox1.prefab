@@ -90,7 +90,10 @@
                 },
                 "Component_[2635600976954600347]": {
                     "$type": "EditorEntitySortComponent",
-                    "Id": 2635600976954600347
+                    "Id": 2635600976954600347,
+                    "Child Entity Order": [
+                        "Entity_[99283788693054]"
+                    ]
                 },
                 "Component_[3144205669266579244]": {
                     "$type": "EditorMaterialComponent",
@@ -125,7 +128,7 @@
                                     "guid": "{8A03C41F-AC4F-5852-8AA7-0A4EFA5E2D61}",
                                     "subId": 282632013
                                 },
-                                "assetHint": "assets/warehouse/models/box1.azmodel"
+                                "assetHint": "assets/warehouse/models/box1.fbx.azmodel"
                             }
                         }
                     }
@@ -141,6 +144,106 @@
                 "Component_[9483887954899180333]": {
                     "$type": "EditorPendingCompositionComponent",
                     "Id": 9483887954899180333
+                }
+            }
+        },
+        "Entity_[99283788693054]": {
+            "Id": "Entity_[99283788693054]",
+            "Name": "Info",
+            "Components": {
+                "EditorBoxShapeComponent": {
+                    "$type": "EditorBoxShapeComponent",
+                    "Id": 17124401086820924525,
+                    "BoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                1.0,
+                                0.5520851612091064,
+                                0.6901825070381165
+                            ],
+                            "TranslationOffset": [
+                                0.0,
+                                -0.004386529326438904,
+                                0.36366888880729675
+                            ]
+                        }
+                    }
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 6272377573003502024
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 4261736700808391015
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 15767446823377832091
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 14007944666053167241
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 3375540018670479054
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 5807592450680506754
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 15258727986761393057
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 7316926263509782690
+                },
+                "PrefabInfoEditorComponent": {
+                    "$type": "PrefabInfoEditorComponent",
+                    "Id": 15816956265793812424,
+                    "Name": "WarehouseBox1",
+                    "Description": "A typical tall box.",
+                    "Aabb": {
+                        "min": [
+                            -0.5,
+                            -0.2804291248321533,
+                            0.01857757568359375
+                        ],
+                        "max": [
+                            0.5,
+                            0.2716560363769531,
+                            0.7087602615356445
+                        ]
+                    },
+                    "AnchorTransform": {
+                        "Translation": [
+                            0.0,
+                            0.0,
+                            0.040079593658447266
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Scale": 1.0
+                    }
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 9507527646945833234,
+                    "Parent Entity": "Entity_[5641038461374]",
+                    "Transform Data": {
+                        "Translate": [
+                            0.0,
+                            0.0,
+                            0.040079593658447266
+                        ]
+                    }
                 }
             }
         }
