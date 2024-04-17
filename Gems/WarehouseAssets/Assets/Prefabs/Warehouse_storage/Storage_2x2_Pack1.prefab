@@ -30,7 +30,8 @@
                     "Instance_[5772913519499]/ContainerEntity",
                     "Instance_[7379231288203]/ContainerEntity",
                     "Instance_[8109375728523]/ContainerEntity",
-                    "Instance_[8856700038027]/ContainerEntity"
+                    "Instance_[8856700038027]/ContainerEntity",
+                    "Entity_[6714358562366]"
                 ]
             },
             "Component_[2784794729749106706]": {
@@ -49,6 +50,88 @@
                 "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
                 "Id": 8129882389223959288,
                 "Parent Entity": ""
+            }
+        }
+    },
+    "Entities": {
+        "Entity_[6714358562366]": {
+            "Id": "Entity_[6714358562366]",
+            "Name": "Info",
+            "Components": {
+                "EditorAxisAlignedBoxShapeComponent": {
+                    "$type": "EditorAxisAlignedBoxShapeComponent",
+                    "Id": 11801499337565818917,
+                    "AxisAlignedBoxShape": {
+                        "Configuration": {
+                            "Dimensions": [
+                                6.229617595672607,
+                                2.2291085720062256,
+                                5.021814346313477
+                            ],
+                            "TranslationOffset": [
+                                -0.011689066886901855,
+                                -0.0007860362529754639,
+                                2.433511734008789
+                            ]
+                        }
+                    }
+                },
+                "EditorDisabledCompositionComponent": {
+                    "$type": "EditorDisabledCompositionComponent",
+                    "Id": 16038002308475242159
+                },
+                "EditorEntityIconComponent": {
+                    "$type": "EditorEntityIconComponent",
+                    "Id": 2903980904705614601
+                },
+                "EditorEntitySortComponent": {
+                    "$type": "EditorEntitySortComponent",
+                    "Id": 10706818838127602869
+                },
+                "EditorInspectorComponent": {
+                    "$type": "EditorInspectorComponent",
+                    "Id": 6363443971184248669
+                },
+                "EditorLockComponent": {
+                    "$type": "EditorLockComponent",
+                    "Id": 2108874714725423346
+                },
+                "EditorOnlyEntityComponent": {
+                    "$type": "EditorOnlyEntityComponent",
+                    "Id": 15677118444341077872
+                },
+                "EditorPendingCompositionComponent": {
+                    "$type": "EditorPendingCompositionComponent",
+                    "Id": 4274404753870429390
+                },
+                "EditorVisibilityComponent": {
+                    "$type": "EditorVisibilityComponent",
+                    "Id": 387498196156717388
+                },
+                "PrefabInfoEditorComponent": {
+                    "$type": "PrefabInfoEditorComponent",
+                    "Id": 2740870588527682977,
+                    "Name": "Storage_2x2_Pack1",
+                    "Description": "Rack with boxes accessible from longer side of the rack. Racks should be put at least 1 m apart along x axis and 2 m apart along y axis.",
+                    "AnchorTransformEntityId": "",
+                    "Aabb": {
+                        "min": [
+                            -3.126497268676758,
+                            -1.115340232849121,
+                            -0.07739543914794922
+                        ],
+                        "max": [
+                            3.1031198501586914,
+                            1.1137681007385254,
+                            4.944418907165527
+                        ]
+                    }
+                },
+                "TransformComponent": {
+                    "$type": "{27F1E1A1-8D9D-4C3B-BD3A-AFB9762449C0} TransformComponent",
+                    "Id": 3382247387917640991,
+                    "Parent Entity": "ContainerEntity"
+                }
             }
         }
     },
@@ -282,14 +365,6 @@
                     "path": "/Entities/Entity_[72079887563198]/Components/Component_[4058468385591425268]/Child Entity Order/10"
                 },
                 {
-                    "op": "remove",
-                    "path": "/Entities/Entity_[72084182530494]/Components/Component_[3937996073827386159]/Child Entity Order/3"
-                },
-                {
-                    "op": "remove",
-                    "path": "/Entities/Entity_[72084182530494]/Components/Component_[3937996073827386159]/Child Entity Order/2"
-                },
-                {
                     "op": "replace",
                     "path": "/Entities/Entity_[72088477497790]/Components/Component_[4058468385591425268]/Child Entity Order/0",
                     "value": "Instance_[71371217959358]/ContainerEntity"
@@ -503,6 +578,20 @@
                 {
                     "op": "remove",
                     "path": "/Entities/Entity_[72092772465086]/Components/Component_[4058468385591425268]/Child Entity Order/9"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[71491477043646]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Asset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[71491477043646]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Configuration/PhysicsAsset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "remove",
+                    "path": "/Entities/Entity_[72084182530494]/Components/PrefabInfoEditorComponent"
                 }
             ]
         },
@@ -737,6 +826,16 @@
                 {
                     "op": "remove",
                     "path": "/Entities/Entity_[367745436219838]/Components/Component_[3937996073827386159]/Child Entity Order/2"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[260027656436158]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Asset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[260027656436158]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Configuration/PhysicsAsset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
                 }
             ]
         },
@@ -906,6 +1005,16 @@
                 {
                     "op": "remove",
                     "path": "/Entities/Entity_[147893677174521]/Components/Component_[3937996073827386159]/Child Entity Order/2"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[10209910566649]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Asset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[10209910566649]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Configuration/PhysicsAsset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
                 }
             ]
         },
@@ -1003,6 +1112,16 @@
                     "op": "add",
                     "path": "/Entities/Entity_[339389089033977]/Components/Component_[4058468385591425268]/Child Entity Order/10",
                     "value": "Instance_[246046564790009]/ContainerEntity"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[5907326433726]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Asset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
+                },
+                {
+                    "op": "replace",
+                    "path": "/Instances/Instance_[5907326433726]/Entities/Entity_[5559434082750]/Components/Component_[2276504649476859699]/ShapeConfiguration/PhysicsAsset/Configuration/PhysicsAsset/assetHint",
+                    "value": "assets/warehouse/models/warehouse_rack.fbx.pxmesh"
                 }
             ]
         }
