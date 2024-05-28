@@ -198,7 +198,12 @@ namespace ROS2
         // TODO: May probably be easily unified with for-loop from line 153 above.
         for (int i = 0; i < lastScanResults.m_points.size(); ++i)
         {
-            memcpy(&message.data[i * bytesStep], &lastScanResults.m_points[i], sizeof(AZ::Vector3));
+            // to avoid alignment issues, we copy the data field by field
+            float xyz[3] = {
+                lastScanResults.m_points[i].GetX(), lastScanResults.m_points[i].GetY(),
+                lastScanResults.m_points[i].GetZ()
+            };
+            memcpy(&message.data[i * bytesStep], &xyz, sizeof(float) * 3);
             memcpy(&message.data[i * bytesStep + 3 * sizeof(float)], &lastScanResults.m_ids[i], sizeof(int32_t));
             memcpy(&message.data[i * bytesStep + 3 * sizeof(float) + sizeof(int32_t)], &lastScanResults.m_classes[i],
                    sizeof(uint8_t));
