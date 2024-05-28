@@ -161,7 +161,7 @@ namespace ROS2
         message.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         message.height = 1;
         message.width = lastScanResults.m_points.size();
-        message.point_step = sizeof(AZ::Vector3) + sizeof(int32_t) + sizeof(uint8_t);
+        message.point_step = 3 * sizeof(float) + sizeof(int32_t) + sizeof(uint8_t);
         message.row_step = message.width * message.point_step;
 
         AZStd::array<const char*, 3> point_field_names = { "x", "y", "z" };
@@ -178,19 +178,19 @@ namespace ROS2
         // TODO: Below point field formatting may be unified with XYZ point field above, e.g. array of names and types?
         sensor_msgs::msg::PointField pfId;
         pfId.name = "entity_id";
-        pfId.offset = sizeof(AZ::Vector3);
+        pfId.offset = 3 * sizeof(float);
         pfId.datatype = sensor_msgs::msg::PointField::INT32;
         pfId.count = 1;
         message.fields.push_back(pfId);
         
         sensor_msgs::msg::PointField pfClassId;
         pfClassId.name = "class_id";
-        pfClassId.offset = sizeof(AZ::Vector3) + sizeof(int32_t);
+        pfClassId.offset = 3 * sizeof(float) + sizeof(int32_t);
         pfClassId.datatype = sensor_msgs::msg::PointField::UINT8;
         pfClassId.count = 1;
         message.fields.push_back(pfClassId);
 
-        const auto bytesStep = sizeof(AZ::Vector3) + sizeof(int32_t) + sizeof(uint8_t);
+        const auto bytesStep = 3 * sizeof(float) + sizeof(int32_t) + sizeof(uint8_t);
         const auto sizeInBytes = lastScanResults.m_points.size() * bytesStep;
         message.data.resize(sizeInBytes);
         AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
@@ -199,8 +199,9 @@ namespace ROS2
         for (int i = 0; i < lastScanResults.m_points.size(); ++i)
         {
             memcpy(&message.data[i * bytesStep], &lastScanResults.m_points[i], sizeof(AZ::Vector3));
-            memcpy(&message.data[i * bytesStep + sizeof(AZ::Vector3)], &lastScanResults.m_ids[i], sizeof(int32_t));
-            memcpy(&message.data[i * bytesStep + sizeof(AZ::Vector3) + sizeof(int32_t)], &lastScanResults.m_classes[i], sizeof(uint8_t));
+            memcpy(&message.data[i * bytesStep + 3 * sizeof(float)], &lastScanResults.m_ids[i], sizeof(int32_t));
+            memcpy(&message.data[i * bytesStep + 3 * sizeof(float) + sizeof(int32_t)], &lastScanResults.m_classes[i],
+                   sizeof(uint8_t));
         }
 
         m_pointCloudPublisher->publish(message);
