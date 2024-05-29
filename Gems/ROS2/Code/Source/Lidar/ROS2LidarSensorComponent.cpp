@@ -185,7 +185,7 @@ namespace ROS2
             constexpr auto fieldLength = sizeof(int32_t);
             message.point_step += fieldLength;
         }
-        AZStd::array<AZ::Color,256> colorLookupTable;
+        AZStd::array<AZ::Color, 256> colorLookupTable;
         if (lastScanResults.m_classes.has_value()) {
             colorLookupTable = m_lidarCore.m_lidarConfiguration.
                     GenerateSegmentationColorsLookupTable();
