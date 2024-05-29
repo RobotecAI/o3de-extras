@@ -168,6 +168,13 @@ namespace ROS2
             AZ_Assert(false, "This Lidar Implementation does not support entity exclusion!");
         }
 
+        //! Configures segmentation classes.
+        //! @param classTags Set of pairs of class names and their corresponding class indices.
+        virtual void ConfigureSegmentationClasses(
+            [[maybe_unused]] const AZStd::set<AZStd::pair<AZStd::string, uint8_t> >& classTags) {
+            AZ_Assert(false, "This Lidar Implementation does not support segmentation class configuration!");
+        }
+
         //! Configures max range point addition.
         //! @param includeMaxRange Should the raycaster add points at max range for rays that exceeded their range?
         virtual void ConfigureMaxRangePointAddition([[maybe_unused]] bool addMaxRangePoints)

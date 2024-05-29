@@ -23,6 +23,7 @@ namespace ROS2
                 ->Field("LidarParameters", &LidarSensorConfiguration::m_lidarParameters)
                 ->Field("IgnoredLayerIndices", &LidarSensorConfiguration::m_ignoredCollisionLayers)
                 ->Field("ExcludedEntities", &LidarSensorConfiguration::m_excludedEntities)
+                ->Field("SegmentationClasses", &LidarSensorConfiguration::m_segmentationClasses)
                 ->Field("PointsAtMax", &LidarSensorConfiguration::m_addPointsAtMax);
 
             if (AZ::EditContext* ec = serializeContext->GetEditContext())
@@ -58,6 +59,15 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, &LidarSensorConfiguration::IsEntityExclusionVisible)
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &LidarSensorConfiguration::m_segmentationClasses,
+                        "Segmentation classes",
+                        "Segmentation classes and their colors.")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true)
+                    ->Attribute(AZ::Edit::Attributes::Visibility,
+                                &LidarSensorConfiguration::IsSegmentationConfigurationVisible)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &LidarSensorConfiguration::m_addPointsAtMax,
@@ -120,6 +130,18 @@ namespace ROS2
         m_lidarParameters = LidarTemplateUtils::GetTemplate(m_lidarModel);
     }
 
+    AZStd::array<AZ::Color,256> LidarSensorConfiguration::GenerateSegmentationColorsLookupTable() const {
+        AZStd::array<AZ::Color, 256> colors;
+        for (auto &color : colors) {
+            color = AZ::Colors::White;
+        }
+
+        for (const auto &[name, segment, color]: m_segmentationClasses) {
+            colors[segment] = color;
+        }
+        return colors;
+    }
+
     bool LidarSensorConfiguration::IsConfigurationVisible() const
     {
         return m_lidarModel == LidarTemplate::LidarModel::Custom3DLidar || m_lidarModel == LidarTemplate::LidarModel::Custom2DLidar;
@@ -138,6 +160,10 @@ namespace ROS2
     bool LidarSensorConfiguration::IsMaxPointsConfigurationVisible() const
     {
         return m_lidarSystemFeatures & LidarSystemFeatures::MaxRangePoints;
+    }
+
+    bool LidarSensorConfiguration::IsSegmentationConfigurationVisible() const {
+        return m_lidarSystemFeatures & LidarSystemFeatures::Segmentation;
     }
 
     AZ::Crc32 LidarSensorConfiguration::OnLidarModelSelected()

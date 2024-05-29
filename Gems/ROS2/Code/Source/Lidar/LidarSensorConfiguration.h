@@ -40,6 +40,12 @@ namespace ROS2
         AZStd::unordered_set<AZ::u32> m_ignoredCollisionLayers;
         AZStd::vector<AZ::EntityId> m_excludedEntities;
 
+        AZStd::vector<AZStd::tuple<AZStd::string, uint8_t, AZ::Color> > m_segmentationClasses = {
+            {"unknown", 0, AZ::Color(1.0f, 1.0f, 1.0f, 1.0f)}
+        };
+
+        [[nodiscard]] AZStd::array<AZ::Color, 256> GenerateSegmentationColorsLookupTable() const;
+
         bool m_addPointsAtMax = false;
 
     private:
@@ -47,6 +53,7 @@ namespace ROS2
         bool IsIgnoredLayerConfigurationVisible() const;
         bool IsEntityExclusionVisible() const;
         bool IsMaxPointsConfigurationVisible() const;
+        bool IsSegmentationConfigurationVisible() const;
 
         //! Update the lidar configuration based on the current lidar model selected.
         void FetchLidarModelConfiguration();

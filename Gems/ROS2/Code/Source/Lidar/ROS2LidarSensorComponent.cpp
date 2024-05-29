@@ -178,17 +178,33 @@ namespace ROS2
         if (lastScanResults.m_ids.has_value()) {
             sensor_msgs::msg::PointField pfId;
             pfId.name = "entity_id";
-            pfId.offset = sizeof(PackedVector3);
+            pfId.offset = message.point_step;
             pfId.datatype = sensor_msgs::msg::PointField::INT32;
             pfId.count = 1;
             message.fields.push_back(pfId);
             constexpr auto fieldLength = sizeof(int32_t);
             message.point_step += fieldLength;
         }
+        AZStd::array<AZ::Color,256> colorLookupTable;
         if (lastScanResults.m_classes.has_value()) {
+            colorLookupTable = m_lidarCore.m_lidarConfiguration.
+                    GenerateSegmentationColorsLookupTable();
+
+            AZStd::array<const char *, 3> colorFieldNames = {"r", "g", "b"};
+
+            for (int i = 0; i < colorFieldNames.size(); i++) {
+                sensor_msgs::msg::PointField pf;
+                pf.name = colorFieldNames[i];
+                pf.offset = message.point_step;
+                pf.datatype = sensor_msgs::msg::PointField::FLOAT32;
+                pf.count = 1;
+                message.fields.push_back(pf);
+                message.point_step += sizeof(float);
+            }
+
             sensor_msgs::msg::PointField pfClassId;
             pfClassId.name = "class_id";
-            pfClassId.offset = 3 * sizeof(float) + sizeof(int32_t);
+            pfClassId.offset = message.point_step;
             pfClassId.datatype = sensor_msgs::msg::PointField::UINT8;
             pfClassId.count = 1;
             message.fields.push_back(pfClassId);
@@ -199,7 +215,7 @@ namespace ROS2
         message.data.resize(sizeInBytes);
 
         PackedVector3 xyz = {0.0f, 0.0f, 0.0f};
-        uint32_t nextFieldOffset = 0;
+
         // IMO this is the clearest way to handle the offset with future fields, compiler should optimize it
         for (int i = 0; i < pointCount; ++i) {
             // to avoid alignment issues, we copy the data field by field
@@ -207,7 +223,7 @@ namespace ROS2
             xyz[1] = lastScanResults.m_points[i].GetY();
             xyz[2] = lastScanResults.m_points[i].GetZ();
             memcpy(&message.data[i * message.point_step], &xyz, sizeof(PackedVector3));
-            nextFieldOffset = sizeof(PackedVector3);
+            uint32_t nextFieldOffset = sizeof(PackedVector3);
 
             if (lastScanResults.m_ids.has_value()) {
                 memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_ids.value()[i],
@@ -216,6 +232,11 @@ namespace ROS2
             }
 
             if (lastScanResults.m_classes.has_value()) {
+                for (int j = 0; j < 3; j++) {
+                    float color = colorLookupTable[lastScanResults.m_classes.value()[i]].GetElement(j);
+                    memcpy(&message.data[i * message.point_step + nextFieldOffset], &color, sizeof(float));
+                    nextFieldOffset += sizeof(float);
+                }
                 memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_classes.value()[i],
                        sizeof(uint8_t));
                 nextFieldOffset += sizeof(uint8_t);
