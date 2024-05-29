@@ -12,6 +12,8 @@
 #include <Lidar/ROS2LidarSensorComponent.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Utilities/ROS2Names.h>
+#include <vision_msgs/msg/vision_class.hpp>
+#include <vision_msgs/msg/label_info.hpp>
 
 namespace ROS2
 {
@@ -100,6 +102,10 @@ namespace ROS2
             const TopicConfiguration& publisherConfig = m_sensorConfiguration.m_publishersConfigurations[PointCloudType];
             AZStd::string fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
             m_pointCloudPublisher = ros2Node->create_publisher<sensor_msgs::msg::PointCloud2>(fullTopic.data(), publisherConfig.GetQoS());
+            if (m_lidarCore.m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation) {
+                auto segmentationClassesPublisher = ros2Node->create_publisher<vision_msgs::msg::LabelInfo>(
+                    ROS2Names::GetNamespacedName(GetNamespace(), "segmentation_classes").data(), publisherConfig.GetQoS());
+            }
         }
 
         StartSensor(
@@ -246,5 +252,16 @@ namespace ROS2
         AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
 
         m_pointCloudPublisher->publish(message);
+
+        if(m_segmentationClassesPublisher) {
+            vision_msgs::msg::LabelInfo segmentationClasses;
+            for (const auto& [name, id, color] : m_lidarCore.m_lidarConfiguration.m_segmentationClasses) {
+                vision_msgs::msg::VisionClass visionClass;
+                visionClass.class_id = id;
+                visionClass.class_name = name.c_str();
+                segmentationClasses.class_map.push_back(visionClass);
+            }
+            m_segmentationClassesPublisher->publish(segmentationClasses);
+        }
     }
 } // namespace ROS2
