@@ -104,7 +104,8 @@ namespace ROS2
             m_pointCloudPublisher = ros2Node->create_publisher<sensor_msgs::msg::PointCloud2>(fullTopic.data(), publisherConfig.GetQoS());
             if (m_lidarCore.m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation) {
                 auto segmentationClassesPublisher = ros2Node->create_publisher<vision_msgs::msg::LabelInfo>(
-                    ROS2Names::GetNamespacedName(GetNamespace(), "segmentation_classes").data(), publisherConfig.GetQoS());
+                    ROS2Names::GetNamespacedName(GetNamespace(), "segmentation_classes").data(),
+                    publisherConfig.GetQoS());
             }
         }
 
@@ -253,9 +254,9 @@ namespace ROS2
 
         m_pointCloudPublisher->publish(message);
 
-        if(m_segmentationClassesPublisher) {
+        if (m_segmentationClassesPublisher) {
             vision_msgs::msg::LabelInfo segmentationClasses;
-            for (const auto& [name, id, color] : m_lidarCore.m_lidarConfiguration.m_segmentationClasses) {
+            for (const auto &[name, id, color]: m_lidarCore.m_lidarConfiguration.m_segmentationClasses) {
                 vision_msgs::msg::VisionClass visionClass;
                 visionClass.class_id = id;
                 visionClass.class_name = name.c_str();
