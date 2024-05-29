@@ -154,60 +154,75 @@ namespace ROS2
         {
             point = inverseLidarTM.TransformPoint(point);
         }
-
+        typedef float PackedVector3[3];
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         auto message = sensor_msgs::msg::PointCloud2();
+        const auto pointCount = lastScanResults.m_points.size();
         message.header.frame_id = ros2Frame->GetFrameID().data();
         message.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         message.height = 1;
-        message.width = lastScanResults.m_points.size();
-        message.point_step = 3 * sizeof(float) + sizeof(int32_t) + sizeof(uint8_t);
-        message.row_step = message.width * message.point_step;
+        message.width = pointCount;
+        message.point_step = sizeof(PackedVector3);
 
-        AZStd::array<const char*, 3> point_field_names = { "x", "y", "z" };
-        for (int i = 0; i < point_field_names.size(); i++)
-        {
+        AZStd::array<const char *, 3> pointFieldNames = {"x", "y", "z"};
+
+        for (int i = 0; i < pointFieldNames.size(); i++) {
             sensor_msgs::msg::PointField pf;
-            pf.name = point_field_names[i];
+            pf.name = pointFieldNames[i];
             pf.offset = i * 4;
             pf.datatype = sensor_msgs::msg::PointField::FLOAT32;
             pf.count = 1;
             message.fields.push_back(pf);
         }
 
-        // TODO: Below point field formatting may be unified with XYZ point field above, e.g. array of names and types?
-        sensor_msgs::msg::PointField pfId;
-        pfId.name = "entity_id";
-        pfId.offset = 3 * sizeof(float);
-        pfId.datatype = sensor_msgs::msg::PointField::INT32;
-        pfId.count = 1;
-        message.fields.push_back(pfId);
-        
-        sensor_msgs::msg::PointField pfClassId;
-        pfClassId.name = "class_id";
-        pfClassId.offset = 3 * sizeof(float) + sizeof(int32_t);
-        pfClassId.datatype = sensor_msgs::msg::PointField::UINT8;
-        pfClassId.count = 1;
-        message.fields.push_back(pfClassId);
-
-        const auto bytesStep = 3 * sizeof(float) + sizeof(int32_t) + sizeof(uint8_t);
-        const auto sizeInBytes = lastScanResults.m_points.size() * bytesStep;
-        message.data.resize(sizeInBytes);
-        AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
-
-        // TODO: May probably be easily unified with for-loop from line 153 above.
-        for (int i = 0; i < lastScanResults.m_points.size(); ++i)
-        {
-            // to avoid alignment issues, we copy the data field by field
-            float xyz[3] = {
-                lastScanResults.m_points[i].GetX(), lastScanResults.m_points[i].GetY(),
-                lastScanResults.m_points[i].GetZ()
-            };
-            memcpy(&message.data[i * bytesStep], &xyz, sizeof(float) * 3);
-            memcpy(&message.data[i * bytesStep + 3 * sizeof(float)], &lastScanResults.m_ids[i], sizeof(int32_t));
-            memcpy(&message.data[i * bytesStep + 3 * sizeof(float) + sizeof(int32_t)], &lastScanResults.m_classes[i],
-                   sizeof(uint8_t));
+        if (lastScanResults.m_ids.has_value()) {
+            sensor_msgs::msg::PointField pfId;
+            pfId.name = "entity_id";
+            pfId.offset = sizeof(PackedVector3);
+            pfId.datatype = sensor_msgs::msg::PointField::INT32;
+            pfId.count = 1;
+            message.fields.push_back(pfId);
+            constexpr auto fieldLength = sizeof(int32_t);
+            message.point_step += fieldLength;
         }
+        if (lastScanResults.m_classes.has_value()) {
+            sensor_msgs::msg::PointField pfClassId;
+            pfClassId.name = "class_id";
+            pfClassId.offset = 3 * sizeof(float) + sizeof(int32_t);
+            pfClassId.datatype = sensor_msgs::msg::PointField::UINT8;
+            pfClassId.count = 1;
+            message.fields.push_back(pfClassId);
+            message.point_step += sizeof(uint8_t);
+        }
+
+        const auto sizeInBytes = pointCount * message.point_step;
+        message.data.resize(sizeInBytes);
+
+        PackedVector3 xyz = {0.0f, 0.0f, 0.0f};
+        uint32_t nextFieldOffset = 0;
+        // IMO this is the clearest way to handle the offset with future fields, compiler should optimize it
+        for (int i = 0; i < pointCount; ++i) {
+            // to avoid alignment issues, we copy the data field by field
+            xyz[0] = lastScanResults.m_points[i].GetX();
+            xyz[1] = lastScanResults.m_points[i].GetY();
+            xyz[2] = lastScanResults.m_points[i].GetZ();
+            memcpy(&message.data[i * message.point_step], &xyz, sizeof(PackedVector3));
+            nextFieldOffset = sizeof(PackedVector3);
+
+            if (lastScanResults.m_ids.has_value()) {
+                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_ids.value()[i],
+                       sizeof(int32_t));
+                nextFieldOffset += sizeof(int32_t);
+            }
+
+            if (lastScanResults.m_classes.has_value()) {
+                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_classes.value()[i],
+                       sizeof(uint8_t));
+                nextFieldOffset += sizeof(uint8_t);
+            }
+        }
+        message.row_step = message.width * message.point_step;
+        AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
 
         m_pointCloudPublisher->publish(message);
     }

@@ -39,7 +39,6 @@ namespace ROS2
 
         AZStd::unordered_set<AZ::u32> m_ignoredCollisionLayers;
         AZStd::vector<AZ::EntityId> m_excludedEntities;
-        AZStd::vector<LmbrCentral::Tag> m_segmentationClasses;
 
         bool m_addPointsAtMax = false;
 
