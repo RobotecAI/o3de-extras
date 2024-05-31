@@ -12,8 +12,6 @@
 #include <Lidar/ROS2LidarSensorComponent.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Utilities/ROS2Names.h>
-#include <vision_msgs/msg/vision_class.hpp>
-#include <vision_msgs/msg/label_info.hpp>
 
 namespace ROS2
 {
@@ -103,7 +101,7 @@ namespace ROS2
             AZStd::string fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
             m_pointCloudPublisher = ros2Node->create_publisher<sensor_msgs::msg::PointCloud2>(fullTopic.data(), publisherConfig.GetQoS());
             if (m_lidarCore.m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation) {
-                auto segmentationClassesPublisher = ros2Node->create_publisher<vision_msgs::msg::LabelInfo>(
+                 m_segmentationClassesPublisher = ros2Node->create_publisher<vision_msgs::msg::LabelInfo>(
                     ROS2Names::GetNamespacedName(GetNamespace(), "segmentation_classes").data(),
                     publisherConfig.GetQoS());
             }
@@ -161,7 +159,6 @@ namespace ROS2
         {
             point = inverseLidarTM.TransformPoint(point);
         }
-        typedef float PackedVector3[3];
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         auto message = sensor_msgs::msg::PointCloud2();
         const auto pointCount = lastScanResults.m_points.size();
@@ -169,11 +166,12 @@ namespace ROS2
         message.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         message.height = 1;
         message.width = pointCount;
-        message.point_step = sizeof(PackedVector3);
+        message.point_step = 3 * sizeof(float);
 
-        AZStd::array<const char *, 3> pointFieldNames = {"x", "y", "z"};
+        AZStd::array<const char*, 3> pointFieldNames = { "x", "y", "z" };
 
-        for (int i = 0; i < pointFieldNames.size(); i++) {
+        for (int i = 0; i < pointFieldNames.size(); i++)
+        {
             sensor_msgs::msg::PointField pf;
             pf.name = pointFieldNames[i];
             pf.offset = i * 4;
@@ -182,7 +180,8 @@ namespace ROS2
             message.fields.push_back(pf);
         }
 
-        if (lastScanResults.m_ids.has_value()) {
+        if (lastScanResults.m_ids.has_value())
+        {
             sensor_msgs::msg::PointField pfId;
             pfId.name = "entity_id";
             pfId.offset = message.point_step;
@@ -192,14 +191,15 @@ namespace ROS2
             constexpr auto fieldLength = sizeof(int32_t);
             message.point_step += fieldLength;
         }
-        AZStd::array<AZ::Color, 256> colorLookupTable;
-        if (lastScanResults.m_classes.has_value()) {
-            colorLookupTable = m_lidarCore.m_lidarConfiguration.
-                    GenerateSegmentationColorsLookupTable();
+        AZStd::array<AZ::Color, LidarSensorConfiguration::MAX_CLASS> colorLookupTable;
+        if (lastScanResults.m_classes.has_value())
+        {
+            colorLookupTable = m_lidarCore.m_lidarConfiguration.GenerateSegmentationColorsLookupTable();
 
-            AZStd::array<const char *, 3> colorFieldNames = {"r", "g", "b"};
+            AZStd::array<const char*, 3> colorFieldNames = { "r", "g", "b" };
 
-            for (int i = 0; i < colorFieldNames.size(); i++) {
+            for (int i = 0; i < colorFieldNames.size(); i++)
+            {
                 sensor_msgs::msg::PointField pf;
                 pf.name = colorFieldNames[i];
                 pf.offset = message.point_step;
@@ -221,31 +221,35 @@ namespace ROS2
         const auto sizeInBytes = pointCount * message.point_step;
         message.data.resize(sizeInBytes);
 
-        PackedVector3 xyz = {0.0f, 0.0f, 0.0f};
-
-        // IMO this is the clearest way to handle the offset with future fields, compiler should optimize it
-        for (int i = 0; i < pointCount; ++i) {
+        float x, y, z;
+        for (int i = 0; i < pointCount; ++i)
+        {
             // to avoid alignment issues, we copy the data field by field
-            xyz[0] = lastScanResults.m_points[i].GetX();
-            xyz[1] = lastScanResults.m_points[i].GetY();
-            xyz[2] = lastScanResults.m_points[i].GetZ();
-            memcpy(&message.data[i * message.point_step], &xyz, sizeof(PackedVector3));
-            uint32_t nextFieldOffset = sizeof(PackedVector3);
+            x = lastScanResults.m_points[i].GetX();
+            y = lastScanResults.m_points[i].GetY();
+            z = lastScanResults.m_points[i].GetZ();
 
-            if (lastScanResults.m_ids.has_value()) {
-                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_ids.value()[i],
-                       sizeof(int32_t));
+            memcpy(&message.data[i * message.point_step], &x, sizeof(float));
+            memcpy(&message.data[i * message.point_step + sizeof(float)], &y, sizeof(float));
+            memcpy(&message.data[i * message.point_step + 2 * sizeof(float)], &z, sizeof(float));
+            uint32_t nextFieldOffset = 3 * sizeof(float);
+
+            if (lastScanResults.m_ids.has_value())
+            {
+                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_ids.value()[i], sizeof(int32_t));
                 nextFieldOffset += sizeof(int32_t);
             }
 
-            if (lastScanResults.m_classes.has_value()) {
-                for (int j = 0; j < 3; j++) {
-                    float color = colorLookupTable[lastScanResults.m_classes.value()[i]].GetElement(j);
-                    memcpy(&message.data[i * message.point_step + nextFieldOffset], &color, sizeof(float));
+            if (lastScanResults.m_classes.has_value())
+            {
+                const AZ::Color color = colorLookupTable[lastScanResults.m_classes.value()[i]];
+                for (int j = 0; j < 3; j++)
+                {
+                    float chanel_value = color.GetElement(j);
+                    memcpy(&message.data[i * message.point_step + nextFieldOffset], &chanel_value, sizeof(float));
                     nextFieldOffset += sizeof(float);
                 }
-                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_classes.value()[i],
-                       sizeof(uint8_t));
+                memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_classes.value()[i], sizeof(uint8_t));
                 nextFieldOffset += sizeof(uint8_t);
             }
         }
@@ -254,9 +258,11 @@ namespace ROS2
 
         m_pointCloudPublisher->publish(message);
 
-        if (m_segmentationClassesPublisher) {
+        if (m_segmentationClassesPublisher)
+        {
             vision_msgs::msg::LabelInfo segmentationClasses;
-            for (const auto &[name, id, color]: m_lidarCore.m_lidarConfiguration.m_segmentationClasses) {
+            for (const auto& [name, id, color] : m_lidarCore.m_lidarConfiguration.m_segmentationClasses)
+            {
                 vision_msgs::msg::VisionClass visionClass;
                 visionClass.class_id = id;
                 visionClass.class_name = name.c_str();

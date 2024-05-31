@@ -41,10 +41,12 @@ namespace ROS2
         AZStd::vector<AZ::EntityId> m_excludedEntities;
 
         AZStd::vector<AZStd::tuple<AZStd::string, uint8_t, AZ::Color> > m_segmentationClasses = {
-            {"unknown", 0, AZ::Color(1.0f, 1.0f, 1.0f, 1.0f)}
+            {"unknown", 0, AZ::Colors::White}
         };
 
-        [[nodiscard]] AZStd::array<AZ::Color, 256> GenerateSegmentationColorsLookupTable() const;
+        static constexpr uint8_t MAX_CLASS = 1<<sizeof(uint8_t);
+
+        [[nodiscard]] AZStd::array<AZ::Color, MAX_CLASS> GenerateSegmentationColorsLookupTable() const;
 
         bool m_addPointsAtMax = false;
 

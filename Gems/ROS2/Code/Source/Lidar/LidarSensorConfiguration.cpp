@@ -130,8 +130,8 @@ namespace ROS2
         m_lidarParameters = LidarTemplateUtils::GetTemplate(m_lidarModel);
     }
 
-    AZStd::array<AZ::Color, 256> LidarSensorConfiguration::GenerateSegmentationColorsLookupTable() const {
-        AZStd::array<AZ::Color, 256> colors;
+    AZStd::array<AZ::Color, LidarSensorConfiguration::MAX_CLASS> LidarSensorConfiguration::GenerateSegmentationColorsLookupTable() const {
+        AZStd::array<AZ::Color, MAX_CLASS> colors;
         for (auto &color: colors) {
             color = AZ::Colors::White;
         }
