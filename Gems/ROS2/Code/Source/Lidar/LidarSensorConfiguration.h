@@ -44,9 +44,9 @@ namespace ROS2
             {"unknown", 0, AZ::Colors::White}
         };
 
-        static constexpr uint8_t MAX_CLASS = 1<<sizeof(uint8_t);
+        static constexpr uint8_t maxClass = 1<<sizeof(uint8_t);
 
-        [[nodiscard]] AZStd::array<AZ::Color, MAX_CLASS> GenerateSegmentationColorsLookupTable() const;
+        [[nodiscard]] AZStd::array<AZ::Color, maxClass> GenerateSegmentationColorsLookupTable() const;
 
         bool m_addPointsAtMax = false;
 

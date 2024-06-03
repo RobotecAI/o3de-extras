@@ -191,7 +191,7 @@ namespace ROS2
             constexpr auto fieldLength = sizeof(int32_t);
             message.point_step += fieldLength;
         }
-        AZStd::array<AZ::Color, LidarSensorConfiguration::MAX_CLASS> colorLookupTable;
+        AZStd::array<AZ::Color, LidarSensorConfiguration::maxClass> colorLookupTable;
         if (lastScanResults.m_classes.has_value())
         {
             colorLookupTable = m_lidarCore.m_lidarConfiguration.GenerateSegmentationColorsLookupTable();
@@ -245,8 +245,8 @@ namespace ROS2
                 const AZ::Color color = colorLookupTable[lastScanResults.m_classes.value()[i]];
                 for (int j = 0; j < 3; j++)
                 {
-                    float chanel_value = color.GetElement(j);
-                    memcpy(&message.data[i * message.point_step + nextFieldOffset], &chanel_value, sizeof(float));
+                    float chanelValue = color.GetElement(j);
+                    memcpy(&message.data[i * message.point_step + nextFieldOffset], &chanelValue, sizeof(float));
                     nextFieldOffset += sizeof(float);
                 }
                 memcpy(&message.data[i * message.point_step + nextFieldOffset], &lastScanResults.m_classes.value()[i], sizeof(uint8_t));
