@@ -44,7 +44,7 @@ namespace ROS2
             {"unknown", 0, AZ::Colors::White}
         };
 
-        static constexpr uint8_t maxClass = 1<<sizeof(uint8_t);
+        static constexpr size_t maxClass = 256;
 
         [[nodiscard]] AZStd::array<AZ::Color, maxClass> GenerateSegmentationColorsLookupTable() const;
 
