@@ -102,8 +102,8 @@ namespace ROS2
 
         if (m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation) {
             AZStd::set<AZStd::pair<AZStd::string, uint8_t> > classTags;
-            for (const auto &[name, segment, color]: m_lidarConfiguration.m_segmentationClasses) {
-                classTags.insert({name, segment});
+            for (const auto &segmentation_class: m_lidarConfiguration.m_segmentationClasses) {
+                classTags.insert({segmentation_class.m_className, segmentation_class.m_classId});
             }
 
             LidarRaycasterRequestBus::Event(

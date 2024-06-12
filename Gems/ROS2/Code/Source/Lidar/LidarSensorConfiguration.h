@@ -15,6 +15,7 @@
 #include "LidarRegistrarSystemComponent.h"
 #include "LidarTemplate.h"
 #include "LidarTemplateUtils.h"
+#include "LidarSegmentationClassConfiguration.h"
 #include "LmbrCentral/Scripting/TagComponentBus.h"
 
 namespace ROS2
@@ -40,9 +41,7 @@ namespace ROS2
         AZStd::unordered_set<AZ::u32> m_ignoredCollisionLayers;
         AZStd::vector<AZ::EntityId> m_excludedEntities;
 
-        AZStd::vector<AZStd::tuple<AZStd::string, uint8_t, AZ::Color> > m_segmentationClasses = {
-            {"unknown", 0, AZ::Colors::White}
-        };
+        AZStd::vector<LidarSegmentationClassConfiguration> m_segmentationClasses;
 
         static constexpr size_t maxClass = 256;
 

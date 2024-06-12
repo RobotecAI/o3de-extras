@@ -261,11 +261,11 @@ namespace ROS2
         if (m_segmentationClassesPublisher)
         {
             vision_msgs::msg::LabelInfo segmentationClasses;
-            for (const auto& [name, id, color] : m_lidarCore.m_lidarConfiguration.m_segmentationClasses)
+            for (const auto&segmentation_class : m_lidarCore.m_lidarConfiguration.m_segmentationClasses)
             {
                 vision_msgs::msg::VisionClass visionClass;
-                visionClass.class_id = id;
-                visionClass.class_name = name.c_str();
+                visionClass.class_id = segmentation_class.m_classId;
+                visionClass.class_name = segmentation_class.m_className.c_str();
                 segmentationClasses.class_map.push_back(visionClass);
             }
             m_segmentationClassesPublisher->publish(segmentationClasses);
