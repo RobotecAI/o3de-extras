@@ -17,7 +17,7 @@ namespace ROS2
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<LidarSegmentationClassConfiguration>()
-                ->Version(1)
+                ->Version(2)
                 ->Field("className", &LidarSegmentationClassConfiguration::m_className)
                 ->Field("classId", &LidarSegmentationClassConfiguration::m_classId)
                 ->Field("classColor", &LidarSegmentationClassConfiguration::m_classColor);
@@ -30,16 +30,19 @@ namespace ROS2
                         &LidarSegmentationClassConfiguration::m_className,
                         "Class Name",
                         "Name of the class")
-                        ->DataElement(
-                                AZ::Edit::UIHandlers::Default,
-                                &LidarSegmentationClassConfiguration::m_classId,
-                                    "Class Id",
-                                "Id of the class")
-                        ->DataElement(
-                                AZ::Edit::UIHandlers::Default,
-                                &LidarSegmentationClassConfiguration::m_classColor,
-                                "Class Color",
-                                "Color of the class");
+                    ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true)
+                    ->DataElement(
+                            AZ::Edit::UIHandlers::Default,
+                            &LidarSegmentationClassConfiguration::m_classId,
+                                "Class Id",
+                            "Id of the class")
+                    ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true)
+                    ->DataElement(
+                            AZ::Edit::UIHandlers::Default,
+                            &LidarSegmentationClassConfiguration::m_classColor,
+                            "Class Color",
+                            "Color of the class")
+                    ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true);
 
             }
         }

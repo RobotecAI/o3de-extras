@@ -9,15 +9,18 @@
 #include "LidarSensorConfiguration.h"
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
+#include <AzCore/std/string/string.h>
+#include <AzCore/std/containers/vector.h>
 
 namespace ROS2
 {
     void LidarSensorConfiguration::Reflect(AZ::ReflectContext* context)
     {
+        LidarSegmentationClassConfiguration::Reflect(context);
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<LidarSensorConfiguration>()
-                ->Version(1)
+                ->Version(2)
                 ->Field("lidarModelName", &LidarSensorConfiguration::m_lidarModelName)
                 ->Field("lidarImplementation", &LidarSensorConfiguration::m_lidarSystem)
                 ->Field("LidarParameters", &LidarSensorConfiguration::m_lidarParameters)
@@ -68,6 +71,11 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::ContainerCanBeModified, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility,
                                 &LidarSensorConfiguration::IsSegmentationConfigurationVisible)
+                    ->Attribute(
+                        AZ::Edit::Attributes::DefaultAsset,
+                        AZStd::vector<LidarSegmentationClassConfiguration>(
+                            { { "unknown", 0, AZ::Colors::White }, { "Ground", 1, AZ::Colors::Brown } }))
+                    ->Attribute(AZ::Edit::Attributes::ChangeNotify, &LidarSensorConfiguration::SegmentationClassesChangeNotify)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &LidarSensorConfiguration::m_addPointsAtMax,
@@ -75,6 +83,55 @@ namespace ROS2
                         "If set true LiDAR will produce points at max range for free space")
                     ->Attribute(AZ::Edit::Attributes::Visibility, &LidarSensorConfiguration::IsMaxPointsConfigurationVisible);
             }
+        }
+    }
+
+    AZ::Crc32 LidarSensorConfiguration::SegmentationClassesChangeNotify()
+    {
+        bool unknown_present = false;
+        bool ground_present = false;
+        bool changed = false;
+        for (size_t i = 0; i < m_segmentationClasses.size(); i++)
+        {
+            if (m_segmentationClasses[i].m_className == "unknown")
+            {
+                if (m_segmentationClasses[i].m_classId != 0)
+                {
+                    m_segmentationClasses[i].m_classId = 0;
+                    changed = true;
+                }
+
+                unknown_present = true;
+            }
+            if (m_segmentationClasses[i].m_className == "Ground")
+            {
+                if (m_segmentationClasses[i].m_classId != 1)
+                {
+                    m_segmentationClasses[i].m_classId = 1;
+                    changed = true;
+                }
+                ground_present = true;
+            }
+        }
+        if (!unknown_present)
+        {
+            m_segmentationClasses.push_back({ "unknown", 0, AZ::Colors::White });
+        }
+        if (!ground_present)
+        {
+            m_segmentationClasses.push_back({ "Ground", 1, AZ::Colors::Brown });
+        }
+        if (changed)
+        {
+            return AZ::Edit::PropertyRefreshLevels::ValuesOnly;
+        }
+        else if (!unknown_present || !ground_present)
+        {
+            return AZ::Edit::PropertyRefreshLevels::EntireTree;
+        }
+        else
+        {
+            return AZ::Edit::PropertyRefreshLevels::None;
         }
     }
 

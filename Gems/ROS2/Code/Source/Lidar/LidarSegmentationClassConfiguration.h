@@ -22,11 +22,18 @@ namespace ROS2
     class LidarSegmentationClassConfiguration
     {
     public:
-        AZ_TYPE_INFO(LidarSegmentationClassConfiguration, "{e46e75f4-1e0e-48ca-a22f-43afc8f25102}");
+        AZ_TYPE_INFO(LidarSegmentationClassConfiguration, "{e46e75f4-1e0e-48ca-a22f-43afc8f25133}");
         static void Reflect(AZ::ReflectContext* context);
-        
-        AZStd::string m_className;
-        uint8_t m_classId;
-        AZ::Color m_classColor;
+
+        LidarSegmentationClassConfiguration() =default;
+        LidarSegmentationClassConfiguration(const AZStd::string& className, uint8_t classId, const AZ::Color& classColor)
+            : m_className(className)
+            , m_classId(classId)
+            , m_classColor(classColor)
+        {
+        };
+        AZStd::string m_className = "Default";
+        uint8_t m_classId = 0;
+        AZ::Color m_classColor = AZ::Color(1.0f, 1.0f, 1.0f, 1.0f);
     };
 } // namespace ROS2

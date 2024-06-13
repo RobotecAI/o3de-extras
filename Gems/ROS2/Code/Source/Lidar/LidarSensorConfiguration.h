@@ -55,12 +55,12 @@ namespace ROS2
         bool IsEntityExclusionVisible() const;
         bool IsMaxPointsConfigurationVisible() const;
         bool IsSegmentationConfigurationVisible() const;
-
         //! Update the lidar configuration based on the current lidar model selected.
         void FetchLidarModelConfiguration();
 
         AZ::Crc32 OnLidarModelSelected();
         AZ::Crc32 OnLidarImplementationSelected();
+        AZ::Crc32 SegmentationClassesChangeNotify();
 
         //! Get all models this configuration can be set to (for example all 2D lidar models).
         AZStd::vector<AZStd::string> GetAvailableModels() const;
