@@ -142,20 +142,26 @@ namespace ROS2
         m_dynamicTFBroadcaster = AZStd::make_unique<tf2_ros::TransformBroadcaster>(m_ros2Node);
 
         ROS2RequestBus::Handler::BusConnect();
-        AZ::TickBus::Handler::BusConnect();
+        AZ::SystemTickBus::Handler::BusConnect();
         m_nodeChangedEvent.Signal(m_ros2Node);
     }
 
-    void ROS2SystemComponent::Deactivate()
-    {
-        AZ::TickBus::Handler::BusDisconnect();
+    void ROS2SystemComponent::Deactivate() {
+        AZ::SystemTickBus::Handler::BusDisconnect();
         ROS2RequestBus::Handler::BusDisconnect();
-        m_simulationClock->Deactivate();
         m_dynamicTFBroadcaster.reset();
         m_staticTFBroadcaster.reset();
-        m_executor->remove_node(m_ros2Node);
-        m_executor.reset();
-        m_simulationClock.reset();
+        if (m_simulationClock)
+        {
+            m_simulationClock->Deactivate();
+            m_simulationClock.reset();
+        }
+
+        if (m_executor)
+        {
+            m_executor->remove_node(m_ros2Node);
+            m_executor.reset();
+        }
         m_ros2Node.reset();
         m_nodeChangedEvent.Signal(m_ros2Node);
     }
@@ -192,10 +198,12 @@ namespace ROS2
         }
     }
 
-    void ROS2SystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void ROS2SystemComponent::OnSystemTick()
     {
+        AZ_Printf("ROS2SystemComponent", "OnTick");
         if (rclcpp::ok())
         {
+            AZ_Printf("ROS2SystemComponent", "OnTick, rclcpp::ok()");
             m_dynamicTFBroadcaster->sendTransform(m_frameTransforms);
             m_frameTransforms.clear();
 

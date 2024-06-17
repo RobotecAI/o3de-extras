@@ -13,12 +13,13 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <ImGuiBus.h>
 #include <ROS2/Manipulation/MotorizedJoints/JointMotorControllerConfiguration.h>
+#include <ROS2/ROS2Bus.h>
 
 namespace ROS2
 {
     class JointMotorControllerComponent
         : public AZ::Component
-        , public AZ::TickBus::Handler
+        , public AZ::SystemTickBus::Handler
         , public ImGui::ImGuiUpdateListenerBus::Handler
         , public AZ::EntityBus::Handler
     {
@@ -57,6 +58,8 @@ namespace ROS2
         virtual void DisplayControllerParameters(){};
 
         // AZ::TickBus overrides
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+        void OnSystemTick() override;
+
+        builtin_interfaces::msg::Time m_lastTickTime;
     };
 } // namespace ROS2

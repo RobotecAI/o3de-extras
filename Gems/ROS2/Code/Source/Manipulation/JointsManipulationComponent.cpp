@@ -22,6 +22,7 @@
 #include <Source/HingeJointComponent.h>
 #include <Source/PrismaticJointComponent.h>
 #include <Utilities/ArticulationsUtilities.h>
+#include <ROS2/Utilities/ROS2Conversions.h>
 
 namespace ROS2
 {
@@ -182,15 +183,15 @@ namespace ROS2
         publisherContext.m_entityId = GetEntityId();
 
         m_jointStatePublisher = AZStd::make_unique<JointStatePublisher>(m_jointStatePublisherConfiguration, publisherContext);
-
-        AZ::TickBus::Handler::BusConnect();
+        m_lastTickTime = ROS2Interface::Get()->GetROSTimestamp();
+        AZ::SystemTickBus::Handler::BusConnect();
         JointsManipulationRequestBus::Handler::BusConnect(GetEntityId());
     }
 
     void JointsManipulationComponent::Deactivate()
     {
         JointsManipulationRequestBus::Handler::BusDisconnect();
-        AZ::TickBus::Handler::BusDisconnect();
+        AZ::SystemTickBus::Handler::BusDisconnect();
     }
 
     ManipulationJoints JointsManipulationComponent::GetJoints()
@@ -422,7 +423,7 @@ namespace ROS2
         return frameComponent->GetNamespace();
     }
 
-    void JointsManipulationComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void JointsManipulationComponent::OnSystemTick()
     {
         if (m_manipulationJoints.empty())
         {
@@ -443,11 +444,14 @@ namespace ROS2
             if (m_manipulationJoints.empty())
             {
                 AZ_Warning("JointsManipulationComponent", false, "No manipulation joints to handle!");
-                AZ::TickBus::Handler::BusDisconnect();
+                AZ::SystemTickBus::Handler::BusDisconnect();
                 return;
             }
             m_jointStatePublisher->InitializePublisher();
         }
+        auto timestamp = ROS2Interface::Get()->GetROSTimestamp();
+        float deltaTime = ROS2Conversions::GetTimeDifference(m_lastTickTime, timestamp);
         MoveToSetPositions(deltaTime);
+        m_lastTickTime = timestamp;
     }
 } // namespace ROS2

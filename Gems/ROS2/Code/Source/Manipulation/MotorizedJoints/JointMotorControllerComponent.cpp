@@ -12,13 +12,15 @@
 #include <PhysX/Joint/PhysXJointRequestsBus.h>
 #include <PrismaticJointComponent.h>
 #include <ROS2/Manipulation/MotorizedJoints/JointMotorControllerComponent.h>
+#include <ROS2/Utilities/ROS2Conversions.h>
 #include <imgui/imgui.h>
 
 namespace ROS2
 {
     void JointMotorControllerComponent::Activate()
     {
-        AZ::TickBus::Handler::BusConnect();
+        m_lastTickTime = ROS2::ROS2Interface::Get()->GetROSTimestamp();
+        AZ::SystemTickBus::Handler::BusConnect();
         ImGui::ImGuiUpdateListenerBus::Handler::BusConnect();
         AZ::EntityBus::Handler::BusConnect(GetEntityId());
     }
@@ -26,7 +28,7 @@ namespace ROS2
     void JointMotorControllerComponent::Deactivate()
     {
         ImGui::ImGuiUpdateListenerBus::Handler::BusDisconnect();
-        AZ::TickBus::Handler::BusDisconnect();
+        AZ::SystemTickBus::Handler::BusDisconnect();
     }
 
     void JointMotorControllerComponent::Reflect(AZ::ReflectContext* context)
@@ -76,7 +78,7 @@ namespace ROS2
         ImGui::End();
     }
 
-    void JointMotorControllerComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void JointMotorControllerComponent::OnSystemTick()
     {
         if (!m_jointComponentIdPair.GetEntityId().IsValid())
         {
@@ -84,8 +86,12 @@ namespace ROS2
         }
 
         PhysX::JointRequestBus::EventResult(m_currentPosition, m_jointComponentIdPair, &PhysX::JointRequests::GetPosition);
-        float setSpeed = CalculateMotorSpeed(deltaTime);
+
+        const auto timestamp = ROS2::ROS2Interface::Get()->GetROSTimestamp();
+        const float deltaTime = ROS2Conversions::GetTimeDifference(m_lastTickTime, timestamp);
+        const float setSpeed = CalculateMotorSpeed(deltaTime);
         PhysX::JointRequestBus::Event(m_jointComponentIdPair, &PhysX::JointRequests::SetVelocity, setSpeed);
+        m_lastTickTime = timestamp;
     }
 
     void JointMotorControllerComponent::OnEntityActivated(const AZ::EntityId& entityId)

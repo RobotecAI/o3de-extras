@@ -40,7 +40,7 @@ namespace ROS2
     //! @note A robot should have this component on every level of entity hierarchy (for each joint, fixed or dynamic)
     class ROS2FrameComponent
         : public AZ::Component
-        , public AZ::TickBus::Handler
+        , public AZ::SystemTickBus::Handler
     {
         friend class JsonFrameComponentConfigSerializer;
 
@@ -102,8 +102,8 @@ namespace ROS2
 
     private:
         //////////////////////////////////////////////////////////////////////////
-        // AZ::TickBus::Handler overrides
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+        // AZ::SystemTickBus::Handler overrides
+        void OnSystemTick() override;
         //////////////////////////////////////////////////////////////////////////
 
         bool IsTopLevel() const; //!< True if this entity does not have a parent entity with ROS2.

@@ -13,6 +13,7 @@
 #include <ROS2/Manipulation/JointsManipulationRequests.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/Utilities/ROS2Names.h>
+#include <ROS2/Utilities/ROS2Conversions.h>
 
 namespace ROS2
 {
@@ -22,8 +23,9 @@ namespace ROS2
         AZ_Assert(ros2Frame, "Missing Frame Component!");
         AZStd::string namespacedAction = ROS2Names::GetNamespacedName(ros2Frame->GetNamespace(), m_followTrajectoryActionName);
         m_followTrajectoryServer = AZStd::make_unique<FollowJointTrajectoryActionServer>(namespacedAction, GetEntityId());
-        AZ::TickBus::Handler::BusConnect();
+        AZ::SystemTickBus::Handler::BusConnect();
         JointsTrajectoryRequestBus::Handler::BusConnect(GetEntityId());
+        m_lastTickTime = ROS2Interface::Get()->GetROSTimestamp();
     }
 
     ManipulationJoints& JointsTrajectoryComponent::GetManipulationJoints()
@@ -38,7 +40,7 @@ namespace ROS2
     void JointsTrajectoryComponent::Deactivate()
     {
         JointsTrajectoryRequestBus::Handler::BusDisconnect();
-        AZ::TickBus::Handler::BusDisconnect();
+        AZ::SystemTickBus::Handler::BusDisconnect();
         m_followTrajectoryServer.reset();
     }
 
@@ -246,14 +248,17 @@ namespace ROS2
         }
     }
 
-    void JointsTrajectoryComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    void JointsTrajectoryComponent::OnSystemTick()
     {
         if (m_manipulationJoints.empty())
         {
             GetManipulationJoints();
             return;
         }
-        uint64_t deltaTimeNs = deltaTime * 1'000'000'000;
+        const auto timestamp = ROS2Interface::Get()->GetROSTimestamp();
+        const float deltaTime = ROS2Conversions::GetTimeDifference(timestamp, m_lastTickTime);
+        m_lastTickTime = timestamp;
+        const uint64_t deltaTimeNs = deltaTime * 1'000'000'000;
         FollowTrajectory(deltaTimeNs);
         UpdateFeedback();
     }

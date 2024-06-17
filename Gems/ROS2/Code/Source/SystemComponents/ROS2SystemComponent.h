@@ -41,7 +41,7 @@ namespace ROS2
     //! Central singleton-like System Component for ROS2 Gem.
     class ROS2SystemComponent
         : public AZ::Component
-        , public AZ::TickBus::Handler
+        , public AZ::SystemTickBus::Handler
         , protected ROS2RequestBus::Handler
     {
     public:
@@ -75,8 +75,8 @@ namespace ROS2
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
-        // AZTickBus interface implementation
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+        // SystemTickBus interface implementation
+        void OnSystemTick() override;
         ////////////////////////////////////////////////////////////////////////
     private:
         void InitClock();

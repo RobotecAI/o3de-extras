@@ -21,21 +21,26 @@ namespace ROS2
 
     void TickBasedSource::Start()
     {
-        AZ::TickBus::Handler::BusConnect();
+        m_lastMonotonicTime = AZStd::chrono::steady_clock::now();
+        AZ::SystemTickBus::Handler::BusConnect();
     }
 
     void TickBasedSource::Stop()
     {
-        AZ::TickBus::Handler::BusDisconnect();
+        AZ::SystemTickBus::Handler::BusDisconnect();
     }
 
-    float TickBasedSource::GetDeltaTime(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time) const
+    float TickBasedSource::GetDeltaTime() const
     {
-        return deltaTime;
+        return m_deltaTime;
     }
 
-    void TickBasedSource::OnTick(float deltaTime, AZ::ScriptTimePoint time)
+    void TickBasedSource::OnSystemTick()
     {
-        m_sourceEvent.Signal(deltaTime, time);
+        auto currentMonotonicTime = AZStd::chrono::steady_clock::now();
+        m_deltaTime = AZStd::chrono::duration<float>(currentMonotonicTime - m_lastMonotonicTime).count();
+        m_lastMonotonicTime = currentMonotonicTime;
+        m_sourceEvent.Signal();
+
     }
 } // namespace ROS2

@@ -18,8 +18,8 @@ namespace ROS2
     //! system ticks.
     //! @see ROS2::SensorEventSource
     class TickBasedSource final
-        : public SensorEventSource<AZ::Event, AZ::EventHandler, float, AZ::ScriptTimePoint>
-        , protected AZ::TickBus::Handler
+        : public SensorEventSource<AZ::Event, AZ::EventHandler>
+        , protected AZ::SystemTickBus ::Handler
     {
     public:
         AZ_TYPE_INFO(TickBasedSource, "{AD3CC041-5F7C-45E8-AA2D-5D8A1D4CC466}");
@@ -28,10 +28,12 @@ namespace ROS2
         // Overrides of ROS2::SensorEventSource.
         void Start() override;
         void Stop() override;
-        [[nodiscard]] float GetDeltaTime(float deltaTime, AZ::ScriptTimePoint time) const override;
+        [[nodiscard]] float GetDeltaTime() const override;
 
     private:
         // Override of AZ::TickBus::Handler.
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+        void OnSystemTick() override;
+        float m_deltaTime = 0.0f;
+        AZStd::chrono::time_point<AZStd::chrono::steady_clock> m_lastMonotonicTime;
     };
 } // namespace ROS2

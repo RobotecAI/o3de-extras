@@ -41,7 +41,7 @@ namespace ROS2
             });
         m_jointPositionsSubscriptionHandler->Activate(GetEntity(), m_topicConfiguration);
 
-        AZ::TickBus::Handler::BusConnect();
+        AZ::SystemTickBus::Handler::BusConnect();
     }
 
     void JointsPositionsComponent::Deactivate()
@@ -52,7 +52,7 @@ namespace ROS2
             m_jointPositionsSubscriptionHandler.reset();
         }
 
-        AZ::TickBus::Handler::BusDisconnect();
+        AZ::SystemTickBus::Handler::BusDisconnect();
     }
 
     void JointsPositionsComponent::Reflect(AZ::ReflectContext* context)
@@ -66,7 +66,7 @@ namespace ROS2
         }
     }
 
-    void JointsPositionsComponent::OnTick([[maybe_unused]] float delta, [[maybe_unused]] AZ::ScriptTimePoint timePoint)
+    void JointsPositionsComponent::OnSystemTick()
     {
         if (!m_rootOfArticulation.IsValid())
         {
@@ -77,7 +77,7 @@ namespace ROS2
                 "Entity %s is not part of an articulation.",
                 GetEntity()->GetName().c_str());
 
-            AZ::TickBus::Handler::BusDisconnect();
+            AZ::SystemTickBus::Handler::BusDisconnect();
         }
     }
 
