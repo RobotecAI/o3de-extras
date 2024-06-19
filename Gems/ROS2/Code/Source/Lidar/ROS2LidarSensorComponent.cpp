@@ -185,7 +185,7 @@ namespace ROS2
         size_t sizeInBytes = lastScanResults.m_points.size() * message.point_step;
         message.data.resize(sizeInBytes);
         AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
-        constexpr float intensity = 5734.0f; // max value from [redacted].mcap file
+        const float intensity = 5734.0f; // max value from [redacted].mcap file
         for (size_t i = 0; i < lastScanResults.m_points.size(); i++)
         {
             memcpy(message.data.data() + i * message.point_step, &lastScanResults.m_points[i], sizeof(AZ::Vector3));
