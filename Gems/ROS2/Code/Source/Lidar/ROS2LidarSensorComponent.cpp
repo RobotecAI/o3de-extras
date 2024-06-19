@@ -6,6 +6,7 @@
  *
  */
 
+
 #include <Atom/RPI.Public/AuxGeom/AuxGeomFeatureProcessorInterface.h>
 #include <Atom/RPI.Public/Scene.h>
 #include <Lidar/LidarRegistrarSystemComponent.h>
@@ -174,11 +175,26 @@ namespace ROS2
             pf.count = 1;
             message.fields.push_back(pf);
         }
+        sensor_msgs::msg::PointField pfIntensity;
+        pfIntensity.name = "intensity";
+        pfIntensity.offset = sizeof(AZ::Vector3);
+        pfIntensity.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfIntensity.count = 1;
+        message.fields.push_back(pfIntensity);
+        message.point_step += sizeof(float);
 
-        size_t sizeInBytes = lastScanResults.m_points.size() * sizeof(AZ::Vector3);
+
+
+        size_t sizeInBytes = lastScanResults.m_points.size() * message.point_step;
         message.data.resize(sizeInBytes);
         AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
-        memcpy(message.data.data(), lastScanResults.m_points.data(), sizeInBytes);
+        constexpr float intensity = 5734.0f; // max value from [redacted].mcap file
+        for (size_t i = 0; i < lastScanResults.m_points.size(); i++)
+        {
+            memcpy(message.data.data() + i * message.point_step, &lastScanResults.m_points[i], sizeof(AZ::Vector3));
+            memcpy(message.data.data() + i * message.point_step + sizeof(AZ::Vector3), &intensity, sizeof(float));
+        }
+
         m_pointCloudPublisher->publish(message);
     }
 } // namespace ROS2
