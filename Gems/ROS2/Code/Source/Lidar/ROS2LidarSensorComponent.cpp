@@ -162,7 +162,7 @@ namespace ROS2
         message.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         message.height = 1;
         message.width = lastScanResults.m_points.size();
-        message.point_step = sizeof(AZ::Vector3);
+        message.point_step = sizeof(AZ::Vector3) + sizeof(float); // 3 floats for x, y, z and 1 float for intensity
         message.row_step = message.width * message.point_step;
 
         AZStd::array<const char*, 3> point_field_names = { "x", "y", "z" };
@@ -181,9 +181,6 @@ namespace ROS2
         pfIntensity.datatype = sensor_msgs::msg::PointField::FLOAT32;
         pfIntensity.count = 1;
         message.fields.push_back(pfIntensity);
-        message.point_step += sizeof(float);
-
-
 
         size_t sizeInBytes = lastScanResults.m_points.size() * message.point_step;
         message.data.resize(sizeInBytes);
