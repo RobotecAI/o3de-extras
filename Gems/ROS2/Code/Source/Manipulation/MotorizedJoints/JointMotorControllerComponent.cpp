@@ -28,7 +28,7 @@ namespace ROS2
     void JointMotorControllerComponent::Deactivate()
     {
         ImGui::ImGuiUpdateListenerBus::Handler::BusDisconnect();
-        AZ::SystemTickBus::Handler::BusDisconnect();
+        AZ::TickBus::Handler::BusDisconnect();
     }
 
     void JointMotorControllerComponent::Reflect(AZ::ReflectContext* context)
@@ -78,7 +78,7 @@ namespace ROS2
         ImGui::End();
     }
 
-    void JointMotorControllerComponent::OnSystemTick()
+    void JointMotorControllerComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         if (!m_jointComponentIdPair.GetEntityId().IsValid())
         {

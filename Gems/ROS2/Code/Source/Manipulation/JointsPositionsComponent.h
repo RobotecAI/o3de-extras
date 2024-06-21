@@ -24,7 +24,7 @@ namespace ROS2
     //! This component implements finger gripper functionality.
     class JointsPositionsComponent
         : public AZ::Component
-        , public AZ::SystemTickBus::Handler
+        , public AZ::TickBus::Handler
     {
     public:
         JointsPositionsComponent() = default;
@@ -41,8 +41,8 @@ namespace ROS2
         static void Reflect(AZ::ReflectContext* context);
 
     private:
-        // AZ::SystemTickBus::Handler overrides...
-        void OnSystemTick() override;
+        // AZ::TickBus::Handler overrides...
+        void OnTick(float delta, AZ::ScriptTimePoint timePoint) override;
 
         void ProcessPositionControlMessage(const std_msgs::msg::Float64MultiArray& message);
 

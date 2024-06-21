@@ -19,7 +19,7 @@ namespace ROS2
 {
     class JointMotorControllerComponent
         : public AZ::Component
-        , public AZ::SystemTickBus::Handler
+        , public AZ::TickBus::Handler
         , public ImGui::ImGuiUpdateListenerBus::Handler
         , public AZ::EntityBus::Handler
     {
@@ -58,8 +58,6 @@ namespace ROS2
         virtual void DisplayControllerParameters(){};
 
         // AZ::TickBus overrides
-        void OnSystemTick() override;
-
-        builtin_interfaces::msg::Time m_lastTickTime;
+        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
     };
 } // namespace ROS2

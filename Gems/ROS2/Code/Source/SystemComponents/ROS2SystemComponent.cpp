@@ -142,26 +142,20 @@ namespace ROS2
         m_dynamicTFBroadcaster = AZStd::make_unique<tf2_ros::TransformBroadcaster>(m_ros2Node);
 
         ROS2RequestBus::Handler::BusConnect();
-        AZ::SystemTickBus::Handler::BusConnect();
+        AZ::TickBus::Handler::BusConnect();
         m_nodeChangedEvent.Signal(m_ros2Node);
     }
 
-    void ROS2SystemComponent::Deactivate() {
-        AZ::SystemTickBus::Handler::BusDisconnect();
+    void ROS2SystemComponent::Deactivate()
+    {
+        AZ::TickBus::Handler::BusDisconnect();
         ROS2RequestBus::Handler::BusDisconnect();
+        m_simulationClock->Deactivate();
         m_dynamicTFBroadcaster.reset();
         m_staticTFBroadcaster.reset();
-        if (m_simulationClock)
-        {
-            m_simulationClock->Deactivate();
-            m_simulationClock.reset();
-        }
-
-        if (m_executor)
-        {
-            m_executor->remove_node(m_ros2Node);
-            m_executor.reset();
-        }
+        m_executor->remove_node(m_ros2Node);
+        m_executor.reset();
+        m_simulationClock.reset();
         m_ros2Node.reset();
         m_nodeChangedEvent.Signal(m_ros2Node);
     }

@@ -191,7 +191,7 @@ namespace ROS2
     void JointsManipulationComponent::Deactivate()
     {
         JointsManipulationRequestBus::Handler::BusDisconnect();
-        AZ::SystemTickBus::Handler::BusDisconnect();
+        AZ::TickBus::Handler::BusDisconnect();
     }
 
     ManipulationJoints JointsManipulationComponent::GetJoints()
@@ -423,7 +423,7 @@ namespace ROS2
         return frameComponent->GetNamespace();
     }
 
-    void JointsManipulationComponent::OnSystemTick()
+    void JointsManipulationComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         if (m_manipulationJoints.empty())
         {
@@ -444,7 +444,7 @@ namespace ROS2
             if (m_manipulationJoints.empty())
             {
                 AZ_Warning("JointsManipulationComponent", false, "No manipulation joints to handle!");
-                AZ::SystemTickBus::Handler::BusDisconnect();
+                AZ::TickBus::Handler::BusDisconnect();
                 return;
             }
             m_jointStatePublisher->InitializePublisher();

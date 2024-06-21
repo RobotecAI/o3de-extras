@@ -25,7 +25,7 @@ namespace ROS2
     //! This manipulator component uses simple joint position interface. For trajectory control, see JointsTrajectoryComponent.
     class JointsManipulationComponent
         : public AZ::Component
-        , public AZ::SystemTickBus::Handler
+        , public AZ::TickBus::Handler
         , public JointsManipulationRequestBus::Handler
     {
     public:
@@ -70,8 +70,8 @@ namespace ROS2
         void Activate() override;
         void Deactivate() override;
 
-        // AZ::SystemTickBus::Handler overrides
-        void OnSystemTick() override;
+        // AZ::TickBus::Handler overrides
+        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
 
         void MoveToSetPositions(float deltaTime);
 

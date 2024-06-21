@@ -21,7 +21,7 @@ namespace ROS2
     //! Component responsible for execution of commands to move robotic arm (manipulator) based on set trajectory goal.
     class JointsTrajectoryComponent
         : public AZ::Component
-        , public AZ::SystemTickBus::Handler
+        , public AZ::TickBus::Handler
         , public JointsTrajectoryRequestBus::Handler
     {
     public:
@@ -47,8 +47,8 @@ namespace ROS2
         void Activate() override;
         void Deactivate() override;
 
-        // AZ::SystemTickBus::Handler overrides
-        void OnSystemTick() override;
+        // AZ::TickBus::Handler overrides
+        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
 
         //! Follow set trajectory.
         //! @param deltaTimeNs frame time step, to advance trajectory by.

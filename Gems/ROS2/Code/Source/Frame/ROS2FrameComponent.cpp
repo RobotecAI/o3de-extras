@@ -175,7 +175,7 @@ namespace ROS2
             m_ros2Transform = AZStd::make_unique<ROS2Transform>(GetParentFrameID(), GetFrameID(), IsDynamic());
             if (IsDynamic())
             {
-                AZ::SystemTickBus::Handler::BusConnect();
+                AZ::TickBus::Handler::BusConnect();
             }
             else
             {
@@ -190,13 +190,13 @@ namespace ROS2
         {
             if (IsDynamic())
             {
-                AZ::SystemTickBus::Handler::BusDisconnect();
+                AZ::TickBus::Handler::BusDisconnect();
             }
             m_ros2Transform.reset();
         }
     }
 
-    void ROS2FrameComponent::OnSystemTick()
+    void ROS2FrameComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         m_ros2Transform->Publish(GetFrameTransform());
     }

@@ -23,7 +23,7 @@ namespace ROS2
         AZ_Assert(ros2Frame, "Missing Frame Component!");
         AZStd::string namespacedAction = ROS2Names::GetNamespacedName(ros2Frame->GetNamespace(), m_followTrajectoryActionName);
         m_followTrajectoryServer = AZStd::make_unique<FollowJointTrajectoryActionServer>(namespacedAction, GetEntityId());
-        AZ::SystemTickBus::Handler::BusConnect();
+        AZ::TickBus::Handler::BusConnect();
         JointsTrajectoryRequestBus::Handler::BusConnect(GetEntityId());
         m_lastTickTime = ROS2Interface::Get()->GetROSTimestamp();
     }
@@ -40,7 +40,7 @@ namespace ROS2
     void JointsTrajectoryComponent::Deactivate()
     {
         JointsTrajectoryRequestBus::Handler::BusDisconnect();
-        AZ::SystemTickBus::Handler::BusDisconnect();
+        AZ::TickBus::Handler::BusDisconnect();
         m_followTrajectoryServer.reset();
     }
 
@@ -248,7 +248,7 @@ namespace ROS2
         }
     }
 
-    void JointsTrajectoryComponent::OnSystemTick()
+    void JointsTrajectoryComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
         if (m_manipulationJoints.empty())
         {
