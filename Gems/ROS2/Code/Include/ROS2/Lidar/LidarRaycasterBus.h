@@ -96,6 +96,7 @@ namespace ROS2
     struct RaycastResult
     {
         AZStd::vector<AZ::Vector3> m_points;
+        AZStd::vector<uint16_t > m_rings;
         AZStd::vector<float> m_ranges;
     };
 
