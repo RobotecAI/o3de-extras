@@ -96,8 +96,13 @@ namespace ROS2
     struct RaycastResult
     {
         AZStd::vector<AZ::Vector3> m_points;
+        AZStd::vector<float> m_intensity;
         AZStd::vector<uint16_t > m_rings;
+        AZStd::vector<float> m_azimuth;
         AZStd::vector<float> m_ranges;
+        AZStd::vector<uint8_t > m_returnType;
+        AZStd::vector<double> m_timestamp;
+        AZStd::vector<int32_t> m_isHit;
     };
 
     //! Interface class that allows for communication with a single Lidar instance.

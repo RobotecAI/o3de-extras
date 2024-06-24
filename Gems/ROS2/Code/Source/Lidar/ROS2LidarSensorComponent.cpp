@@ -155,6 +155,33 @@ namespace ROS2
             point = inverseLidarTM.TransformPoint(point);
         }
 
+        uint32_t offsetXYZ, offsetIntensity, offsetRing, offsetAzimuth, offsetDistance, offsetReturnType, offsetTimestamp;
+        offsetXYZ = 0;
+        offsetIntensity = offsetXYZ + (3 * sizeof(float)) /* extra 32 padding*/ + sizeof(uint32_t) /* extra 32 padding*/;
+        offsetRing = offsetIntensity + sizeof(float);
+        offsetAzimuth = offsetRing + sizeof(uint16_t) /* extra 16 padding*/ + sizeof(uint16_t) /* extra 16 padding*/;
+        offsetDistance = offsetAzimuth + sizeof(float);
+        offsetReturnType = offsetDistance + sizeof(float);
+        offsetTimestamp = offsetReturnType + sizeof(uint8_t) /* extra 56 padding*/ + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t) /* extra 56 padding*/;
+
+        AZ_TracePrintfOnce(">>>>>>>>>>>>>>", "Offsets: \nXYZ %d,\nIntensity: %d\nRing %d\nAzimuth %d\nDistance %d\nReturn type %d\nTime stamp %d\n ",
+                           offsetXYZ, offsetIntensity, offsetRing, offsetAzimuth, offsetDistance, offsetReturnType, offsetTimestamp);
+
+
+//        message.point_step =
+//            + 3 * sizeof(float) // XYZ
+//            + sizeof(uint32_t) // padding 32
+//            + sizeof(float) // intensity /\----
+//            + sizeof(uint16_t) // ring /\----
+//            + sizeof(uint16_t) // padding 16
+//            + sizeof(float) // azimuth /\----
+//            + sizeof(float) // distance /\----
+//            + sizeof(uint8_t) // return type /\----
+//            + sizeof(uint8_t) // padding 8
+//            + sizeof(uint16_t) // padding 16
+//            + sizeof(uint32_t ) // padding 32
+//            + sizeof(double); // timestamp <----
+
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         auto message = sensor_msgs::msg::PointCloud2();
         message.header.frame_id = ros2Frame->GetFrameID().data();
