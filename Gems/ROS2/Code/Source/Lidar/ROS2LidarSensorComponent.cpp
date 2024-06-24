@@ -18,6 +18,7 @@ namespace ROS2
     namespace
     {
         const char* PointCloudType = "sensor_msgs::msg::PointCloud2";
+        const char* PointCloudExType = "sensor_msgs::msg::PointCloud2Ex";
     }
 
     void ROS2LidarSensorComponent::Reflect(AZ::ReflectContext* context)
@@ -57,8 +58,15 @@ namespace ROS2
         AZStd::string type = PointCloudType;
         pc.m_type = type;
         pc.m_topic = "pc";
+
+        TopicConfiguration pcEx;
+        AZStd::string typeEx = PointCloudExType;
+        pcEx.m_type = typeEx;
+        pcEx.m_topic = "pcEx";
+
         m_sensorConfiguration.m_frequency = 10.f;
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, pc));
+        m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(typeEx, pcEx));
     }
 
     ROS2LidarSensorComponent::ROS2LidarSensorComponent(
@@ -188,7 +196,19 @@ namespace ROS2
         message.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
         message.height = 1;
         message.width = lastScanResults.m_points.size();
-        message.point_step = 3 * sizeof(float) + sizeof(uint16_t);
+        message.point_step =
+            + 3 * sizeof(float) // XYZ
+            + sizeof(uint32_t) // padding 32
+            + sizeof(float) // intensity /\----
+            + sizeof(uint16_t) // ring /\----
+            + sizeof(uint16_t) // padding 16
+            + sizeof(float) // azimuth /\----
+            + sizeof(float) // distance /\----
+            + sizeof(uint8_t) // return type /\----
+            + sizeof(uint8_t) // padding 8
+            + sizeof(uint16_t) // padding 16
+            + sizeof(uint32_t ) // padding 32
+            + sizeof(double); // timestamp <----
         message.row_step = message.width * message.point_step;
         message.is_dense = false;
  
@@ -203,23 +223,62 @@ namespace ROS2
             message.fields.push_back(pf);
         }
 
+        sensor_msgs::msg::PointField pfIntensity;
+        pfIntensity.name = "intensity";
+        pfIntensity.offset = offsetIntensity;
+        pfIntensity.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfIntensity.count = 1;
+        message.fields.push_back(pfIntensity);
+
         sensor_msgs::msg::PointField pfRing;
         pfRing.name = "ring";
-        pfRing.offset = 12;
+        pfRing.offset = offsetRing;
         pfRing.datatype = sensor_msgs::msg::PointField::UINT16;
         pfRing.count = 1;
         message.fields.push_back(pfRing);
+
+        sensor_msgs::msg::PointField pfAzimuth;
+        pfAzimuth.name = "azimuth";
+        pfAzimuth.offset = offsetAzimuth;
+        pfAzimuth.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfAzimuth.count = 1;
+        message.fields.push_back(pfAzimuth);
+
+        sensor_msgs::msg::PointField pfDistance;
+        pfDistance.name = "distance";
+        pfDistance.offset = offsetDistance;
+        pfDistance.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfDistance.count = 1;
+        message.fields.push_back(pfDistance);
+
+        sensor_msgs::msg::PointField pfReturnType;
+        pfReturnType.name = "return_type";
+        pfReturnType.offset = offsetReturnType;
+        pfReturnType.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfReturnType.count = 1;
+        message.fields.push_back(pfReturnType);
+
+        sensor_msgs::msg::PointField pfTimestamp;
+        pfTimestamp.name = "timestamp";
+        pfTimestamp.offset = offsetTimestamp;
+        pfTimestamp.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfTimestamp.count = 1;
+        message.fields.push_back(pfTimestamp);
 
         size_t sizeInBytes = lastScanResults.m_points.size() * message.point_step;
         message.data.resize(sizeInBytes);
         AZ_Assert(message.row_step * message.height == sizeInBytes, "Inconsistency in the size of point cloud data");
 
-        int offset = 0;
-        for (int i = 0; i < lastScanResults.m_points.size(); ++i)
+        for (int i = 0; i < lastScanResults.m_points.size(); i++)
         {
-            memcpy(message.data.data() + offset, &lastScanResults.m_points[i], 3 * sizeof(float));
-            memcpy(message.data.data() + offset + 3 * sizeof(float), &lastScanResults.m_rings[i], sizeof(uint16_t));
-            offset += message.point_step;
+            double timestamp = 0;
+            memcpy(message.data.data() + (message.point_step * i) + offsetXYZ, &lastScanResults.m_points[i], 3 * sizeof(float));
+            memcpy(message.data.data() + (message.point_step * i) + offsetIntensity, &lastScanResults.m_intensity[i], sizeof(float));
+            memcpy(message.data.data() + (message.point_step * i) + offsetRing, &lastScanResults.m_rings[i], sizeof(uint16_t));
+            memcpy(message.data.data() + (message.point_step * i) + offsetAzimuth, &lastScanResults.m_azimuth[i], sizeof(float));
+            memcpy(message.data.data() + (message.point_step * i) + offsetDistance, &lastScanResults.m_ranges[i], sizeof(float));
+            memcpy(message.data.data() + (message.point_step * i) + offsetReturnType, &lastScanResults.m_returnType[i], sizeof(uint8_t));
+            memcpy(message.data.data() + (message.point_step * i) + offsetTimestamp, &timestamp, sizeof(double));
         }
         m_pointCloudPublisher->publish(message);
     }
