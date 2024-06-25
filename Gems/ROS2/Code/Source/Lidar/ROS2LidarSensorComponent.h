@@ -47,6 +47,7 @@ namespace ROS2
 
         bool m_canRaycasterPublish = false;
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> m_pointCloudPublisher;
+        std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> m_pointCloudLitePublisher;
 
         LidarCore m_lidarCore;
 

@@ -81,6 +81,25 @@
                                     "Topic": "pc"
                                 }
                             }
+                        },
+                        "lidarCore": {
+                            "lidarConfiguration": {
+                                "lidarModelName": "Velodyne Puck (VLP-16)",
+                                "lidarImplementation": "RobotecGPULidar",
+                                "LidarParameters": {
+                                    "Name": "Velodyne Puck (VLP-16)",
+                                    "Layers": 16,
+                                    "Points per layer": 1800,
+                                    "Min vertical angle": 15.0,
+                                    "Max vertical angle": -15.0,
+                                    "Noise Parameters": {
+                                        "Distance noise standard deviation base": 0.029999999329447746
+                                    }
+                                },
+                                "ExcludedEntities": [
+                                    "Entity_[417184227077]"
+                                ]
+                            }
                         }
                     }
                 },
@@ -175,7 +194,7 @@
                                     "guid": "{99D850A3-8E59-5E78-93FE-AE8DB228684D}",
                                     "subId": 2574200790
                                 },
-                                "assetHint": "models/sensors/lidaros2/lidaros2.pxmesh"
+                                "assetHint": "models/sensors/lidaros2/lidaros2.fbx.pxmesh"
                             },
                             "Configuration": {
                                 "PhysicsAsset": {
@@ -184,7 +203,7 @@
                                         "subId": 2574200790
                                     },
                                     "loadBehavior": "QueueLoad",
-                                    "assetHint": "models/sensors/lidaros2/lidaros2.pxmesh"
+                                    "assetHint": "models/sensors/lidaros2/lidaros2.fbx.pxmesh"
                                 }
                             }
                         }

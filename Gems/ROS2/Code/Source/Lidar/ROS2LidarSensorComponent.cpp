@@ -12,13 +12,14 @@
 #include <Lidar/ROS2LidarSensorComponent.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Utilities/ROS2Names.h>
+#include <AzCore/Math/MathUtils.h>
 
 namespace ROS2
 {
     namespace
     {
         const char* PointCloudType = "sensor_msgs::msg::PointCloud2";
-        const char* PointCloudExType = "sensor_msgs::msg::PointCloud2Ex";
+        const char* PointCloudLiteType = "sensor_msgs::msg::PointCloud2Lite";
     }
 
     void ROS2LidarSensorComponent::Reflect(AZ::ReflectContext* context)
@@ -60,7 +61,7 @@ namespace ROS2
         pc.m_topic = "pc";
 
         TopicConfiguration pcEx;
-        AZStd::string typeEx = PointCloudExType;
+        AZStd::string typeEx = PointCloudLiteType;
         pcEx.m_type = typeEx;
         pcEx.m_topic = "pcEx";
 
@@ -108,6 +109,10 @@ namespace ROS2
             const TopicConfiguration& publisherConfig = m_sensorConfiguration.m_publishersConfigurations[PointCloudType];
             AZStd::string fullTopic = ROS2Names::GetNamespacedName(GetNamespace(), publisherConfig.m_topic);
             m_pointCloudPublisher = ros2Node->create_publisher<sensor_msgs::msg::PointCloud2>(fullTopic.data(), publisherConfig.GetQoS());
+
+            const TopicConfiguration& publisherLiteConfig = m_sensorConfiguration.m_publishersConfigurations[PointCloudLiteType];
+            AZStd::string fullTopicLite = ROS2Names::GetNamespacedName(GetNamespace(), publisherLiteConfig.m_topic);
+            m_pointCloudLitePublisher = ros2Node->create_publisher<sensor_msgs::msg::PointCloud2>(fullTopicLite.data(), publisherLiteConfig.GetQoS());
         }
 
         StartSensor(
@@ -134,6 +139,7 @@ namespace ROS2
     {
         StopSensor();
         m_pointCloudPublisher.reset();
+        m_pointCloudLitePublisher.reset();
         m_lidarCore.Deinit();
     }
 
@@ -175,21 +181,6 @@ namespace ROS2
         AZ_TracePrintfOnce(">>>>>>>>>>>>>>", "Offsets: \nXYZ %d,\nIntensity: %d\nRing %d\nAzimuth %d\nDistance %d\nReturn type %d\nTime stamp %d\n ",
                            offsetXYZ, offsetIntensity, offsetRing, offsetAzimuth, offsetDistance, offsetReturnType, offsetTimestamp);
 
-
-//        message.point_step =
-//            + 3 * sizeof(float) // XYZ
-//            + sizeof(uint32_t) // padding 32
-//            + sizeof(float) // intensity /\----
-//            + sizeof(uint16_t) // ring /\----
-//            + sizeof(uint16_t) // padding 16
-//            + sizeof(float) // azimuth /\----
-//            + sizeof(float) // distance /\----
-//            + sizeof(uint8_t) // return type /\----
-//            + sizeof(uint8_t) // padding 8
-//            + sizeof(uint16_t) // padding 16
-//            + sizeof(uint32_t ) // padding 32
-//            + sizeof(double); // timestamp <----
-
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         auto message = sensor_msgs::msg::PointCloud2();
         message.header.frame_id = ros2Frame->GetFrameID().data();
@@ -210,7 +201,7 @@ namespace ROS2
             + sizeof(uint32_t ) // padding 32
             + sizeof(double); // timestamp <----
         message.row_step = message.width * message.point_step;
-        message.is_dense = false;
+        message.is_dense = true;
  
         AZStd::array<const char*, 3> point_field_names = { "x", "y", "z" };
         for (int i = 0; i < point_field_names.size(); i++)
@@ -272,14 +263,72 @@ namespace ROS2
         for (int i = 0; i < lastScanResults.m_points.size(); i++)
         {
             double timestamp = 0;
+            float azimuth = AZ::Atan2(lastScanResults.m_points[i].GetY(), lastScanResults.m_points[i].GetX());
             memcpy(message.data.data() + (message.point_step * i) + offsetXYZ, &lastScanResults.m_points[i], 3 * sizeof(float));
             memcpy(message.data.data() + (message.point_step * i) + offsetIntensity, &lastScanResults.m_intensity[i], sizeof(float));
             memcpy(message.data.data() + (message.point_step * i) + offsetRing, &lastScanResults.m_rings[i], sizeof(uint16_t));
-            memcpy(message.data.data() + (message.point_step * i) + offsetAzimuth, &lastScanResults.m_azimuth[i], sizeof(float));
+            memcpy(message.data.data() + (message.point_step * i) + offsetAzimuth, &azimuth, sizeof(float));
             memcpy(message.data.data() + (message.point_step * i) + offsetDistance, &lastScanResults.m_ranges[i], sizeof(float));
             memcpy(message.data.data() + (message.point_step * i) + offsetReturnType, &lastScanResults.m_returnType[i], sizeof(uint8_t));
             memcpy(message.data.data() + (message.point_step * i) + offsetTimestamp, &timestamp, sizeof(double));
         }
+
         m_pointCloudPublisher->publish(message);
+
+        /*
+         *  Lite pointcloud
+         */
+
+        auto messageLite = sensor_msgs::msg::PointCloud2();
+        messageLite.header.frame_id = ros2Frame->GetFrameID().data();
+        messageLite.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
+        messageLite.height = 1;
+        messageLite.width = lastScanResults.m_points.size();
+        messageLite.point_step =
+            + 3 * sizeof(float) // XYZ
+            + sizeof(uint32_t) // padding 32
+            + sizeof(float) // intensity /\----
+            + sizeof(uint16_t) // ring /\----
+            + sizeof(uint16_t); // padding 16
+        messageLite.row_step = messageLite.width * messageLite.point_step;
+        messageLite.is_dense = true;
+
+        for (int i = 0; i < point_field_names.size(); i++)
+        {
+            sensor_msgs::msg::PointField pf;
+            pf.name = point_field_names[i];
+            pf.offset = i * 4;
+            pf.datatype = sensor_msgs::msg::PointField::FLOAT32;
+            pf.count = 1;
+            messageLite.fields.push_back(pf);
+        }
+
+        sensor_msgs::msg::PointField pfIntensityLite;
+        pfIntensityLite.name = "intensity";
+        pfIntensityLite.offset = offsetIntensity;
+        pfIntensityLite.datatype = sensor_msgs::msg::PointField::FLOAT32;
+        pfIntensityLite.count = 1;
+        messageLite.fields.push_back(pfIntensityLite);
+
+        sensor_msgs::msg::PointField pfRingLite;
+        pfRingLite.name = "ring";
+        pfRingLite.offset = offsetRing;
+        pfRingLite.datatype = sensor_msgs::msg::PointField::UINT16;
+        pfRingLite.count = 1;
+        messageLite.fields.push_back(pfRing);
+
+        sizeInBytes = lastScanResults.m_points.size() * messageLite.point_step;
+        messageLite.data.resize(sizeInBytes);
+        AZ_Assert(messageLite.row_step * messageLite.height == sizeInBytes, "Inconsistency in the size of point cloud data");
+
+        for (int i = 0; i < lastScanResults.m_points.size(); i++)
+        {
+            memcpy(messageLite.data.data() + (messageLite.point_step * i) + offsetXYZ, &lastScanResults.m_points[i], 3 * sizeof(float));
+            memcpy(messageLite.data.data() + (messageLite.point_step * i) + offsetIntensity, &lastScanResults.m_intensity[i], sizeof(float));
+            memcpy(messageLite.data.data() + (messageLite.point_step * i) + offsetRing, &lastScanResults.m_rings[i], sizeof(uint16_t));
+        }
+
+        m_pointCloudLitePublisher->publish(messageLite);
+
     }
 } // namespace ROS2
