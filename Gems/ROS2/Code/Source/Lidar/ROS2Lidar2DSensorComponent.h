@@ -13,6 +13,7 @@
 #include <ROS2/Lidar/LidarSystemBus.h>
 #include <ROS2/Sensor/Events/TickBasedSource.h>
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
+
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
@@ -28,7 +29,7 @@ namespace ROS2
     class ROS2Lidar2DSensorComponent : public ROS2SensorComponentBase<TickBasedSource>
     {
     public:
-        AZ_COMPONENT(ROS2Lidar2DSensorComponent, "{F4C2D970-1D69-40F2-9D4D-B52DCFDD2704}", SensorBaseType);
+        AZ_COMPONENT(ROS2Lidar2DSensorComponent, ROS2Lidar2DSensorComponentTypeId, SensorBaseType);
         ROS2Lidar2DSensorComponent();
         ROS2Lidar2DSensorComponent(const SensorConfiguration& sensorConfiguration, const LidarSensorConfiguration& lidarConfiguration);
         ~ROS2Lidar2DSensorComponent() = default;

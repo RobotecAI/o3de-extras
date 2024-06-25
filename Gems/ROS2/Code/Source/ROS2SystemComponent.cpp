@@ -30,7 +30,7 @@
 #include <AzCore/std/smart_ptr/make_shared.h>
 #include <AzCore/std/string/string_view.h>
 #include <AzFramework/API/ApplicationAPI.h>
-
+#include <ROS2/Sensor/SensorConfigurationRequestBus.h>
 namespace ROS2
 {
     constexpr AZStd::string_view ClockTypeConfigurationKey = "/O3DE/ROS2/ClockType";
