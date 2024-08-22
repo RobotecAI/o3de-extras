@@ -108,7 +108,7 @@ namespace ROS2
 
     void ROS2Lidar2DSensorComponent::FrequencyTick()
     {
-        RaycastResult lastScanResults = m_lidarCore.PerformRaycast();
+        const RaycastResult& lastScanResults = m_lidarCore.PerformRaycast();
 
         auto* ros2Frame = Utils::GetGameOrEditorComponent<ROS2FrameComponent>(GetEntity());
         auto message = sensor_msgs::msg::LaserScan();
