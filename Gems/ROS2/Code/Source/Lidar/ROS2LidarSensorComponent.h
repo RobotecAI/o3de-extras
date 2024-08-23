@@ -61,10 +61,10 @@ namespace ROS2
 
         LidarId m_lidarRaycasterId;
 
-        ROS2::TopicConfiguration m_parametersConfigurationTopic;
+        ROS2::TopicConfiguration m_parametersSetterConfigurationTopic;
         rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_parametersConfigurationTopicSubscription;
 
-        ROS2::TopicConfiguration m_parametersGetConfigurationTopic;
+        ROS2::TopicConfiguration m_parametersGetterConfigurationTopic;
         rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_parametersGetConfigurationTopicPublisher;
     };
 } // namespace ROS2

@@ -31,7 +31,8 @@ namespace ROS2
             serializeContext->Class<ROS2LidarSensorComponent, SensorBaseType>()
                 ->Version(3)
                 ->Field("lidarCore", &ROS2LidarSensorComponent::m_lidarCore)
-                ->Field("ParametersTopicConfiguration", &ROS2LidarSensorComponent::m_parametersConfigurationTopic);
+                ->Field("ParametersSetterTopicConfiguration", &ROS2LidarSensorComponent::m_parametersSetterConfigurationTopic)
+                ->Field("ParametersGetterTopicConfiguration", &ROS2LidarSensorComponent::m_parametersGetterConfigurationTopic);
 
             if (auto* editContext = serializeContext->GetEditContext())
             {
@@ -49,9 +50,14 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
-                        &ROS2LidarSensorComponent::m_parametersConfigurationTopic,
-                        "Parameters Topic",
-                        "Topic to receive parameters for the sensor");
+                        &ROS2LidarSensorComponent::m_parametersSetterConfigurationTopic,
+                        "Parameters setter topic",
+                        "Topic to receive parameters for the sensor")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2LidarSensorComponent::m_parametersGetterConfigurationTopic,
+                        "Parameters getter topic",
+                        "Topic to publish parameters for the sensor");
             }
         }
     }
@@ -70,6 +76,12 @@ namespace ROS2
         pc.m_topic = "pc";
         m_sensorConfiguration.m_frequency = 10.f;
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, pc));
+
+        m_parametersSetterConfigurationTopic.m_topic = "SetLidarParameters";
+        m_parametersSetterConfigurationTopic.m_type = "std_msgs/msg/String";
+
+        m_parametersGetterConfigurationTopic.m_topic = "GetLidarParameters";
+        m_parametersGetterConfigurationTopic.m_type = "std_msgs/msg/String";
     }
 
     ROS2LidarSensorComponent::ROS2LidarSensorComponent(
@@ -137,8 +149,8 @@ namespace ROS2
         AZ_Assert(ros2Node, "ROS 2 node is not initialized");
 
         m_parametersConfigurationTopicSubscription = ros2Node->create_subscription<std_msgs::msg::String>(
-            m_parametersConfigurationTopic.m_topic.c_str(),
-            m_parametersConfigurationTopic.GetQoS(),
+            ROS2Names::GetNamespacedName(GetNamespace(), m_parametersSetterConfigurationTopic.m_topic).c_str(),
+            m_parametersSetterConfigurationTopic.GetQoS(),
             [this](const std_msgs::msg::String::SharedPtr msg)
             {
                 // Copy the message to a string to avoid lifetime issues.
@@ -146,10 +158,9 @@ namespace ROS2
                 SetConfigurationFormJsonString(msgString);
             });
 
-        m_parametersGetConfigurationTopic.m_topic = ROS2Names::GetNamespacedName(GetNamespace(), "get_configuration");
-
         m_parametersGetConfigurationTopicPublisher = ros2Node->create_publisher<std_msgs::msg::String>(
-            m_parametersGetConfigurationTopic.m_topic.c_str(), m_parametersGetConfigurationTopic.GetQoS());
+            ROS2Names::GetNamespacedName(GetNamespace(), m_parametersGetterConfigurationTopic.m_topic).c_str(),
+            m_parametersGetterConfigurationTopic.GetQoS());
 
         PublishConfiguration();
     }
@@ -157,6 +168,7 @@ namespace ROS2
     void ROS2LidarSensorComponent::Deactivate()
     {
         m_parametersConfigurationTopicSubscription.reset();
+        m_parametersGetConfigurationTopicPublisher.reset();
 
         StopSensor();
         m_pointCloudPublisher.reset();
