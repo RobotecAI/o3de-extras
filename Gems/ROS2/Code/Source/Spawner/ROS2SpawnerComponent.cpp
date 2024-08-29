@@ -226,9 +226,9 @@ namespace ROS2
             }
         }
 
-        optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableNamespace, parent](auto id, auto view)
+        optionalArgs.m_preInsertionCallback = [this, transform, ticketName, spawnableNamespace, parent](auto id, auto view)
         {
-            PreSpawn(id, view, transform, spawnableName, spawnableNamespace, parent);
+            PreSpawn(id, view, transform, ticketName, spawnableNamespace, parent);
         };
 
         optionalArgs.m_completionCallback = [service_handle, header, ticketName](auto id, auto view)
@@ -246,7 +246,7 @@ namespace ROS2
         AzFramework::EntitySpawnTicket::Id id [[maybe_unused]],
         AzFramework::SpawnableEntityContainerView view,
         const AZ::Transform& transform,
-        const AZStd::string& spawnableName,
+        const AZStd::string& instanceName,
         const AZStd::string& spawnableNamespace,
         const AZ::EntityId& parent)
     {
@@ -260,7 +260,6 @@ namespace ROS2
         transformInterface->SetWorldTM(transform);
         transformInterface->SetParent(parent);
 
-        AZStd::string instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
         for (AZ::Entity* entity : view)
         { // Update name for the first entity with ROS2Frame in hierarchy (left to right)
             auto* frameComponent = entity->FindComponent<ROS2FrameComponent>();

@@ -76,7 +76,7 @@ namespace ROS2
             AzFramework::EntitySpawnTicket::Id,
             AzFramework::SpawnableEntityContainerView,
             const AZ::Transform&,
-            const AZStd::string& spawnableName,
+            const AZStd::string& instanceName,
             const AZStd::string& spawnableNamespace,
             const AZ::EntityId& parent);
 
