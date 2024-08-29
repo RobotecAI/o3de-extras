@@ -85,7 +85,7 @@ namespace ROS2
         AZ::Transform transform = { AZ::Vector3{ 0, 0, 0 }, AZ::Quaternion{ 0, 0, 0, 1.0 }, 1.0 };
         AZ::TransformBus::EventResult(transform, m_config.m_editorEntityId, &AZ::TransformBus::Events::GetWorldTM);
 
-        return { m_config.m_name, SpawnPointInfo{ m_config.m_info, transform } };
+        return { m_config.m_name, SpawnPointInfo{ m_config.m_info, transform, m_config.m_editorEntityId } };
     }
 
 } // namespace ROS2

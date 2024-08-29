@@ -85,7 +85,11 @@ namespace ROS2
             {
                 editContext->Class<ROS2SpawnerComponentConfig>("ROS2SpawnerComponentConfig", "Config for ROS2SpawnerComponent")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2SpawnerComponentConfig::m_supportWGS, "Support WGS", "Support for spawning entities using WGS84 coordinate system")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2SpawnerComponentConfig::m_supportWGS,
+                        "Support WGS",
+                        "Support for spawning entities using WGS84 coordinate system")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2SpawnerComponentConfig::m_spawnables, "Spawnables", "Spawnables")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
@@ -146,7 +150,7 @@ namespace ROS2
     AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponentController::GetSpawnPoints() const
     {
         AZStd::vector<AZ::EntityId> children;
-        AZ::TransformBus::EventResult(children, m_config.m_editorEntityId, &AZ::TransformBus::Events::GetChildren);
+        AZ::TransformBus::EventResult(children, m_config.m_editorEntityId, &AZ::TransformBus::Events::GetAllDescendants);
 
         AZStd::unordered_map<AZStd::string, SpawnPointInfo> result;
 
@@ -164,7 +168,8 @@ namespace ROS2
 
         // setting name of spawn point component "default" in a child entity will have no effect since it is overwritten here with the
         // default spawn pose of spawner
-        result["default"] = SpawnPointInfo{ "Default spawn pose defined in the Editor", m_config.m_defaultSpawnPose };
+        result["default"] =
+            SpawnPointInfo{ "Default spawn pose defined in the Editor", m_config.m_defaultSpawnPose, m_config.m_editorEntityId };
         return result;
     }
 

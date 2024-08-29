@@ -1,10 +1,10 @@
 /*
-* Copyright (c) Contributors to the Open 3D Engine Project.
-* For complete copyright and license terms please see the LICENSE at the root of this distribution.
-*
-* SPDX-License-Identifier: Apache-2.0 OR MIT
-*
-*/
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
 
 #include "ROS2SpawnerComponent.h"
 #include "Spawner/ROS2SpawnerComponentController.h"
@@ -23,17 +23,17 @@
 namespace ROS2
 {
 
-   ROS2SpawnerComponent::ROS2SpawnerComponent(const ROS2SpawnerComponentConfig& properties)
-       : ROS2SpawnerComponentBase(properties)
-   {
-   }
+    ROS2SpawnerComponent::ROS2SpawnerComponent(const ROS2SpawnerComponentConfig& properties)
+        : ROS2SpawnerComponentBase(properties)
+    {
+    }
 
-   void ROS2SpawnerComponent::Activate()
-   {
-       ROS2SpawnerComponentBase::Activate();
+    void ROS2SpawnerComponent::Activate()
+    {
+        ROS2SpawnerComponentBase::Activate();
 
-       auto ros2Node = ROS2Interface::Get()->GetNode();
-       AZ_Assert(ros2Node, "ROS 2 node is not initialized");
+        auto ros2Node = ROS2Interface::Get()->GetNode();
+        AZ_Assert(ros2Node, "ROS 2 node is not initialized");
 
         const auto serviceNames = m_controller.GetServiceNames();
 
@@ -77,36 +77,36 @@ namespace ROS2
             });
     }
 
-   void ROS2SpawnerComponent::Deactivate()
-   {
-       ROS2SpawnerComponentBase::Deactivate();
+    void ROS2SpawnerComponent::Deactivate()
+    {
+        ROS2SpawnerComponentBase::Deactivate();
 
-       m_getSpawnablesNamesService.reset();
-       m_spawnService.reset();
-       m_deleteService.reset();
-       m_getSpawnPointInfoService.reset();
-       m_getSpawnPointsNamesService.reset();
-       m_tickets.clear();
-   }
+        m_getSpawnablesNamesService.reset();
+        m_spawnService.reset();
+        m_deleteService.reset();
+        m_getSpawnPointInfoService.reset();
+        m_getSpawnPointsNamesService.reset();
+        m_tickets.clear();
+    }
 
-   void ROS2SpawnerComponent::Reflect(AZ::ReflectContext* context)
-   {
-       ROS2SpawnerComponentBase::Reflect(context);
+    void ROS2SpawnerComponent::Reflect(AZ::ReflectContext* context)
+    {
+        ROS2SpawnerComponentBase::Reflect(context);
 
-       if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
-       {
-           serialize->Class<ROS2SpawnerComponent, ROS2SpawnerComponentBase>()->Version(1);
-       }
-   }
+        if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
+        {
+            serialize->Class<ROS2SpawnerComponent, ROS2SpawnerComponentBase>()->Version(1);
+        }
+    }
 
-   void ROS2SpawnerComponent::GetAvailableSpawnableNames(
-       const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
-   {
-       for (const auto& spawnable : m_controller.GetSpawnables())
-       {
-           response->model_names.emplace_back(spawnable.first.c_str());
-       }
-   }
+    void ROS2SpawnerComponent::GetAvailableSpawnableNames(
+        const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
+    {
+        for (const auto& spawnable : m_controller.GetSpawnables())
+        {
+            response->model_names.emplace_back(spawnable.first.c_str());
+        }
+    }
 
     void ROS2SpawnerComponent::SpawnEntity(
         const SpawnEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, const SpawnEntityRequest request)
@@ -144,24 +144,24 @@ namespace ROS2
             return;
         }
 
-       auto spawnable = m_controller.GetSpawnables().find(spawnableName);
+        auto spawnable = m_controller.GetSpawnables().find(spawnableName);
 
-       if (spawnable->second->IsLoading())
-       {
-           // This is an Editor only situation. All assets during game mode are fully loaded.
-           response.success = false;
-           response.status_message = "Asset for spawnable " + request->name + " has not yet loaded.";
-           service_handle->send_response(*header, response);
-           return;
-       }
+        if (spawnable->second->IsLoading())
+        {
+            // This is an Editor only situation. All assets during game mode are fully loaded.
+            response.success = false;
+            response.status_message = "Asset for spawnable " + request->name + " has not yet loaded.";
+            service_handle->send_response(*header, response);
+            return;
+        }
 
-       if (spawnable->second->IsError())
-       {
-           response.success = false;
-           response.status_message = "Spawnable " + request->name + " loaded with an error.";
-           service_handle->send_response(*header, response);
-           return;
-       }
+        if (spawnable->second->IsError())
+        {
+            response.success = false;
+            response.status_message = "Spawnable " + request->name + " loaded with an error.";
+            service_handle->send_response(*header, response);
+            return;
+        }
 
         if (!m_tickets.contains(spawnableName))
         {
@@ -170,16 +170,17 @@ namespace ROS2
             m_tickets.emplace(spawnable->first, AzFramework::EntitySpawnTicket(spawnable->second));
         }
 
-       auto spawnableTicket = AzFramework::EntitySpawnTicket(spawnable->second);
-       auto ticketId = spawnableTicket.GetId();
-       AZStd::string ticketName = spawnable->first + "_" + AZStd::to_string(ticketId);
-       m_tickets.emplace(ticketName, AZStd::move(spawnableTicket));
+        auto spawnableTicket = AzFramework::EntitySpawnTicket(spawnable->second);
+        auto ticketId = spawnableTicket.GetId();
+        AZStd::string ticketName = spawnable->first + "_" + AZStd::to_string(ticketId);
+        m_tickets.emplace(ticketName, AZStd::move(spawnableTicket));
 
-       auto spawner = AZ::Interface<AzFramework::SpawnableEntitiesDefinition>::Get();
+        auto spawner = AZ::Interface<AzFramework::SpawnableEntitiesDefinition>::Get();
 
-       AzFramework::SpawnAllEntitiesOptionalArgs optionalArgs;
+        AzFramework::SpawnAllEntitiesOptionalArgs optionalArgs;
 
-       AZ::Transform transform;
+        AZ::Transform transform;
+        AZ::EntityId parent;
 
         if (isWGS)
         {
@@ -208,6 +209,7 @@ namespace ROS2
             if (auto spawnPoints = GetSpawnPoints(); spawnPoints.contains(spawnPointName))
             {
                 transform = spawnPoints.at(spawnPointName).pose;
+                parent = spawnPoints.at(spawnPointName).entityId;
             }
             else
             {
@@ -219,113 +221,116 @@ namespace ROS2
                                   request->initial_pose.orientation.z,
                                   request->initial_pose.orientation.w),
                               1.0f };
+
+                parent = GetEntityId();
             }
         }
 
-       optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableNamespace](auto id, auto view)
-       {
-           PreSpawn(id, view, transform, spawnableName, spawnableNamespace);
-       };
+        optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableNamespace, parent](auto id, auto view)
+        {
+            PreSpawn(id, view, transform, spawnableName, spawnableNamespace, parent);
+        };
 
-       optionalArgs.m_completionCallback = [service_handle, header, ticketName](auto id, auto view)
-       {
-           SpawnEntityResponse response;
-           response.success = true;
-           response.status_message = ticketName.c_str();
-           service_handle->send_response(*header, response);
-       };
+        optionalArgs.m_completionCallback = [service_handle, header, ticketName](auto id, auto view)
+        {
+            SpawnEntityResponse response;
+            response.success = true;
+            response.status_message = ticketName.c_str();
+            service_handle->send_response(*header, response);
+        };
 
-       spawner->SpawnAllEntities(m_tickets.at(ticketName), optionalArgs);
-   }
+        spawner->SpawnAllEntities(m_tickets.at(ticketName), optionalArgs);
+    }
 
-   void ROS2SpawnerComponent::PreSpawn(
-       AzFramework::EntitySpawnTicket::Id id [[maybe_unused]],
-       AzFramework::SpawnableEntityContainerView view,
-       const AZ::Transform& transform,
-       const AZStd::string& spawnableName,
-       const AZStd::string& spawnableNamespace)
-   {
-       if (view.empty())
-       {
-           return;
-       }
-       AZ::Entity* root = *view.begin();
+    void ROS2SpawnerComponent::PreSpawn(
+        AzFramework::EntitySpawnTicket::Id id [[maybe_unused]],
+        AzFramework::SpawnableEntityContainerView view,
+        const AZ::Transform& transform,
+        const AZStd::string& spawnableName,
+        const AZStd::string& spawnableNamespace,
+        const AZ::EntityId& parent)
+    {
+        if (view.empty())
+        {
+            return;
+        }
+        AZ::Entity* root = *view.begin();
 
-       auto* transformInterface = root->FindComponent<AzFramework::TransformComponent>();
-       transformInterface->SetWorldTM(transform);
-       transformInterface->SetParent(GetEntityId());
+        auto* transformInterface = root->FindComponent<AzFramework::TransformComponent>();
+        transformInterface->SetWorldTM(transform);
+        transformInterface->SetParent(parent);
 
-       AZStd::string instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
-       for (AZ::Entity* entity : view)
-       { // Update name for the first entity with ROS2Frame in hierarchy (left to right)
-           auto* frameComponent = entity->FindComponent<ROS2FrameComponent>();
-           if (frameComponent)
-           {
-               entity->SetName(instanceName);
-               if (!spawnableNamespace.empty())
-               {
-                   frameComponent->UpdateNamespaceConfiguration(spawnableNamespace, NamespaceConfiguration::NamespaceStrategy::Custom);
-               }
-               break;
-           }
-       }
-   }
+        AZStd::string instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
+        for (AZ::Entity* entity : view)
+        { // Update name for the first entity with ROS2Frame in hierarchy (left to right)
+            auto* frameComponent = entity->FindComponent<ROS2FrameComponent>();
+            if (frameComponent)
+            {
+                entity->SetName(instanceName);
+                if (!spawnableNamespace.empty())
+                {
+                    frameComponent->UpdateNamespaceConfiguration(spawnableNamespace, NamespaceConfiguration::NamespaceStrategy::Custom);
+                }
+                break;
+            }
+        }
+    }
 
-   void ROS2SpawnerComponent::DeleteEntity(
-       const DeleteEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, DeleteEntityRequest request)
-   {
-       auto deleteName = AZStd::string(request->name.c_str());
-       if (!m_tickets.contains(deleteName))
-       {
-           DeleteEntityResponse response;
-           response.success = false;
-           response.status_message = "Could not find entity with given name: " + request->name;
-           service_handle->send_response(*header, response);
-           return;
-       }
-       auto spawner = AZ::Interface<AzFramework::SpawnableEntitiesDefinition>::Get();
+    void ROS2SpawnerComponent::DeleteEntity(
+        const DeleteEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, DeleteEntityRequest request)
+    {
+        auto deleteName = AZStd::string(request->name.c_str());
+        if (!m_tickets.contains(deleteName))
+        {
+            DeleteEntityResponse response;
+            response.success = false;
+            response.status_message = "Could not find entity with given name: " + request->name;
+            service_handle->send_response(*header, response);
+            return;
+        }
+        auto spawner = AZ::Interface<AzFramework::SpawnableEntitiesDefinition>::Get();
 
-       AzFramework::DespawnAllEntitiesOptionalArgs optionalArgs;
+        AzFramework::DespawnAllEntitiesOptionalArgs optionalArgs;
 
-       optionalArgs.m_completionCallback = [service_handle, header](auto id)
-       {
-           DeleteEntityResponse response;
-           response.success = true;
-           service_handle->send_response(*header, response);
-       };
+        optionalArgs.m_completionCallback = [service_handle, header](auto id)
+        {
+            DeleteEntityResponse response;
+            response.success = true;
+            service_handle->send_response(*header, response);
+        };
 
-       spawner->DespawnAllEntities(m_tickets.at(deleteName), optionalArgs);
-       m_tickets.erase(deleteName);
-   }
+        spawner->DespawnAllEntities(m_tickets.at(deleteName), optionalArgs);
+        m_tickets.erase(deleteName);
+    }
 
-   void ROS2SpawnerComponent::GetSpawnPointsNames(
-       const ROS2::GetSpawnPointsNamesRequest request, ROS2::GetSpawnPointsNamesResponse response)
-   {
-       for (auto spawnPoint : GetSpawnPoints())
-       {
-           response->model_names.emplace_back(spawnPoint.first.c_str());
-       }
-   }
+    void ROS2SpawnerComponent::GetSpawnPointsNames(
+        const ROS2::GetSpawnPointsNamesRequest request, ROS2::GetSpawnPointsNamesResponse response)
+    {
+        for (auto spawnPoint : GetSpawnPoints())
+        {
+            response->model_names.emplace_back(spawnPoint.first.c_str());
+        }
+    }
 
-   void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest request, ROS2::GetSpawnPointInfoResponse response)
-   {
-       const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
+    void ROS2SpawnerComponent::GetSpawnPointInfo(const ROS2::GetSpawnPointInfoRequest request, ROS2::GetSpawnPointInfoResponse response)
+    {
+        const AZStd::string_view key(request->model_name.c_str(), request->model_name.size());
 
-       auto spawnPoints = GetSpawnPoints();
-       if (spawnPoints.contains(key))
-       {
-           auto info = spawnPoints.at(key);
-           response->pose = ROS2Conversions::ToROS2Pose(info.pose);
-           response->status_message = info.info.c_str();
-       }
-       else
-       {
-           response->status_message = "Could not find spawn point with given name: " + request->model_name;
-       }
-   }
+        auto spawnPoints = GetSpawnPoints();
+        if (spawnPoints.contains(key))
+        {
+            auto info = spawnPoints.at(key);
+            response->pose = ROS2Conversions::ToROS2Pose(info.pose);
+            response->status_message = info.info.c_str();
+        }
+        else
+        {
+            response->status_message = "Could not find spawn point with given name: " + request->model_name;
+        }
+    }
 
-   AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponent::GetSpawnPoints()
-   {
-       return m_controller.GetSpawnPoints();
-   }
+    AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponent::GetSpawnPoints()
+    {
+        return m_controller.GetSpawnPoints();
+    }
 } // namespace ROS2

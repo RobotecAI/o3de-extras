@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <AzCore/Component/Entity.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Memory/Memory.h>
 #include <AzCore/Memory/Memory_fwd.h>
@@ -20,6 +21,7 @@ namespace ROS2
     {
         AZStd::string info;
         AZ::Transform pose;
+        AZ::EntityId entityId{ AZ::EntityId::InvalidEntityId };
     };
 
     using SpawnPointInfoMap = AZStd::unordered_map<AZStd::string, SpawnPointInfo>;
