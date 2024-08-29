@@ -77,10 +77,10 @@ namespace ROS2
         m_sensorConfiguration.m_frequency = 10.f;
         m_sensorConfiguration.m_publishersConfigurations.insert(AZStd::make_pair(type, pc));
 
-        m_parametersSetterConfigurationTopic.m_topic = "SetLidarParameters";
+        m_parametersSetterConfigurationTopic.m_topic = "set_parameters";
         m_parametersSetterConfigurationTopic.m_type = "std_msgs/msg/String";
 
-        m_parametersGetterConfigurationTopic.m_topic = "GetLidarParameters";
+        m_parametersGetterConfigurationTopic.m_topic = "get_parameters";
         m_parametersGetterConfigurationTopic.m_type = "std_msgs/msg/String";
     }
 
