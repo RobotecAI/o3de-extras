@@ -118,10 +118,9 @@ namespace ROS2
 
         //! Schedules a raycast that originates from the point described by the lidarTransform.
         //! @param lidarTransform Current transform from global to lidar reference frame.
-        //! @param flags Used to request different kinds of data returned by raycast query
         //! @return Results of the raycast in the requested form if the raycast was successfull or an error message if it was not.
         //! The returned error messages are c-style string literals which are statically allocated and therefore do not need to be
-        //! dealocated.
+        //! deallocated.
         virtual AZ::Outcome<RaycastResults, const char*> PerformRaycast(const AZ::Transform& lidarTransform) = 0;
 
         //! Configures ray Gaussian Noise parameters.
@@ -129,7 +128,7 @@ namespace ROS2
         //! This type of noise is especially useful when trying to simulate real-life lidars, since its noise mimics
         //! the imperfections arising due to various physical factors e.g. fluctuations in rotary motion of the lidar (angular noise) or
         //! distance accuracy (distance noise).
-        //! For the the details about Gaussian noise, please refer to https://en.wikipedia.org/wiki/Gaussian_noise.
+        //! For the details about Gaussian noise, please refer to https://en.wikipedia.org/wiki/Gaussian_noise.
         //! @param angularNoiseStdDev Angular noise standard deviation.
         //! @param distanceNoiseStdDevBase Base value for Distance noise standard deviation.
         //! @param distanceNoiseStdDevRisePerMeter Value by which the distance noise standard deviation increases per meter length from
@@ -157,7 +156,7 @@ namespace ROS2
         }
 
         //! Configures max range point addition.
-        //! @param includeMaxRange Should the raycaster add points at max range for rays that exceeded their range?
+        //! @param addMaxRangePoints Should the raycaster add points at max range for rays that exceeded their range?
         virtual void ConfigureMaxRangePointAddition([[maybe_unused]] bool addMaxRangePoints)
         {
             AZ_Assert(false, "This Lidar Implementation does not support Max range point addition configuration!");
@@ -187,10 +186,10 @@ namespace ROS2
             AZ_Assert(false, "This Lidar Implementation does not support PointCloud publishing!");
         }
 
-        //! Can the raycaster handle publishing?
-        //! This function should be called after the raycaster has been configured.
-        //! The raycaster may not be able to handle point-cloud publishing in certain configurations (e.g. when the maxPointAddition
-        //! is selected) in which case publishing must be handled somewhere else (e.g. by the ROS2LidarComponent).
+        //! Can the raycaster handle publishing under current configuration?
+        //! This function should be called after the raycaster has been configured (except for the publisher).
+        //! The raycaster may not be able to handle point-cloud publishing in certain configurations (e.g. when segmeenation is enabled)
+        //! in which case publishing must be handled somewhere else (e.g. by the ROS2LidarComponent).
         virtual bool CanHandlePublishing()
         {
             AZ_Assert(false, "This Lidar Implementation does not support PointCloud publishing!");
