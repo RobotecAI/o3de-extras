@@ -37,9 +37,15 @@ namespace ROS2
         }
     }
 
-    RaycastResultFlags LidarCore::GetRaycastResultFlagsForConfig(const LidarSensorConfiguration& configuration)
+    RaycastResultFlags LidarCore::CalculateRaycastResultFlags(const LidarSensorConfiguration& configuration, bool isRangeRequired)
     {
-        RaycastResultFlags flags = RaycastResultFlags::Range | RaycastResultFlags::Point;
+        RaycastResultFlags flags = RaycastResultFlags::Point;
+
+        if (isRangeRequired)
+        {
+            flags |= RaycastResultFlags::Range;
+        }
+
         if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Intensity)
         {
             flags |= RaycastResultFlags::Intensity;
@@ -90,11 +96,6 @@ namespace ROS2
                 m_lidarConfiguration.m_lidarParameters.m_noiseParameters.m_distanceNoiseStdDevRisePerMeter);
         }
 
-        LidarRaycasterRequestBus::Event(
-            m_lidarRaycasterId,
-            &LidarRaycasterRequestBus::Events::ConfigureRaycastResultFlags,
-            GetRaycastResultFlagsForConfig(m_lidarConfiguration));
-
         if (m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::CollisionLayers)
         {
             LidarRaycasterRequestBus::Event(
@@ -116,6 +117,12 @@ namespace ROS2
                 &LidarRaycasterRequestBus::Events::ConfigureMaxRangePointAddition,
                 m_lidarConfiguration.m_addPointsAtMax);
         }
+
+        LidarRaycasterRequestBus::Event(
+            m_lidarRaycasterId,
+            &LidarRaycasterRequestBus::Events::ConfigureRaycastResultFlags,
+            m_raycastResultFlags);
+
     }
 
     void LidarCore::UpdatePoints(const RaycastResults& results)
@@ -155,7 +162,7 @@ namespace ROS2
         }
     }
 
-    void LidarCore::Init(AZ::EntityId entityId)
+    void LidarCore::Init(AZ::EntityId entityId, bool isRangeRequired)
     {
         m_entityId = entityId;
 
@@ -166,6 +173,8 @@ namespace ROS2
 
         m_lidarConfiguration.FetchLidarImplementationFeatures();
         ConnectToLidarRaycaster();
+
+        m_raycastResultFlags = CalculateRaycastResultFlags(m_lidarConfiguration, isRangeRequired);
         ConfigureLidarRaycaster();
     }
 
