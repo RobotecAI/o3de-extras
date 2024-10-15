@@ -58,6 +58,7 @@ namespace ROS2
 
     void ROS2GNSSSensorComponent::Activate()
     {
+        ROS2SensorComponentBase::Activate();
         auto ros2Node = ROS2Interface::Get()->GetNode();
         AZ_Assert(m_sensorConfiguration.m_publishersConfigurations.size() == 1, "Invalid configuration of publishers for GNSS sensor");
 
@@ -88,6 +89,7 @@ namespace ROS2
     {
         StopSensor();
         m_gnssPublisher.reset();
+        ROS2SensorComponentBase::Deactivate();
     }
 
     void ROS2GNSSSensorComponent::FrequencyTick()
@@ -97,7 +99,7 @@ namespace ROS2
 
         WGS::WGS84Coordinate currentPositionWGS84;
         ROS2::GeoreferenceRequestsBus::BroadcastResult(
-            currentPositionWGS84, &GeoreferenceRequests::ConvertFromLevelToWSG84, currentPosition);
+            currentPositionWGS84, &GeoreferenceRequests::ConvertFromLevelToWGS84, currentPosition);
 
         m_gnssMsg.latitude = currentPositionWGS84.m_latitude;
         m_gnssMsg.longitude = currentPositionWGS84.m_longitude;

@@ -14,6 +14,7 @@
 #include <AzCore/std/string/string.h>
 #include <AzFramework/Spawnable/Spawnable.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Georeference/GeoreferenceBus.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2GemUtilities.h>
 #include <ROS2/Utilities/ROS2Conversions.h>
@@ -34,45 +35,47 @@ namespace ROS2
        auto ros2Node = ROS2Interface::Get()->GetNode();
        AZ_Assert(ros2Node, "ROS 2 node is not initialized");
 
+        const auto serviceNames = m_controller.GetServiceNames();
+
         m_getSpawnablesNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
-            "get_available_spawnable_names",
+            serviceNames.m_availableSpawnableNamesServiceName.c_str(),
             [this](const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response)
             {
                 GetAvailableSpawnableNames(request, response);
             });
 
-       m_spawnService = ros2Node->create_service<gazebo_msgs::srv::SpawnEntity>(
-           "spawn_entity",
-           [this](
-               const SpawnEntityServiceHandle service_handle,
-               const std::shared_ptr<rmw_request_id_t> header,
-               const SpawnEntityRequest request)
-           {
-               SpawnEntity(service_handle, header, request);
-           });
+        m_spawnService = ros2Node->create_service<gazebo_msgs::srv::SpawnEntity>(
+            serviceNames.m_spawnEntityServiceName.c_str(),
+            [this](
+                const SpawnEntityServiceHandle service_handle,
+                const std::shared_ptr<rmw_request_id_t> header,
+                const SpawnEntityRequest request)
+            {
+                SpawnEntity(service_handle, header, request);
+            });
 
-       m_deleteService = ros2Node->create_service<gazebo_msgs::srv::DeleteEntity>(
-           "delete_entity",
-           [this](
-               const DeleteEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, DeleteEntityRequest request)
-           {
-               DeleteEntity(service_handle, header, request);
-           });
+        m_deleteService = ros2Node->create_service<gazebo_msgs::srv::DeleteEntity>(
+            serviceNames.m_deleteEntityServiceName.c_str(),
+            [this](
+                const DeleteEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, DeleteEntityRequest request)
+            {
+                DeleteEntity(service_handle, header, request);
+            });
 
-       m_getSpawnPointInfoService = ros2Node->create_service<gazebo_msgs::srv::GetModelState>(
-           "get_spawn_point_info",
-           [this](const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response)
-           {
-               GetSpawnPointInfo(request, response);
-           });
+        m_getSpawnPointInfoService = ros2Node->create_service<gazebo_msgs::srv::GetModelState>(
+            serviceNames.m_spawnPointInfoServiceName.c_str(),
+            [this](const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response)
+            {
+                GetSpawnPointInfo(request, response);
+            });
 
-       m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
-           "get_spawn_points_names",
-           [this](const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response)
-           {
-               GetSpawnPointsNames(request, response);
-           });
-   }
+        m_getSpawnPointsNamesService = ros2Node->create_service<gazebo_msgs::srv::GetWorldProperties>(
+            serviceNames.m_spawnPointsNamesServiceName.c_str(),
+            [this](const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response)
+            {
+                GetSpawnPointsNames(request, response);
+            });
+    }
 
    void ROS2SpawnerComponent::Deactivate()
    {
@@ -105,14 +108,25 @@ namespace ROS2
        }
    }
 
-   void ROS2SpawnerComponent::SpawnEntity(
-       const SpawnEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, const SpawnEntityRequest request)
-   {
-       AZStd::string spawnableName(request->name.c_str());
-       AZStd::string spawnableNamespace(request->robot_namespace.c_str());
-       AZStd::string spawnPointName(request->xml.c_str(), request->xml.size());
+    void ROS2SpawnerComponent::SpawnEntity(
+        const SpawnEntityServiceHandle service_handle, const std::shared_ptr<rmw_request_id_t> header, const SpawnEntityRequest request)
+    {
+        AZStd::string referenceFrame(request->reference_frame.c_str());
+        const bool isWGS{ referenceFrame == "wgs84" && m_controller.GetSupportWGS() };
 
-       SpawnEntityResponse response;
+        SpawnEntityResponse response;
+
+        if (isWGS && !GeoreferenceRequestsBus::HasHandlers())
+        {
+            response.success = false;
+            response.status_message = "Level is not geographically positioned. Action aborted.";
+            service_handle->send_response(*header, response);
+            return;
+        }
+
+        AZStd::string spawnableName(request->name.c_str());
+        AZStd::string spawnableNamespace(request->robot_namespace.c_str());
+        AZStd::string spawnPointName(request->xml.c_str(), request->xml.size());
 
         if (auto namespaceValidation = ROS2Names::ValidateNamespace(spawnableNamespace); !namespaceValidation.IsSuccess())
         {
@@ -167,19 +181,45 @@ namespace ROS2
 
        AZ::Transform transform;
 
-        if (auto spawnPoints = GetSpawnPoints(); spawnPoints.contains(spawnPointName))
+        if (isWGS)
         {
-            transform = spawnPoints.at(spawnPointName).pose;
+            ROS2::WGS::WGS84Coordinate coordinate;
+            AZ::Vector3 coordinateInLevel = AZ::Vector3(-1);
+            AZ::Quaternion rotationInENU = AZ::Quaternion::CreateIdentity();
+            coordinate.m_latitude = request->initial_pose.position.x;
+            coordinate.m_longitude = request->initial_pose.position.y;
+            coordinate.m_altitude = request->initial_pose.position.z;
+            ROS2::GeoreferenceRequestsBus::BroadcastResult(rotationInENU, &ROS2::GeoreferenceRequests::GetRotationFromLevelToENU);
+            ROS2::GeoreferenceRequestsBus::BroadcastResult(
+                coordinateInLevel, &ROS2::GeoreferenceRequests::ConvertFromWGS84ToLevel, coordinate);
+
+            rotationInENU = (rotationInENU.GetInverseFast() *
+                             AZ::Quaternion(
+                                 request->initial_pose.orientation.x,
+                                 request->initial_pose.orientation.y,
+                                 request->initial_pose.orientation.z,
+                                 request->initial_pose.orientation.w))
+                                .GetNormalized();
+
+            transform = { coordinateInLevel, rotationInENU, 1.0f };
         }
         else
         {
-            transform = { AZ::Vector3(request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
-                          AZ::Quaternion(
-                              request->initial_pose.orientation.x,
-                              request->initial_pose.orientation.y,
-                              request->initial_pose.orientation.z,
-                              request->initial_pose.orientation.w),
-                          1.0f };
+            if (auto spawnPoints = GetSpawnPoints(); spawnPoints.contains(spawnPointName))
+            {
+                transform = spawnPoints.at(spawnPointName).pose;
+            }
+            else
+            {
+                transform = { AZ::Vector3(
+                                  request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
+                              AZ::Quaternion(
+                                  request->initial_pose.orientation.x,
+                                  request->initial_pose.orientation.y,
+                                  request->initial_pose.orientation.z,
+                                  request->initial_pose.orientation.w),
+                              1.0f };
+            }
         }
 
        optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableNamespace](auto id, auto view)
@@ -213,6 +253,7 @@ namespace ROS2
 
        auto* transformInterface = root->FindComponent<AzFramework::TransformComponent>();
        transformInterface->SetWorldTM(transform);
+       transformInterface->SetParent(GetEntityId());
 
        AZStd::string instanceName = AZStd::string::format("%s_%d", spawnableName.c_str(), m_counter++);
        for (AZ::Entity* entity : view)

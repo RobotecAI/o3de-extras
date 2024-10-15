@@ -22,8 +22,10 @@ set(FILES
         Source/Camera/ROS2CameraSensorComponent.h
         Source/Camera/CameraUtilities.cpp
         Source/Camera/CameraUtilities.h
-        Source/Clock/PhysicallyStableClock.cpp
-        Source/Clock/SimulationClock.cpp
+        Source/Clock/ROS2Clock.cpp
+        Source/Clock/ROS2TimeSource.cpp
+        Source/Clock/SimulationTimeSource.cpp
+        Source/Clock/RealTimeSource.cpp
         Source/Communication/QoS.cpp
         Source/Communication/PublisherConfiguration.cpp
         Source/Communication/TopicConfiguration.cpp
@@ -114,6 +116,7 @@ set(FILES
         Source/Sensor/Events/PhysicsBasedSource.cpp
         Source/Sensor/Events/TickBasedSource.cpp
         Source/Sensor/SensorConfiguration.cpp
+        Source/Sensor/SensorHelpers.cpp
         Source/SimulationUtils/FollowingCameraConfiguration.cpp
         Source/SimulationUtils/FollowingCameraConfiguration.h
         Source/SimulationUtils/FollowingCameraComponent.cpp
