@@ -37,7 +37,7 @@ namespace ROS2
         }
     }
 
-    RaycastResultFlags LidarCore::GetRaycastResultFlagsForConfig(const LidarSensorConfiguration& configuration)
+    RaycastResultFlags LidarCore::GetProvidedResultFlags(const LidarSensorConfiguration& configuration)
     {
         RaycastResultFlags flags = RaycastResultFlags::Range | RaycastResultFlags::Point;
         if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Intensity)
@@ -93,7 +93,8 @@ namespace ROS2
         LidarRaycasterRequestBus::Event(
             m_lidarRaycasterId,
             &LidarRaycasterRequestBus::Events::ConfigureRaycastResultFlags,
-            GetRaycastResultFlagsForConfig(m_lidarConfiguration));
+            m_resultFlags
+            );
 
         if (m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::CollisionLayers)
         {
@@ -155,7 +156,7 @@ namespace ROS2
         }
     }
 
-    void LidarCore::Init(AZ::EntityId entityId)
+    void LidarCore::Init(AZ::EntityId entityId, RaycastResultFlags requestedResultFlags)
     {
         m_entityId = entityId;
 
@@ -165,6 +166,7 @@ namespace ROS2
         m_lastRotations = LidarTemplateUtils::PopulateRayRotations(m_lidarConfiguration.m_lidarParameters);
 
         m_lidarConfiguration.FetchLidarImplementationFeatures();
+        m_resultFlags = GetProvidedResultFlags(m_lidarConfiguration) & requestedResultFlags;
         ConnectToLidarRaycaster();
         ConfigureLidarRaycaster();
     }
@@ -182,6 +184,11 @@ namespace ROS2
     LidarId LidarCore::GetLidarRaycasterId() const
     {
         return m_lidarRaycasterId;
+    }
+
+    RaycastResultFlags LidarCore::GetResultFlags() const
+    {
+        return m_resultFlags;
     }
 
     AZStd::optional<RaycastResults> LidarCore::PerformRaycast()
