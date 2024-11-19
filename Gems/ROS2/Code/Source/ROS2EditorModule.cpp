@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+
 #include <AzCore/RTTI/RTTIMacros.h>
 #include <Camera/ROS2CameraSensorEditorComponent.h>
 #include <Camera/ROS2EditorCameraSystemComponent.h>
 #include <Frame/ROS2FrameSystemComponent.h>
 #include <Georeference/GeoreferenceLevelEditorComponent.h>
+#include <Lidar/LidarIntensityTransformComponent.h>
 #include <Lidar/LidarRegistrarEditorSystemComponent.h>
 #include <Manipulation/JointsManipulationEditorComponent.h>
 #include <Manipulation/JointsPositionsEditorComponent.h>
@@ -42,19 +44,22 @@ namespace ROS2
 
             m_descriptors.insert(
                 m_descriptors.end(),
-                { ROS2EditorSystemComponent::CreateDescriptor(),
-                  ROS2EditorCameraSystemComponent::CreateDescriptor(),
-                  LidarRegistrarEditorSystemComponent::CreateDescriptor(),
-                  ROS2RobotImporterEditorSystemComponent::CreateDescriptor(),
-                  ROS2CameraSensorEditorComponent::CreateDescriptor(),
-                  ROS2SpawnerEditorComponent::CreateDescriptor(),
-                  ROS2SpawnPointEditorComponent::CreateDescriptor(),
-                  SdfAssetBuilderSystemComponent::CreateDescriptor(),
-                  JointsManipulationEditorComponent::CreateDescriptor(),
-                  JointsPositionsEditorComponent::CreateDescriptor(),
-                  GeoReferenceLevelEditorComponent::CreateDescriptor(),
-                  ROS2FrameSystemComponent::CreateDescriptor(),
-                  ROS2FrameEditorComponent::CreateDescriptor() });
+                {
+                    ROS2EditorSystemComponent::CreateDescriptor(),
+                    ROS2EditorCameraSystemComponent::CreateDescriptor(),
+                    LidarRegistrarEditorSystemComponent::CreateDescriptor(),
+                    ROS2RobotImporterEditorSystemComponent::CreateDescriptor(),
+                    ROS2CameraSensorEditorComponent::CreateDescriptor(),
+                    ROS2SpawnerEditorComponent::CreateDescriptor(),
+                    ROS2SpawnPointEditorComponent::CreateDescriptor(),
+                    SdfAssetBuilderSystemComponent::CreateDescriptor(),
+                    JointsManipulationEditorComponent::CreateDescriptor(),
+                    JointsPositionsEditorComponent::CreateDescriptor(),
+                    GeoReferenceLevelEditorComponent::CreateDescriptor(),
+                    ROS2FrameSystemComponent::CreateDescriptor(),
+                    ROS2FrameEditorComponent::CreateDescriptor(),
+                    LidarIntensityTransformComponent::CreateDescriptor(),
+                });
         }
 
         AZ::ComponentTypeList GetRequiredSystemComponents() const override

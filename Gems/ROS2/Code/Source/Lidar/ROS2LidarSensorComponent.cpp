@@ -14,6 +14,7 @@
 #include <ROS2/Lidar/ClassSegmentationBus.h>
 #include <ROS2/Utilities/ROS2Names.h>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <Lidar/LidarResultsTransformBus.h>
 
 namespace ROS2
 {
@@ -197,6 +198,8 @@ namespace ROS2
         {
             TransformToLidarLocalSpace(pointSpan.value());
         }
+
+        LidarResultsTransformBus::Event(GetEntityId(), &LidarResultsTransformRequests::TransformResults, lastScanResults.value());
 
         const auto outcome = PublishRaycastResults(lastScanResults.value());
         if (!outcome.IsSuccess())
