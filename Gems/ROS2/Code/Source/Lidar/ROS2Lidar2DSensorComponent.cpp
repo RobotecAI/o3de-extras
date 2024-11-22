@@ -120,6 +120,11 @@ namespace ROS2
     {
         const bool isIntensityEnabled = m_lidarCore.m_lidarConfiguration.m_lidarSystemFeatures & LidarSystemFeatures::Intensity;
 
+        if (!m_sensorConfiguration.m_publishingEnabled)
+        { // Skip publishing when it is disabled.
+            return;
+        }
+
         auto* ros2Frame = GetEntity()->FindComponent<ROS2FrameComponent>();
         auto message = sensor_msgs::msg::LaserScan();
         message.header.frame_id = ros2Frame->GetFrameID().data();
