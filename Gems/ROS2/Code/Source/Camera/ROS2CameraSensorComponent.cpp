@@ -60,6 +60,9 @@ namespace ROS2
                 {
                     return;
                 }
+                auto now = std::chrono::system_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+                AZ_Printf("CHRONO", "%lld : CameraSensorTrigger\n", duration.count());
                 FrequencyTick();
             });
     }

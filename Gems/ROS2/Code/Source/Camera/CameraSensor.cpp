@@ -23,7 +23,7 @@
 #include <PostProcess/PostProcessFeatureProcessor.h>
 
 #include <sensor_msgs/distortion_models.hpp>
-
+#include <chrono>
 namespace ROS2
 {
     namespace Internal
@@ -49,6 +49,9 @@ namespace ROS2
         sensor_msgs::msg::Image CreateImageMessageFromReadBackResult(
             const AZ::EntityId& entityId, const AZ::RPI::AttachmentReadback::ReadbackResult& result, const std_msgs::msg::Header& header)
         {
+            auto now = std::chrono::system_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+            AZ_Printf("CHRONO", "%lld : CreateImageMessageFromReadBackResult\n", duration.count());
             const AZ::RHI::ImageDescriptor& descriptor = result.m_imageDescriptor;
             const auto format = descriptor.m_format;
             AZ_Assert(Internal::FormatMappings.contains(format), "Unknown format in result %u", static_cast<uint32_t>(format));
@@ -263,7 +266,7 @@ namespace ROS2
 
     AZStd::string CameraColorSensor::GetPipelineTemplateName() const
     {
-        return "PipelineRenderToTextureROSColor";
+        return "MainPipelineRenderToTexture";
     };
 
     CameraSensorDescription::CameraChannelType CameraColorSensor::GetChannelType() const

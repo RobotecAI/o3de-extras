@@ -4,7 +4,7 @@
     "ClassName": "PassAsset",
     "ClassData": {
         "PassTemplate": {
-            "Name": "PipelineROSColor",
+            "Name": "CameraPipeline",
             "PassClass": "ParentPass",
             "Slots": [
                 {
@@ -314,7 +314,7 @@
                         "ShaderAsset": {
                             "FilePath": "Shaders/ScreenSpace/DeferredFog.shader"
                         },
-                        "PipelineViewTag": "MainCamera"
+                        "BindViewSrg": true
                     }
                 },
                 {

@@ -23,7 +23,7 @@
 #include <ROS2/Utilities/ROS2Names.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
-
+#include <AzCore/Component/ComponentApplicationBus.h>
 namespace ROS2
 {
     namespace Internal
@@ -146,6 +146,17 @@ namespace ROS2
 
     void ROS2FrameComponent::Activate()
     {
+
+        //get system entity
+        AZ::Entity* systemEntity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(systemEntity, &AZ::ComponentApplicationRequests::FindEntity, AZ::EntityId(0));
+        if (systemEntity)
+        {
+            for (auto component : systemEntity->GetComponents())
+            {
+                std::cout << component->RTTI_GetTypeName() << std::endl;
+            }
+        }
         m_namespaceConfiguration.PopulateNamespace(IsTopLevel(), GetEntity()->GetName());
 
         if (m_publishTransform)

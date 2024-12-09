@@ -165,10 +165,13 @@ namespace ROS2
         ROS2RequestBus::Handler::BusConnect();
         AZ::TickBus::Handler::BusConnect();
         m_nodeChangedEvent.Signal(m_ros2Node);
+        AzFramework::EntityDebugDisplayEventBus::Handler::BusConnect(this->GetEntityId());
     }
 
     void ROS2SystemComponent::Deactivate()
     {
+
+        AzFramework::EntityDebugDisplayEventBus::Handler::BusDisconnect();
         AZ::TickBus::Handler::BusDisconnect();
         ROS2RequestBus::Handler::BusDisconnect();
         if (m_simulationClock) {
@@ -222,6 +225,12 @@ namespace ROS2
 
     void ROS2SystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
+        // debug draw timesmtamp
+
+
+        auto now = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+        AZ_Printf("CHRONO", "%lld : AppOnTick\n", duration.count());
         if (rclcpp::ok())
         {
             m_dynamicTFBroadcaster->sendTransform(m_frameTransforms);
@@ -230,6 +239,23 @@ namespace ROS2
             m_simulationClock->Tick();
             m_executor->spin_some();
         }
+    }
+
+    void ROS2SystemComponent::DisplayEntityViewport(
+            [[maybe_unused]] const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay)
+    {
+        
+        const AZ::u32 stateBefore = debugDisplay.GetState();
+        auto ts = GetROSTimestamp();
+        double timestamp = ts.sec+static_cast<double>(ts.nanosec)/1e9;
+        uint64_t timestamp_ms = timestamp * 1000;
+        auto now = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+
+        AZStd::string timestamp_str = AZStd::string::format("ROS2 Time: %lu\nchrono: %lu", timestamp_ms, duration.count());
+        debugDisplay.Draw2dTextLabel(0,0, 5.f, timestamp_str.c_str() );
+
+        debugDisplay.SetState(stateBefore);
     }
 
 } // namespace ROS2

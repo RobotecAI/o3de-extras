@@ -18,7 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
-
+#include <AzFramework/Entity/EntityDebugDisplayBus.h>
 /**
  * \mainpage
  *
@@ -43,6 +43,7 @@ namespace ROS2
         : public AZ::Component
         , public AZ::TickBus::Handler
         , protected ROS2RequestBus::Handler
+        , protected AzFramework::EntityDebugDisplayEventBus::Handler
     {
     public:
         AZ_COMPONENT(ROS2SystemComponent, "{cb28d486-afa4-4a9f-a237-ac5eb42e1c87}");
@@ -78,6 +79,12 @@ namespace ROS2
         // AZTickBus interface implementation
         void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
         ////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////
+        // EntityDebugDisplayEventBus::Handler overrides
+        void DisplayEntityViewport(const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay) override;
+        ////////////////////////////////////////////////////////////////////////
+
     private:
         void InitClock();
 
