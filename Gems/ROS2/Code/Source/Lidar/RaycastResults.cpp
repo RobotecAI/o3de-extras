@@ -19,6 +19,7 @@ namespace ROS2
         EnsureFlagSatisfied<RaycastResultFlags::SegmentationData>(flags, count);
         EnsureFlagSatisfied<RaycastResultFlags::IsHit>(flags, count);
         EnsureFlagSatisfied<RaycastResultFlags::Ring>(flags, count);
+        EnsureFlagSatisfied<RaycastResultFlags::Reflectivity>(flags, count);
     }
 
     RaycastResults::RaycastResults(RaycastResults&& other)
@@ -28,6 +29,7 @@ namespace ROS2
         , m_segmentationData{ AZStd::move(other.m_segmentationData) }
         , m_isHit{ AZStd::move(other.m_isHit) }
         , m_ringId{ AZStd::move(other.m_ringId) }
+        , m_reflectivities{ AZStd::move(other.m_reflectivities) }
         , m_count{ other.m_count }
         , m_flags{ other.m_flags }
     {
@@ -44,6 +46,7 @@ namespace ROS2
         ClearFieldIfPresent<RaycastResultFlags::SegmentationData>();
         ClearFieldIfPresent<RaycastResultFlags::IsHit>();
         ClearFieldIfPresent<RaycastResultFlags::Ring>();
+        ClearFieldIfPresent<RaycastResultFlags::Reflectivity>();
     }
 
     void RaycastResults::Resize(size_t count)
@@ -55,6 +58,7 @@ namespace ROS2
         ResizeFieldIfPresent<RaycastResultFlags::SegmentationData>(count);
         ResizeFieldIfPresent<RaycastResultFlags::IsHit>(count);
         ResizeFieldIfPresent<RaycastResultFlags::Ring>(count);
+        ResizeFieldIfPresent<RaycastResultFlags::Reflectivity>(count);
     }
 
     RaycastResults& RaycastResults::operator=(RaycastResults&& other)
@@ -76,6 +80,7 @@ namespace ROS2
         m_segmentationData = AZStd::move(other.m_segmentationData);
         m_isHit = AZStd::move(other.m_isHit);
         m_ringId = AZStd::move(other.m_ringId);
+        m_reflectivities = AZStd::move(other.m_reflectivities);
 
         return *this;
     }

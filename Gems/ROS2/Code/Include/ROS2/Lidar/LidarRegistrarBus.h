@@ -24,7 +24,8 @@ namespace ROS2
         Intensity =             1 << 3,
         Segmentation =          1 << 4,
         RingIds =               1 << 5,
-        All =                   (1 << 6) - 1, // All feature bits enabled.
+        Reflectivity =          1 << 6,
+        All =                   (1 << 7) - 1, // All feature bits enabled.
         // clang-format on
     };
 

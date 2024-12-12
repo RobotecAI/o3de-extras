@@ -49,6 +49,10 @@ namespace ROS2
                 break;
             case RaycastResultFlags::Ring:
                 wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Ring>(results, fielFlag, i, skipNonHits);
+                break;
+            case RaycastResultFlags::Reflectivity:
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Reflectivity>(results, fielFlag, i, skipNonHits);
+                break;
             default:
                 break;
             }
