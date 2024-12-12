@@ -46,6 +46,11 @@ namespace ROS2
             flags |= RaycastResultFlags::Intensity;
         }
 
+        if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Reflectivity)
+        {
+            flags |= RaycastResultFlags::Reflectivity;
+        }
+
         if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation && configuration.m_isSegmentationEnabled)
         {
             if (ClassSegmentationInterface::Get())

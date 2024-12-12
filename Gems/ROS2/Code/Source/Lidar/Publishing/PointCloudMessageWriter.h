@@ -210,6 +210,24 @@ namespace ROS2
         return AZ::Success();
     }
 
+    template<>
+    inline AZ::Outcome<void, AZStd::string_view> PointCloudMessageWriter::
+        AssignResultFieldValue<RaycastResultFlags::Reflectivity, FieldFlags::ReflectivityU16>(
+            const ResultTraits<RaycastResultFlags::Reflectivity>::Type& resultValue,
+            FieldTraits<FieldFlags::ReflectivityU16>::Type& messageFieldValue)
+    {
+        if (resultValue > aznumeric_cast<float>(AZStd::numeric_limits<AZ::u16>::max()))
+        {
+            messageFieldValue = AZStd::numeric_limits<AZ::u16>::max();
+        }
+        else
+        {
+            messageFieldValue = aznumeric_cast<AZ::u16>(resultValue);
+        }
+
+        return AZ::Success();
+    }
+
     template<RaycastResultFlags R>
     bool PointCloudMessageWriter::WriteResultIfPresent(const RaycastResults& results, FieldFlags fieldFlag, size_t index, bool skipNonHits)
     {
@@ -319,6 +337,20 @@ namespace ROS2
         {
             WriteResultToMessageField<RaycastResultFlags::Ring, FieldFlags::RingU16>(
                 results.GetConstFieldSpan<RaycastResultFlags::Ring>().value(), fieldIndex, isHit);
+        }
+    }
+
+    template<>
+    inline void PointCloudMessageWriter::WriteResult<RaycastResultFlags::Reflectivity>(
+        const RaycastResults& results,
+        FieldFlags fieldFlag,
+        size_t fieldIndex,
+        AZStd::optional<RaycastResults::ConstFieldSpan<RaycastResultFlags::IsHit>> isHit)
+    {
+        if (fieldFlag == FieldFlags::ReflectivityU16)
+        {
+            WriteResultToMessageField<RaycastResultFlags::Reflectivity, FieldFlags::ReflectivityU16>(
+                results.GetConstFieldSpan<RaycastResultFlags::Reflectivity>().value(), fieldIndex, isHit);
         }
     }
 
