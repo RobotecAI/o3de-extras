@@ -50,7 +50,6 @@ namespace ROS2
         static const Pc2MessageFormat& GetDefaultMessageFormat();
         void TransformToLidarLocalSpace(AZStd::span<AZ::Vector3> pointSpan) const;
         RaycastResultFlags GetRequestResultFlags() const;
-        bool IsPointcloudOrderingVisible() const;
         bool IsDistanceUnitsVisible() const;
         bool IsDistanceMultiplierVisible() const;
         void FrequencyTick();
@@ -73,7 +72,6 @@ namespace ROS2
         LidarCore m_lidarCore;
         LidarId m_lidarRaycasterId;
 
-        bool m_pointcloudIsDense{ true };
-        bool m_pointcloudOrderingEnabled{ false };
+        bool m_pointcloudIsCompact{ false };
     };
 } // namespace ROS2

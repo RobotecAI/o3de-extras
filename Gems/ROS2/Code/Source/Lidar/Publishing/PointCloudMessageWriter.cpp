@@ -26,8 +26,8 @@ namespace ROS2
     {
         for (size_t i = 0; i < m_message.m_fieldFlags.size(); ++i)
         {
-            const auto fielFlag = m_message.m_fieldFlags[i];
-            if (IsPadding(fielFlag))
+            const auto fieldFlag = m_message.m_fieldFlags[i];
+            if (IsPadding(fieldFlag))
             {
                 continue;
             }
@@ -36,22 +36,22 @@ namespace ROS2
             switch (GetFieldProvider(m_message.m_fieldFlags.at(i)))
             {
             case RaycastResultFlags::Point:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Point>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Point>(results, fieldFlag, i, skipNonHits);
                 break;
             case RaycastResultFlags::Range:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Range>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Range>(results, fieldFlag, i, skipNonHits);
                 break;
             case RaycastResultFlags::Intensity:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Intensity>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Intensity>(results, fieldFlag, i, skipNonHits);
                 break;
             case RaycastResultFlags::SegmentationData:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::SegmentationData>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::SegmentationData>(results, fieldFlag, i, skipNonHits);
                 break;
             case RaycastResultFlags::Ring:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Ring>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Ring>(results, fieldFlag, i, skipNonHits);
                 break;
             case RaycastResultFlags::Reflectivity:
-                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Reflectivity>(results, fielFlag, i, skipNonHits);
+                wasWrittenTo = WriteResultIfPresent<RaycastResultFlags::Reflectivity>(results, fieldFlag, i, skipNonHits);
                 break;
             default:
                 break;

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <AzCore/Math/Vector3.h>
+#include <AzCore/base.h>
 #include <AzCore/std/containers/span.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/typetraits/type_identity.h>
@@ -224,7 +225,8 @@ namespace ROS2
     }
 
     template<>
-    inline const RaycastResults::FieldInternal<RaycastResultFlags::Reflectivity>& RaycastResults::GetField<RaycastResultFlags::Reflectivity>() const
+    inline const RaycastResults::FieldInternal<RaycastResultFlags::Reflectivity>& RaycastResults::GetField<
+        RaycastResultFlags::Reflectivity>() const
     {
         return m_reflectivities;
     }

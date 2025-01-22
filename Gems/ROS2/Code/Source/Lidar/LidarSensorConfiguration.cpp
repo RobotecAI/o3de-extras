@@ -24,6 +24,7 @@ namespace ROS2
                 ->Field("IgnoredLayerIndices", &LidarSensorConfiguration::m_ignoredCollisionLayers)
                 ->Field("ExcludedEntities", &LidarSensorConfiguration::m_excludedEntities)
                 ->Field("IsSegmentationEnabled", &LidarSensorConfiguration::m_isSegmentationEnabled)
+                ->Field("PointsAtMin", &LidarSensorConfiguration::m_addPointsAtMin)
                 ->Field("PointsAtMax", &LidarSensorConfiguration::m_addPointsAtMax);
 
             if (AZ::EditContext* ec = serializeContext->GetEditContext())
@@ -68,9 +69,16 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::Visibility, &LidarSensorConfiguration::IsSegmentationConfigurationVisible)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
+                        &LidarSensorConfiguration::m_addPointsAtMin,
+                        "Points at Min",
+                        "If set true LiDAR will produce points at min range for free space (only min or max is allowed)")
+                    ->Attribute(AZ::Edit::Attributes::ChangeNotify, &LidarSensorConfiguration::OnAddPointsMinSelected)
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
                         &LidarSensorConfiguration::m_addPointsAtMax,
                         "Points at Max",
-                        "If set true LiDAR will produce points at max range for free space");
+                        "If set true LiDAR will produce points at max range for free space  (only min or max is allowed)")
+                    ->Attribute(AZ::Edit::Attributes::ChangeNotify, &LidarSensorConfiguration::OnAddPointsMaxSelected);
             }
         }
     }
@@ -158,6 +166,24 @@ namespace ROS2
     {
         FetchLidarImplementationFeatures();
         UpdateShowNoise();
+        return AZ::Edit::PropertyRefreshLevels::EntireTree;
+    }
+
+    AZ::Crc32 LidarSensorConfiguration::OnAddPointsMinSelected()
+    {
+        if (m_addPointsAtMin)
+        {
+            m_addPointsAtMax = false;
+        }
+        return AZ::Edit::PropertyRefreshLevels::EntireTree;
+    }
+
+    AZ::Crc32 LidarSensorConfiguration::OnAddPointsMaxSelected()
+    {
+        if (m_addPointsAtMax)
+        {
+            m_addPointsAtMin = false;
+        }
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }
 

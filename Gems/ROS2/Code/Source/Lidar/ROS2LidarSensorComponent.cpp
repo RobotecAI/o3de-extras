@@ -33,8 +33,7 @@ namespace ROS2
                 ->Version(3)
                 ->Field("lidarCore", &ROS2LidarSensorComponent::m_lidarCore)
                 ->Field("messageFormat", &ROS2LidarSensorComponent::m_messageFormat)
-                ->Field("pointCloudIsDense", &ROS2LidarSensorComponent::m_pointcloudIsDense)
-                ->Field("pointCloudOrdering", &ROS2LidarSensorComponent::m_pointcloudOrderingEnabled)
+                ->Field("pointcloudIsCompact", &ROS2LidarSensorComponent::m_pointcloudIsCompact)
                 ->Field("distanceUnits", &ROS2LidarSensorComponent::m_distanceUnits)
                 ->Field("distanceMultiplier", &ROS2LidarSensorComponent::m_distanceMultiplier);
 
@@ -62,18 +61,11 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &ROS2LidarSensorComponent::OnMessageFormatChanged)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
-                        &ROS2LidarSensorComponent::m_pointcloudIsDense,
-                        "Dense pointcloud",
+                        &ROS2LidarSensorComponent::m_pointcloudIsCompact,
+                        "Compact pointcloud",
                         "If enabled, only the points that hit an obstacle are processed and published. Having this option enabled improves "
                         "performance but disallows pointcloud ordering and points at max.")
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &ROS2LidarSensorComponent::OnDensePointcloudChanged)
-                    ->DataElement(
-                        AZ::Edit::UIHandlers::Default,
-                        &ROS2LidarSensorComponent::m_pointcloudOrderingEnabled,
-                        "Pointcloud ordering",
-                        "Message's width and height match those of the used ray pattern. Only available for sparse (non-dense) "
-                        "pointclouds.")
-                    ->Attribute(AZ::Edit::Attributes::Visibility, &ROS2LidarSensorComponent::IsPointcloudOrderingVisible)
                     ->DataElement(
                         AZ::Edit::UIHandlers::ComboBox,
                         &ROS2LidarSensorComponent::m_distanceUnits,
@@ -200,19 +192,14 @@ namespace ROS2
 
     RaycastResultFlags ROS2LidarSensorComponent::GetRequestResultFlags() const
     {
-        auto flags = GetNecessaryProviders(m_messageFormat) | RaycastResultFlags::Point; // We need points for visualisation.
+        auto flags = GetNecessaryProviders(m_messageFormat) | RaycastResultFlags::Point; // We need points for visualization.
 
-        if (!m_pointcloudIsDense)
+        if (!m_pointcloudIsCompact)
         {
             flags |= RaycastResultFlags::IsHit;
         }
 
         return flags;
-    }
-
-    bool ROS2LidarSensorComponent::IsPointcloudOrderingVisible() const
-    {
-        return !m_pointcloudIsDense;
     }
 
     bool ROS2LidarSensorComponent::IsDistanceUnitsVisible() const
@@ -270,21 +257,21 @@ namespace ROS2
 
         const size_t rayLayerCount = m_lidarCore.m_lidarConfiguration.m_lidarParameters.m_layers;
         const size_t rayCountPerLayer = m_lidarCore.m_lidarConfiguration.m_lidarParameters.m_numberOfIncrements;
-        if (m_pointcloudOrderingEnabled && results.GetCount() != rayLayerCount * rayCountPerLayer)
+        if (!m_pointcloudIsCompact && results.GetCount() != rayLayerCount * rayCountPerLayer)
         {
             return AZ::Failure("Received raycast results with dimensions that were not expected.");
         }
 
-        const size_t pcWidth = m_pointcloudOrderingEnabled ? rayCountPerLayer : results.GetCount();
-        const size_t pcHeight = m_pointcloudOrderingEnabled ? rayLayerCount : 1U;
+        const size_t pcWidth = m_pointcloudIsCompact ? results.GetCount() : rayCountPerLayer;
+        const size_t pcHeight = m_pointcloudIsCompact ? 1U : rayLayerCount;
         m_pointCloudMessageWriter->Reset(
             GetEntity()->FindComponent<ROS2FrameComponent>()->GetFrameID(),
             ROS2Interface::Get()->GetROSTimestamp(),
             pcWidth,
             pcHeight,
-            m_pointcloudIsDense);
+            !m_pointcloudIsCompact);
 
-        m_pointCloudMessageWriter->WriteResults(results, !m_pointcloudIsDense && !m_lidarCore.m_lidarConfiguration.m_addPointsAtMax);
+        m_pointCloudMessageWriter->WriteResults(results, m_pointcloudIsCompact);
 
         PC2PostProcessingRequestBus::Event(
             GetEntityId(), &PC2PostProcessingRequests::ApplyPostProcessing, m_pointCloudMessageWriter->GetMessage());
@@ -296,9 +283,9 @@ namespace ROS2
 
     AZ::Crc32 ROS2LidarSensorComponent::OnLidarCoreChanged()
     {
-        if (m_lidarCore.m_lidarConfiguration.m_addPointsAtMax)
+        if (m_lidarCore.m_lidarConfiguration.m_addPointsAtMin || m_lidarCore.m_lidarConfiguration.m_addPointsAtMax)
         {
-            m_pointcloudIsDense = false;
+            m_pointcloudIsCompact = false;
             return AZ::Edit::PropertyRefreshLevels::EntireTree;
         }
 
@@ -338,13 +325,13 @@ namespace ROS2
 
     AZ::Crc32 ROS2LidarSensorComponent::OnDensePointcloudChanged()
     {
-        if (m_pointcloudIsDense)
+        if (m_pointcloudIsCompact)
         {
+            m_lidarCore.m_lidarConfiguration.m_addPointsAtMin = false;
             m_lidarCore.m_lidarConfiguration.m_addPointsAtMax = false;
-            m_pointcloudOrderingEnabled = false;
         }
 
-        // This is to ensure that visibility of pointcloud ordering is updated.
+        // This is to ensure that visibility of lidar configuration is updated.
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }
 
