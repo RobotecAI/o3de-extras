@@ -46,6 +46,11 @@ namespace ROS2
             flags |= RaycastResultFlags::Intensity;
         }
 
+        if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Reflectivity)
+        {
+            flags |= RaycastResultFlags::Reflectivity;
+        }
+
         if (configuration.m_lidarSystemFeatures & LidarSystemFeatures::Segmentation && configuration.m_isSegmentationEnabled)
         {
             if (ClassSegmentationInterface::Get())
@@ -129,20 +134,27 @@ namespace ROS2
         }
 
         {
-            const bool returnNonHits =
-                IsFlagEnabled(RaycastResultFlags::IsHit, GetResultFlags()) || m_lidarConfiguration.m_addPointsAtMax || m_is2DLidar;
+            const bool returnNonHits = IsFlagEnabled(RaycastResultFlags::IsHit, GetResultFlags()) ||
+                m_lidarConfiguration.m_addPointsAtMin || m_lidarConfiguration.m_addPointsAtMax || m_is2DLidar;
             LidarRaycasterRequestBus::Event(m_lidarRaycasterId, &LidarRaycasterRequestBus::Events::ConfigureNonHitReturn, returnNonHits);
         }
+
+        const auto nonHitRange = (m_lidarConfiguration.m_addPointsAtMin)
+            ? AZStd::make_optional(RayRange{ 0.0f, 0.0f })
+            : AZStd::make_optional(
+                  RayRange{ m_lidarConfiguration.m_lidarParameters.m_minRange, m_lidarConfiguration.m_lidarParameters.m_maxRange });
+
+        LidarRaycasterRequestBus::Event(m_lidarRaycasterId, &LidarRaycasterRequestBus::Events::ConfigureNonHitValues, nonHitRange);
     }
 
     void LidarCore::UpdatePoints(const RaycastResults& results)
     {
         const auto pointsField = results.GetConstFieldSpan<RaycastResultFlags::Point>().value();
-        if (!m_lidarConfiguration.m_addPointsAtMax && results.IsFieldPresent<RaycastResultFlags::IsHit>())
+        if (!m_lidarConfiguration.m_addPointsAtMin && !m_lidarConfiguration.m_addPointsAtMax &&
+            results.IsFieldPresent<RaycastResultFlags::IsHit>())
         {
             m_lastPoints.clear();
             m_lastPoints.reserve(pointsField.size());
-
 
             const auto isHit = results.GetConstFieldSpan<RaycastResultFlags::IsHit>();
             auto isHitIt = isHit->begin();

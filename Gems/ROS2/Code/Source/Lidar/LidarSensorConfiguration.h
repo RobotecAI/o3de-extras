@@ -40,8 +40,8 @@ namespace ROS2
         AZStd::vector<AZ::EntityId> m_excludedEntities;
 
         bool m_isSegmentationEnabled = false;
+        bool m_addPointsAtMin = false;
         bool m_addPointsAtMax = false;
-        bool m_returnNonHits = false;
 
     private:
         bool IsConfigurationVisible() const;
@@ -53,6 +53,8 @@ namespace ROS2
 
         AZ::Crc32 OnLidarModelSelected();
         AZ::Crc32 OnLidarImplementationSelected();
+        AZ::Crc32 OnAddPointsMinSelected();
+        AZ::Crc32 OnAddPointsMaxSelected();
 
         //! Get all models this configuration can be set to (for example all 2D lidar models).
         AZStd::vector<AZStd::string> GetAvailableModels() const;

@@ -12,6 +12,7 @@
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/Outcome/Outcome.h>
+#include <AzCore/std/optional.h>
 #include <ROS2/Communication/QoS.h>
 #include <ROS2/Lidar/RaycastResults.h>
 
@@ -118,10 +119,9 @@ namespace ROS2
 
         //! Schedules a raycast that originates from the point described by the lidarTransform.
         //! @param lidarTransform Current transform from global to lidar reference frame.
-        //! @param flags Used to request different kinds of data returned by raycast query
-        //! @return Results of the raycast in the requested form if the raycast was successfull or an error message if it was not.
+        //! @return Results of the raycast in the requested form if the raycast was successful or an error message if it was not.
         //! The returned error messages are c-style string literals which are statically allocated and therefore do not need to be
-        //! dealocated.
+        //! deallocated.
         virtual AZ::Outcome<RaycastResults, const char*> PerformRaycast(const AZ::Transform& lidarTransform) = 0;
 
         //! Configures ray Gaussian Noise parameters.
@@ -160,10 +160,18 @@ namespace ROS2
         //! @param returnNonHits Should the non hit rays be included in returned results?
         virtual void ConfigureNonHitReturn([[maybe_unused]] bool returnNonHits) = 0;
 
+        //! Configures non-hit values for distances closer than a minimum range and beyond a maximum range.
+        //! By default, non-hit values are set to infinity.
+        //! @param range non hit values at range. Use empty optional to reset to default.
+        virtual void ConfigureNonHitValues([[maybe_unused]] AZStd::optional<ROS2::RayRange> range)
+        {
+            AZ_Assert(false, "This Lidar Implementation does not support configurable non hit values!");
+        }
+
         //! Configures ring IDs of the requested rays.
         //! ID count must be equal to that of the ray count (@see ConfigureRayOrientations).
         //! @param ringIds List of IDs for each of the requested rays.
-        virtual void ConfigureRayRingIds(const AZStd::vector<AZ::s32>& ringIds)
+        virtual void ConfigureRayRingIds([[maybe_unused]] const AZStd::vector<AZ::s32>& ringIds)
         {
             AZ_Assert(false, "This Lidar Implementation does not support ring ids!")
         }
