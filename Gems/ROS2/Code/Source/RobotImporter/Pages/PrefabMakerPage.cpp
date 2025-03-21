@@ -11,7 +11,7 @@
 #include <AzCore/Debug/Trace.h>
 #include <AzCore/EBus/Results.h>
 #include <AzCore/Math/Transform.h>
-#include <AzCore/std/smart_ptr/make_shared.h>
+
 #include <AzCore/std/string/string.h>
 
 #include <ROS2/Spawner/SpawnerBus.h>
