@@ -11,7 +11,7 @@
 
 #include <SimulationInterfaces/SimulationInterfacesTypeIds.h>
 
-#include <Clients/SimulationInterfacesSystemComponent.h>
+#include <Clients/SimulationEntitiesManager.h>
 
 namespace SimulationInterfaces
 {
@@ -27,14 +27,14 @@ namespace SimulationInterfaces
         // This will associate the AzTypeInfo information for the components with the the SerializeContext, BehaviorContext and EditContext.
         // This happens through the [MyComponent]::Reflect() function.
         m_descriptors.insert(m_descriptors.end(), {
-            SimulationInterfacesSystemComponent::CreateDescriptor(),
+                SimulationEntitiesManager::CreateDescriptor(),
             });
     }
 
     AZ::ComponentTypeList SimulationInterfacesModuleInterface::GetRequiredSystemComponents() const
     {
         return AZ::ComponentTypeList{
-            azrtti_typeid<SimulationInterfacesSystemComponent>(),
+            azrtti_typeid<SimulationEntitiesManager>(),
         };
     }
 } // namespace SimulationInterfaces

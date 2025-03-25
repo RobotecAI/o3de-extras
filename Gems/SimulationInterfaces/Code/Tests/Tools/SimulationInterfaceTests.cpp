@@ -32,13 +32,13 @@
 #include <string_view>
 #include <vector>
 
-#include <SimulationInterfaces/SimulationInterfacesBus.h>
-#include "Clients/SimulationInterfacesSystemComponent.h"
-#include <AzFramework/Physics/SystemBus.h>
-#include <AzFramework/Physics/PhysicsSystem.h>
+#include "Clients/SimulationEntitiesManager.h"
 #include <AzFramework/Physics/Configuration/SystemConfiguration.h>
+#include <AzFramework/Physics/PhysicsSystem.h>
 #include <AzFramework/Physics/RigidBodyBus.h>
 #include <AzFramework/Physics/SimulatedBodies/RigidBody.h>
+#include <AzFramework/Physics/SystemBus.h>
+#include <SimulationInterfaces/SimulationInterfacesBus.h>
 
 namespace UnitTest
 {
@@ -66,10 +66,10 @@ namespace UnitTest
         AddDynamicModulePaths({"PhysX5.Gem"});
         AddDynamicModulePaths({"LmbrCentral"});
         AddComponentDescriptors({
-            SimulationInterfaces::SimulationInterfacesSystemComponent::CreateDescriptor(),
+            SimulationInterfaces::SimulationEntitiesManager::CreateDescriptor(),
         });
         AddRequiredComponents({
-            SimulationInterfaces::SimulationInterfacesSystemComponent::TYPEINFO_Uuid()
+            SimulationInterfaces::SimulationEntitiesManager::TYPEINFO_Uuid()
         });
     }
 
@@ -242,7 +242,7 @@ namespace UnitTest
 
 
         EntityFilter filter;
-        filter.m_bounds = AZStd::make_shared<Physics::SphereShapeConfiguration>(2.0f);
+        filter.m_bounds_shape = AZStd::make_shared<Physics::SphereShapeConfiguration>(2.0f);
 
         AZStd::vector<AZStd::string> entities;
         SimulationInterfacesRequestBus::BroadcastResult(entities, &SimulationInterfacesRequestBus::Events::GetEntities, filter);
@@ -256,6 +256,77 @@ namespace UnitTest
         }
         DeleteEntity(entityId1);
         DeleteEntity(entityId2);
+    }
+
+    TEST_F(SimulationInterfaceTestFixture, TestRegexFilter)
+    {
+
+        using namespace SimulationInterfaces;
+        const AZ::EntityId entityId1 = CreateEntityWithStaticBodyComponent("WillMatch", AZ::Transform::CreateTranslation(AZ::Vector3(0.0f, 0.0f, 0.0f)));
+        const AZ::EntityId entityId2 = CreateEntityWithStaticBodyComponent("WontMatch", AZ::Transform::CreateTranslation(AZ::Vector3(10.0f, 0.0f, 0.0f)));
+
+        EntityFilter filter;
+        filter.m_filter = "Will.*";
+
+        AZStd::vector<AZStd::string> entities;
+        SimulationInterfacesRequestBus::BroadcastResult(entities, &SimulationInterfacesRequestBus::Events::GetEntities, filter);
+
+        EXPECT_EQ(entities.size(),1);
+        if (entities.size() > 0)
+        {
+            EXPECT_EQ(entities.front(), "WillMatch");
+        }
+        DeleteEntity(entityId1);
+        DeleteEntity(entityId2);
+    }
+
+
+    TEST_F(SimulationInterfaceTestFixture, TestRegexFilterInvalid)
+    {
+        // Invalid regex should not match any entity
+        using namespace SimulationInterfaces;
+        const AZ::EntityId entityId1 = CreateEntityWithStaticBodyComponent("WillMatch", AZ::Transform::CreateTranslation(AZ::Vector3(0.0f, 0.0f, 0.0f)));
+        const AZ::EntityId entityId2 = CreateEntityWithStaticBodyComponent("WontMatch", AZ::Transform::CreateTranslation(AZ::Vector3(10.0f, 0.0f, 0.0f)));
+
+        EntityFilter filter;
+        filter.m_filter = "[a-z";
+
+        AZStd::vector<AZStd::string> entities;
+        SimulationInterfacesRequestBus::BroadcastResult(entities, &SimulationInterfacesRequestBus::Events::GetEntities, filter);
+
+        EXPECT_EQ(entities.size(),0);
+        DeleteEntity(entityId1);
+        DeleteEntity(entityId2);
+    }
+
+    TEST_F(SimulationInterfaceTestFixture, SmokeTestGetEntityState)
+    {
+
+        // Invalid regex should not match any entity
+        using namespace SimulationInterfaces;
+        const AZStd::string entityName = "DroppedBall";
+        const AZ::EntityId entityId1 = CreateEntityWithStaticBodyComponent(entityName, AZ::Transform::CreateTranslation(AZ::Vector3(2.0f, 0.0f, 10.0f)));
+
+        EntityFilter filter;
+        EntityState stateBefore;
+        SimulationInterfacesRequestBus::BroadcastResult(stateBefore, &SimulationInterfacesRequestBus::Events::GetEntityState, entityName);
+        EXPECT_EQ(stateBefore.m_pose.GetTranslation(), AZ::Vector3(2.0f, 0.0f, 10.0f));
+        for (int i = 0; i < 10; i++)
+        {
+            auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
+            physicsSystem->Simulate(1.0f / 60.0f);
+        }
+        EntityState stateAfter;
+        SimulationInterfacesRequestBus::BroadcastResult(stateAfter, &SimulationInterfacesRequestBus::Events::GetEntityState, entityName);
+        AZ::Vector3 deltaPos = stateAfter.m_pose.GetTranslation() - stateBefore.m_pose.GetTranslation();
+
+        // check if the entity moved
+        EXPECT_GT(deltaPos.GetLength(), 0.0f);
+
+        // check if entity has velocity
+        EXPECT_GT(stateAfter.m_twist_linear.GetLength(), 0.0f);
+
+        DeleteEntity(entityId1);
     }
 
 

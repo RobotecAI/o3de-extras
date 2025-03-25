@@ -18,12 +18,22 @@ namespace SimulationInterfaces
 {
     //! # A set of filters to apply to entity queries. See GetEntities, GetEntitiesStates.
     //! # The filters are combined with a logical AND.
+    //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/msg/EntityFilters.msg
     struct EntityFilter
     {
         AZStd::string m_filter; //! A posix regular expression to match against entity names
-        AZStd::shared_ptr<Physics::ShapeConfiguration> m_bounds; //! A shape to use for filtering entities, null means no bounds filtering
-
+        AZStd::shared_ptr<Physics::ShapeConfiguration> m_bounds_shape; //! A shape to use for filtering entities, null means no bounds filtering
+        AZ::Transform m_bounds_pose {AZ::Transform::CreateIdentity()};
     };
+
+    //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/msg/EntityState.msg
+    struct EntityState
+    {
+        AZ::Transform m_pose; //! The pose of the entity
+        AZ::Vector3 m_twist_linear; //! The linear velocity of the entity (in the entity frame)
+        AZ::Vector3 m_twist_angular; //! The angular velocity of the entity (in the entity frame)
+    };
+
     class SimulationInterfacesRequests
     {
     public:
@@ -31,8 +41,21 @@ namespace SimulationInterfaces
         virtual ~SimulationInterfacesRequests() = default;
 
         //! # Get a list of entities that match the filter.
-        //! context : https://github.com/adamdbrw/simulation_interfaces/blob/simulation_interfaces/srv/GetEntities.srv
+        //! Supported filters:
+        //! - name : a posix regular expression to match against entity names
+        //! - bounds : a shape to use for filtering entities, null means no bounds filtering
+        //! context : https://github.com/ros-simulation/simulation_interfaces/b lob/main/srv/GetEntities.srv
         virtual AZStd::vector<AZStd::string> GetEntities(const EntityFilter& filter) = 0;
+
+        //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/srv/GetEntityState.srv
+        virtual EntityState GetEntityState(const AZStd::string& name) = 0;
+
+        //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/srv/GetEntitiesStates.srv
+        virtual AZStd::unordered_map<AZStd::string, EntityState> GetEntitiesStates(const EntityFilter& filter) = 0;
+
+        //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/srv/SetEntityState.srv
+        virtual bool SetEntityState(const AZStd::string& name, const EntityState& state) = 0;
+
 
     };
 

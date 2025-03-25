@@ -6,9 +6,9 @@
  *
  */
 
+#include "SimulationEntitiesManager.h"
 #include <SimulationInterfaces/SimulationInterfacesTypeIds.h>
 #include <SimulationInterfacesModuleInterface.h>
-#include "SimulationInterfacesSystemComponent.h"
 
 namespace SimulationInterfaces
 {

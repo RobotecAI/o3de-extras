@@ -7,6 +7,6 @@
 set(FILES
     Source/SimulationInterfacesModuleInterface.cpp
     Source/SimulationInterfacesModuleInterface.h
-    Source/Clients/SimulationInterfacesSystemComponent.cpp
-    Source/Clients/SimulationInterfacesSystemComponent.h
+    Source/Clients/SimulationEntitiesManager.cpp
+    Source/Clients/SimulationEntitiesManager.h
 )

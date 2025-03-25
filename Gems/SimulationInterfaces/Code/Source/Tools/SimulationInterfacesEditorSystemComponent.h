@@ -10,16 +10,16 @@
 
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 
-#include <Clients/SimulationInterfacesSystemComponent.h>
+#include <Clients/SimulationEntitiesManager.h>
 
 namespace SimulationInterfaces
 {
     /// System component for SimulationInterfaces editor
     class SimulationInterfacesEditorSystemComponent
-        : public SimulationInterfacesSystemComponent
+        : public SimulationEntitiesManager
         , protected AzToolsFramework::EditorEvents::Bus::Handler
     {
-        using BaseSystemComponent = SimulationInterfacesSystemComponent;
+        using BaseSystemComponent = SimulationEntitiesManager;
     public:
         AZ_COMPONENT_DECL(SimulationInterfacesEditorSystemComponent);
 

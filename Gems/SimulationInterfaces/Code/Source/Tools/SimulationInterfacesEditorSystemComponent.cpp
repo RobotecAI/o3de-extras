@@ -20,7 +20,7 @@ namespace SimulationInterfaces
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<SimulationInterfacesEditorSystemComponent, SimulationInterfacesSystemComponent>()
+            serializeContext->Class<SimulationInterfacesEditorSystemComponent, SimulationEntitiesManager>()
                 ->Version(0);
         }
     }
@@ -53,14 +53,14 @@ namespace SimulationInterfaces
 
     void SimulationInterfacesEditorSystemComponent::Activate()
     {
-        SimulationInterfacesSystemComponent::Activate();
+        SimulationEntitiesManager::Activate();
         AzToolsFramework::EditorEvents::Bus::Handler::BusConnect();
     }
 
     void SimulationInterfacesEditorSystemComponent::Deactivate()
     {
         AzToolsFramework::EditorEvents::Bus::Handler::BusDisconnect();
-        SimulationInterfacesSystemComponent::Deactivate();
+        SimulationEntitiesManager::Deactivate();
     }
 
 } // namespace SimulationInterfaces

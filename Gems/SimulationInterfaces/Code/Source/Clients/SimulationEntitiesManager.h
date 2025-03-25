@@ -15,13 +15,12 @@
 #include <AzFramework/Physics/PhysicsScene.h>
 namespace SimulationInterfaces
 {
-    class SimulationInterfacesSystemComponent
+    class SimulationEntitiesManager
         : public AZ::Component
         , protected SimulationInterfacesRequestBus::Handler
-        , public AZ::TickBus::Handler
     {
     public:
-        AZ_COMPONENT_DECL(SimulationInterfacesSystemComponent);
+        AZ_COMPONENT_DECL(SimulationEntitiesManager);
 
         static void Reflect(AZ::ReflectContext* context);
 
@@ -30,17 +29,17 @@ namespace SimulationInterfaces
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent);
 
-        // SimulationInterfacesRequestBus interface implementation
-        AZStd::vector<AZStd::string> GetEntities(const EntityFilter& filter) override;
 
-
-        SimulationInterfacesSystemComponent();
-        ~SimulationInterfacesSystemComponent();
+        SimulationEntitiesManager();
+        ~SimulationEntitiesManager();
 
     protected:
         ////////////////////////////////////////////////////////////////////////
         // SimulationInterfacesRequestBus interface implementation
-
+        AZStd::vector<AZStd::string> GetEntities(const EntityFilter& filter) override;
+        EntityState GetEntityState(const AZStd::string& name) override;
+        AZStd::unordered_map<AZStd::string, EntityState> GetEntitiesStates(const EntityFilter& filter) override;
+        bool SetEntityState(const AZStd::string& name, const EntityState& state) override;
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
@@ -50,10 +49,6 @@ namespace SimulationInterfaces
         void Deactivate() override;
         ////////////////////////////////////////////////////////////////////////
 
-        ////////////////////////////////////////////////////////////////////////
-        // AZTickBus interface implementation
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
-        ////////////////////////////////////////////////////////////////////////
 
         //! Registers simulated entity to entity id mapping.
         //! Note that the entityId will be registered under unique name.
@@ -68,12 +63,14 @@ namespace SimulationInterfaces
     private:
         AzPhysics::SceneEvents::OnSimulationBodyAdded::Handler m_simulationBodyAddedHandler;
         AzPhysics::SceneEvents::OnSimulationBodyRemoved::Handler m_simulationBodyRemovedHandler;
+        AzPhysics::SceneEvents::OnSceneSimulationFinishHandler m_sceneSimulationFinishHandler;
 
         AzPhysics::SystemEvents::OnSceneAddedEvent::Handler m_sceneAddedHandler;
         AzPhysics::SystemEvents::OnSceneRemovedEvent::Handler m_sceneRemovedHandler;
         AzPhysics::SceneHandle m_physicsScenesHandle = AzPhysics::InvalidSceneHandle;
         AZStd::unordered_map<AZStd::string, AZ::EntityId> m_simulatedEntityToEntityIdMap;
         AZStd::unordered_map<AZ::EntityId, AZStd::string> m_entityIdToSimulatedEntityMap;
+        AZStd::unordered_set<AzPhysics::SimulatedBodyHandle> m_disabledBodies;
 
     };
 
