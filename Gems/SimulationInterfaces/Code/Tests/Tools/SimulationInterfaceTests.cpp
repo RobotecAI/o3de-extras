@@ -329,6 +329,20 @@ namespace UnitTest
         DeleteEntity(entityId1);
     }
 
+    TEST_F(SimulationInterfaceTestFixture, SpawnEntity)
+    {
+        using namespace SimulationInterfaces;
+        AZStd::string entityName = "SpawnedEntity";
+        AZ::Transform initialPose = AZ::Transform::CreateTranslation(AZ::Vector3(0.0f, 0.0f, 0.0f));
+        AZStd::string uri = "uri://some-SpawnedEntity";
+        AZStd::string entityNamespace = "";
+        SimulationInterfacesRequests::SpawnCompletedCb completedCb = [](const AZ::Outcome<AZStd::string, AZStd::string>& result) {
+            EXPECT_TRUE(result.IsSuccess());
+        };
+        SimulationInterfacesRequestBus::Broadcast(&SimulationInterfacesRequestBus::Events::SpawnEntity,
+                                                  entityName, uri, entityNamespace, initialPose, completedCb);
+
+    }
 
 } // namespace UnitTest
 

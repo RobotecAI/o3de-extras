@@ -34,6 +34,13 @@ namespace SimulationInterfaces
         AZ::Vector3 m_twist_angular; //! The angular velocity of the entity (in the entity frame)
     };
 
+    struct Spawnable
+    {
+        AZStd::string m_uri;
+        AZStd::string m_description;
+        AZStd::string m_bounds_sphere;
+    };
+
     class SimulationInterfacesRequests
     {
     public:
@@ -56,7 +63,18 @@ namespace SimulationInterfaces
         //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/srv/SetEntityState.srv
         virtual bool SetEntityState(const AZStd::string& name, const EntityState& state) = 0;
 
+        //! context : https://github.com/ros-simulation/simulation_interfaces/blob/main/srv/DeleteEntity.srv
+        virtual bool DeleteEntity(const AZStd::string& name) = 0;
 
+        virtual AZStd::vector<Spawnable> GetSpawnables() = 0;
+
+        //! Callback for when an entity has been spawned and registered. The string is the name of the entity in the simulation interface.
+        //! Note : The names is empty, if the entity could not be reigstered (e.g. prefab has no simulated entities)
+        using SpawnCompletedCb= AZStd::function<void(const AZ::Outcome<AZStd::string, AZStd::string>&)> ;
+
+        virtual void SpawnEntity(const AZStd::string& name, const AZStd::string& uri, const AZStd::string& entityNamespace,
+                                 const AZ::Transform& initialPose,
+                                 SpawnCompletedCb completedCb) = 0;
     };
 
     class SimulationInterfacesBusTraits

@@ -66,6 +66,8 @@ namespace Georeferencing
         //! Function is useful to find georeferencing rotation of the level.
         //! @return Quaternion in ENU coordinate system.
         virtual AZ::Quaternion GetRotationFromLevelToENU() = 0;
+
+
     };
 
     class GeoreferenceRequestsTraits : public AZ::EBusTraits
