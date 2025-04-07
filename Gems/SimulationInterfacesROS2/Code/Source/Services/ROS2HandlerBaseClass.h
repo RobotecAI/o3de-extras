@@ -11,7 +11,6 @@
 #include "Interfaces/IROS2HandlerBase.h"
 #include "Utils/RegistryUtils.h"
 #include <AzCore/std/containers/unordered_set.h>
-#include <AzCore/std/optional.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/service.hpp>
 #include <simulation_interfaces/msg/simulator_features.hpp>
