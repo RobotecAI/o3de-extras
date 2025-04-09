@@ -22,7 +22,7 @@
   ],
   "icon_path": "preview.png",
   "requirements": "ROS2, SimulationInterfaces",
-  "documentation_url": "",
+  "documentation_url": "README.md",
   "dependencies": [
     "SimulationInterfaces>=1.0.0",
     "ROS2>=3.3.0"
