@@ -210,12 +210,12 @@ namespace ROS2
         }
     }
 
-    const ROS2ContactSensorConfiguration ROS2ContactSensorComponent::GetConfiguration() const
+    const ROS2ContactSensorConfiguration ROS2ContactSensorComponent::GetComponentConfiguration() const
     {
         return {};
     }
 
-    void ROS2ContactSensorComponent::SetConfiguration([[maybe_unused]] const ROS2ContactSensorConfiguration configuration)
+    void ROS2ContactSensorComponent::SetComponentConfiguration([[maybe_unused]] const ROS2ContactSensorConfiguration configuration)
     {
         // No configuration parameters
     }

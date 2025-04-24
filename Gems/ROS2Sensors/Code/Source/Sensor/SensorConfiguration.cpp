@@ -23,7 +23,8 @@ namespace ROS2
                 ->Field("Visualize", &SensorConfiguration::m_visualize)
                 ->Field("Publishing Enabled", &SensorConfiguration::m_publishingEnabled)
                 ->Field("Frequency (HZ)", &SensorConfiguration::m_frequency)
-                ->Field("Publishers", &SensorConfiguration::m_publishersConfigurations);
+                ->Field("Publishers", &SensorConfiguration::m_publishersConfigurations)
+                ->Field("Configurable from ROS2", &SensorConfiguration::m_configurableFromROS2);
 
             if (AZ::EditContext* ec = serializeContext->GetEditContext())
             {
@@ -35,6 +36,11 @@ namespace ROS2
                         &SensorConfiguration::m_publishingEnabled,
                         "Publishing Enabled",
                         "Toggle publishing for topic")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &SensorConfiguration::m_configurableFromROS2,
+                        "Configurable from ROS2",
+                        "Enables JSON configuration from ROS2")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default, &SensorConfiguration::m_frequency, "Frequency", "Frequency of publishing [Hz]")
                     ->Attribute(AZ::Edit::Attributes::Min, SensorConfiguration::m_minFrequency)

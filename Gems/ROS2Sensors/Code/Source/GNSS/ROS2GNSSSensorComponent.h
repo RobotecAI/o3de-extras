@@ -58,8 +58,8 @@ namespace ROS2
         [[nodiscard]] AZ::Transform GetCurrentPose() const;
 
         // Configuration Bus overrides
-        void SetConfiguration(const ROS2GNSSSensorConfiguration configuration) override;
-        const ROS2GNSSSensorConfiguration GetConfiguration() const override;
+        void SetComponentConfiguration(const ROS2GNSSSensorConfiguration configuration) override;
+        const ROS2GNSSSensorConfiguration GetComponentConfiguration() const override;
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>> m_gnssPublisher;
         sensor_msgs::msg::NavSatFix m_gnssMsg;

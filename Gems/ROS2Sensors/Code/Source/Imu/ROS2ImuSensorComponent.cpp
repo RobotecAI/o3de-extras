@@ -208,12 +208,12 @@ namespace ROS2
         m_orientationCovariance = ToDiagonalCovarianceMatrix(m_imuConfiguration.m_orientationVariance);
     }
 
-    const ImuSensorConfiguration ROS2ImuSensorComponent::GetConfiguration() const
+    const ImuSensorConfiguration ROS2ImuSensorComponent::GetComponentConfiguration() const
     {
         return m_imuConfiguration;
     }
 
-    void ROS2ImuSensorComponent::SetConfiguration(const ImuSensorConfiguration configuration)
+    void ROS2ImuSensorComponent::SetComponentConfiguration(const ImuSensorConfiguration configuration)
     {
         m_imuConfiguration = configuration;
         ConfigureSensor();

@@ -216,12 +216,12 @@ namespace ROS2
         ROS2SensorComponentBase::Deactivate();
     }
 
-    const ROS2WheelOdometryConfiguration ROS2WheelOdometryComponent::GetConfiguration() const
+    const ROS2WheelOdometryConfiguration ROS2WheelOdometryComponent::GetComponentConfiguration() const
     {
         return m_odometryConfiguration;
     }
 
-    void ROS2WheelOdometryComponent::SetConfiguration(const ROS2WheelOdometryConfiguration configuration)
+    void ROS2WheelOdometryComponent::SetComponentConfiguration(const ROS2WheelOdometryConfiguration configuration)
     {
         m_odometryConfiguration = configuration;
     }

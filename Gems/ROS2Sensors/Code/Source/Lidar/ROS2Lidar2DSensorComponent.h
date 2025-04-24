@@ -47,8 +47,8 @@ namespace ROS2
         void PublishRaycastResults(const RaycastResults& results);
 
         // ConfigurationBus overrides
-        const LidarSensorConfiguration GetConfiguration() const override;
-        void SetConfiguration(const LidarSensorConfiguration configuration) override;
+        const LidarSensorConfiguration GetComponentConfiguration() const override;
+        void SetComponentConfiguration(const LidarSensorConfiguration configuration) override;
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::LaserScan>> m_laserScanPublisher;
 

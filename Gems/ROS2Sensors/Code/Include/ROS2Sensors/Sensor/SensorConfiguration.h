@@ -35,6 +35,9 @@ namespace ROS2
 
         bool m_publishingEnabled = true; //!< Determines whether the sensor is publishing (sending data to ROS 2 ecosystem).
         bool m_visualize = true; //!< Determines whether the sensor is visualized in O3DE (for example, point cloud is drawn for LIDAR).
+
+        bool m_configurableFromROS2 =
+            false; //!< Determines whether the sensor can be configured from ROS 2 (for example, camera resolution).
     private:
         // Frequency limit is once per day.
         static constexpr float m_minFrequency = AZStd::numeric_limits<float>::epsilon();

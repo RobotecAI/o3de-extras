@@ -50,8 +50,8 @@ namespace ROS2
 
     private:
         // ConfigurationBus overrides
-        const ROS2OdometrySensorConfiguration GetConfiguration() const override;
-        void SetConfiguration(const ROS2OdometrySensorConfiguration configuration) override;
+        const ROS2OdometrySensorConfiguration GetComponentConfiguration() const override;
+        void SetComponentConfiguration(const ROS2OdometrySensorConfiguration configuration) override;
 
         AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;
         std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> m_odometryPublisher;

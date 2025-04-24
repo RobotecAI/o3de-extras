@@ -48,8 +48,8 @@ namespace ROS2
         void PublishRaycastResults(const RaycastResults& results);
 
         // ConfigurationBus overrides
-        const LidarSensorConfiguration GetConfiguration() const override;
-        void SetConfiguration(const LidarSensorConfiguration configuration) override;
+        const LidarSensorConfiguration GetComponentConfiguration() const override;
+        void SetComponentConfiguration(const LidarSensorConfiguration configuration) override;
 
         bool m_canRaycasterPublish = false;
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> m_pointCloudPublisher;

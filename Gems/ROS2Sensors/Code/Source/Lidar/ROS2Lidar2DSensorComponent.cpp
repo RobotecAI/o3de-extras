@@ -145,12 +145,12 @@ namespace ROS2
         m_laserScanPublisher->publish(message);
     }
 
-    const LidarSensorConfiguration ROS2Lidar2DSensorComponent::GetConfiguration() const
+    const LidarSensorConfiguration ROS2Lidar2DSensorComponent::GetComponentConfiguration() const
     {
         return m_lidarCore.m_lidarConfiguration;
     }
 
-    void ROS2Lidar2DSensorComponent::SetConfiguration(const LidarSensorConfiguration configuration)
+    void ROS2Lidar2DSensorComponent::SetComponentConfiguration(const LidarSensorConfiguration configuration)
     {
         m_lidarCore.Deinit();
         m_lidarCore.UpdateConfig(configuration);

@@ -286,14 +286,14 @@ namespace ROS2
         }
     }
 
-    void ROS2LidarSensorComponent::SetConfiguration(const LidarSensorConfiguration configuration)
+    void ROS2LidarSensorComponent::SetComponentConfiguration(const LidarSensorConfiguration configuration)
     {
         m_lidarCore.Deinit();
         m_lidarCore.UpdateConfig(configuration);
         m_lidarCore.Init(GetEntityId());
     }
 
-    const LidarSensorConfiguration ROS2LidarSensorComponent::GetConfiguration() const
+    const LidarSensorConfiguration ROS2LidarSensorComponent::GetComponentConfiguration() const
     {
         return m_lidarCore.m_lidarConfiguration;
     }

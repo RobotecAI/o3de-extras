@@ -77,8 +77,8 @@ namespace ROS2
         void SetCameraSensorConfiguration();
 
         // ConfigurationBus overrides
-        void SetConfiguration(const CameraSensorConfiguration configuration) override;
-        const CameraSensorConfiguration GetConfiguration() const override;
+        void SetComponentConfiguration(const CameraSensorConfiguration configuration) override;
+        const CameraSensorConfiguration GetComponentConfiguration() const override;
 
         CameraSensorConfiguration m_cameraConfiguration;
         AZStd::string m_frameName;

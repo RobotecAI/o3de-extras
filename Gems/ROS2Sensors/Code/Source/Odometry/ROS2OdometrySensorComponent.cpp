@@ -143,13 +143,13 @@ namespace ROS2
         ROS2SensorComponentBase::Deactivate();
     }
 
-    const ROS2OdometrySensorConfiguration ROS2OdometrySensorComponent::GetConfiguration() const
+    const ROS2OdometrySensorConfiguration ROS2OdometrySensorComponent::GetComponentConfiguration() const
     {
         // This sensor does not have any configuration parameters.
         return {};
     }
 
-    void ROS2OdometrySensorComponent::SetConfiguration([[maybe_unused]] ROS2OdometrySensorConfiguration configuration)
+    void ROS2OdometrySensorComponent::SetComponentConfiguration([[maybe_unused]] ROS2OdometrySensorConfiguration configuration)
     {
         // This sensor does not have any configuration parameters.
     }

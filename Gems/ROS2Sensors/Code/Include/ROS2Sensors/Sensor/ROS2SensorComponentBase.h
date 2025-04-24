@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "AzCore/Serialization/Json/JsonSerializationResult.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
@@ -17,6 +18,8 @@
 #include <ROS2Sensors/ROS2SensorsTypeIds.h>
 #include <ROS2Sensors/Sensor/SensorConfiguration.h>
 #include <ROS2Sensors/Sensor/SensorConfigurationRequestBus.h>
+#include <rapidjson/writer.h>
+#include <std_msgs/msg/string.hpp>
 
 namespace ROS2
 {
@@ -113,10 +116,32 @@ namespace ROS2
             AZ::EntityComponentIdPair entityComponentIdPair(GetEntityId(), GetId());
             SensorConfigurationRequestBus::Handler::BusConnect(entityComponentIdPair);
             ConfigurationBus<ComponentConfigurationT>::Handler::BusConnect(GetEntityId());
+
+            if (m_sensorConfiguration.m_configurableFromROS2)
+            {
+                AZStd::string ns = GetNamespace();
+                AZStd::string configurationName = ComponentConfigurationT::TYPEINFO_Name();
+                AZStd::string getTopic = ns + "/" + "Get" + configurationName;
+                AZStd::string setTopic = ns + "/" + "Set" + configurationName;
+                m_configurationPublisher = ROS2Interface::Get()->GetNode()->create_publisher<std_msgs::msg::String>(
+                    getTopic.data(), rclcpp::QoS(1).transient_local());
+                m_configurationSubscriber = ROS2Interface::Get()->GetNode()->create_subscription<std_msgs::msg::String>(
+                    setTopic.data(),
+                    rclcpp::QoS(1).reliable(),
+                    [this](const std_msgs::msg::String::SharedPtr msg)
+                    {
+                        ProcessConfigurationMsg(msg->data);
+                    });
+
+                PublishConfiguration(GetConfiguration());
+            }
         }
 
         void Deactivate() override
         {
+            m_configurationPublisher.reset();
+            m_configurationSubscriber.reset();
+
             ConfigurationBus<ComponentConfigurationT>::Handler::BusDisconnect();
             SensorConfigurationRequestBus::Handler::BusDisconnect();
         }
@@ -125,6 +150,49 @@ namespace ROS2
         {
             return AZ::TypeId(ROS2Sensors::ROS2SensorComponentBaseTypeId);
         }
+
+        //! Returns the configuration of this sensor.
+        [[nodiscard]] const ComponentConfigurationT GetConfiguration() const
+        {
+            return GetComponentConfiguration();
+        }
+
+        void ProcessConfigurationMsg(AZStd::string msg)
+        {
+            rapidjson::Document document;
+            document.Parse(msg.c_str());
+            if (document.HasParseError())
+            {
+                AZ_Error("ROS2Sensors", false, "Failed to parse configuration message");
+                return;
+            }
+
+            AZ::JsonDeserializerSettings deserializerSettings;
+
+            ComponentConfigurationT configuration = GetConfiguration();
+            auto result = AZ::JsonSerialization::Load(configuration, document, deserializerSettings);
+            auto processing = result.GetProcessing();
+            if (processing == AZ::JsonSerializationResult::Processing::Completed)
+            {
+                SetConfiguration(configuration);
+            }
+            else
+            {
+                AZ_Error("ROS2Sensors", false, "Failed to deserialize configuration message: %s", result.ToString("").c_str());
+            }
+        }
+
+        //! Sets the configuration of this sensor.
+        //! @param configuration Configuration to set.
+        void SetConfiguration(const ComponentConfigurationT configuration) override
+        {
+            SetComponentConfiguration(configuration);
+
+            PublishConfiguration(configuration);
+        }
+
+        virtual const ComponentConfigurationT GetComponentConfiguration() const = 0;
+        virtual void SetComponentConfiguration(const ComponentConfigurationT configuration) = 0;
 
     protected:
         //! Starts sensor with passed frequency and adapted event callback. Optionally, user can pass source event callback, that will be
@@ -184,6 +252,27 @@ namespace ROS2
 
         //! Handler for adapted event. Requires manual assignment and connecting to adapted event in derived class.
         typename EventSourceT::AdaptedEventHandlerType m_adaptedEventHandler;
+
+        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_configurationPublisher; ///< Publisher for the sensor configuration.
+        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_configurationSubscriber; ///< Subscriber for the sensor configuration.
+
+    private:
+        void PublishConfiguration(const ComponentConfigurationT& configuration)
+        {
+            if (m_configurationPublisher != nullptr)
+            {
+                rapidjson::Document document(rapidjson::kObjectType);
+                AZ::JsonSerializerSettings serializerSettings;
+                serializerSettings.m_keepDefaults = true;
+                AZ::JsonSerialization::Store(document, document.GetAllocator(), configuration, serializerSettings);
+                rapidjson::StringBuffer buffer;
+                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                document.Accept(writer);
+                std_msgs::msg::String msg;
+                msg.data = buffer.GetString();
+                m_configurationPublisher->publish(msg);
+            }
+        }
     };
 
     AZ_COMPONENT_IMPL_INLINE(

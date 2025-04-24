@@ -65,8 +65,8 @@ namespace ROS2
         void ConfigureSensor();
 
         // Configuration Bus
-        void SetConfiguration(const ImuSensorConfiguration configuration) override;
-        const ImuSensorConfiguration GetConfiguration() const override;
+        void SetComponentConfiguration(const ImuSensorConfiguration configuration) override;
+        const ImuSensorConfiguration GetComponentConfiguration() const override;
 
         // Handle to the simulated physical body
         AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;

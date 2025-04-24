@@ -144,7 +144,7 @@ namespace ROS2
         }
     }
 
-    void ROS2CameraSensorComponent::SetConfiguration(const CameraSensorConfiguration configuration)
+    void ROS2CameraSensorComponent::SetComponentConfiguration(const CameraSensorConfiguration configuration)
     {
         m_cameraConfiguration = configuration;
         m_cameraSensor.reset();
@@ -157,7 +157,7 @@ namespace ROS2
             });
     }
 
-    const CameraSensorConfiguration ROS2CameraSensorComponent::GetConfiguration() const
+    const CameraSensorConfiguration ROS2CameraSensorComponent::GetComponentConfiguration() const
     {
         return m_cameraConfiguration;
     }
