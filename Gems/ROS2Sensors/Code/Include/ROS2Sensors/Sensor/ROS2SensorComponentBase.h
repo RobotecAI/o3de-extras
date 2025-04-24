@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "AzCore/Serialization/Json/JsonSerializationResult.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/EditContext.h>
+#include <AzCore/Serialization/Json/JsonSerializationResult.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/ROS2GemUtilities.h>
 #include <ROS2/Sensor/Events/EventSourceAdapter.h>
@@ -151,8 +151,7 @@ namespace ROS2
             return AZ::TypeId(ROS2Sensors::ROS2SensorComponentBaseTypeId);
         }
 
-        //! Returns the configuration of this sensor.
-        [[nodiscard]] const ComponentConfigurationT GetConfiguration() const
+        const ComponentConfigurationT GetConfiguration() const override
         {
             return GetComponentConfiguration();
         }
@@ -182,8 +181,6 @@ namespace ROS2
             }
         }
 
-        //! Sets the configuration of this sensor.
-        //! @param configuration Configuration to set.
         void SetConfiguration(const ComponentConfigurationT configuration) override
         {
             SetComponentConfiguration(configuration);
