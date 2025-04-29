@@ -12,11 +12,11 @@
 #include <AzCore/Outcome/Outcome.h>
 #include <control_msgs/action/follow_joint_trajectory.hpp>
 
-namespace ROS2
+namespace ROS2Controllers
 {
     //! Interface for commanding a system of joints such as robotic arm (manipulator) through FollowJointTrajectory actions.
     //@see <a
-    //href="https://github.com/ros-controls/control_msgs/blob/humble/control_msgs/action/FollowJointTrajectory.action">FollowJointTrajectory</a>
+    // href="https://github.com/ros-controls/control_msgs/blob/humble/control_msgs/action/FollowJointTrajectory.action">FollowJointTrajectory</a>
     class JointsTrajectoryRequests : public AZ::EBusTraits
     {
     public:
@@ -54,4 +54,4 @@ namespace ROS2
     };
 
     using JointsTrajectoryRequestBus = AZ::EBus<JointsTrajectoryRequests>;
-} // namespace ROS2
+} // namespace ROS2Controllers
