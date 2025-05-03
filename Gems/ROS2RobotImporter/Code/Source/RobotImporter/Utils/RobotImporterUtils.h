@@ -31,6 +31,13 @@ namespace ROS2::Utils
 
 namespace ROS2::Utils
 {
+
+    //! Create component for a given entity in safe way.
+    //! @param entityId entity that will own component
+    //! @param componentType Uuid of component to create
+    //! @return The created componentId if successful, otherwise returns an invalid id
+    AZ::ComponentId CreateComponent(const AZ::EntityId& entityId, const AZ::Uuid& componentType);
+
     //! Determine whether a given link is likely a wheel link.
     //! This can be useful to provide a good default behavior - for example, to add Vehicle Dynamics components to this link's entity.
     //! @param sdfModel Model object which is used to query the joints from SDF format data

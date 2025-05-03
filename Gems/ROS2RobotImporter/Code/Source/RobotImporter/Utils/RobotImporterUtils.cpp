@@ -15,6 +15,7 @@
 #include <AzCore/Utils/Utils.h>
 #include <AzCore/std/string/regex.h>
 #include <AzToolsFramework/API/EditorAssetSystemAPI.h>
+#include <AzToolsFramework/API/EntityCompositionRequestBus.h>
 #include <RobotImporter/Utils/ErrorUtils.h>
 #include <string.h>
 
@@ -28,6 +29,31 @@ namespace ROS2::Utils
             return AZ::IO::SystemFile::Exists(pathStorage.c_str());
         };
     } // namespace Internal
+
+    AZ::ComponentId CreateComponent(const AZ::EntityId& entityId, const AZ::Uuid& componentType)
+    {
+        const AZ::ComponentTypeList componentsToAdd{ componentType };
+        const AZStd::vector<AZ::EntityId> entityIds{ entityId };
+        AzToolsFramework::EntityCompositionRequests::AddComponentsOutcome addComponentsOutcome = AZ::Failure(AZStd::string());
+        AzToolsFramework::EntityCompositionRequestBus::BroadcastResult(
+            addComponentsOutcome, &AzToolsFramework::EntityCompositionRequests::AddComponentsToEntities, entityIds, componentsToAdd);
+        if (!addComponentsOutcome.IsSuccess())
+        {
+            AZ_Warning(
+                "URDF importer",
+                false,
+                "Failed to create component %s, entity %s : %s",
+                componentType.ToString<AZStd::string>().c_str(),
+                entityId.ToString().c_str(),
+                addComponentsOutcome.GetError().c_str());
+        }
+        const auto& added = addComponentsOutcome.GetValue().at(entityId).m_componentsAdded;
+        if (!added.empty())
+        {
+            return added.front()->GetId();
+        }
+        return AZ::InvalidComponentId;
+    }
 
     bool IsWheelURDFHeuristics(const sdf::Model& model, const sdf::Link* link)
     {

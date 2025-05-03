@@ -97,7 +97,7 @@ namespace ROS2Controllers::VehicleDynamics
         AZ::Entity* wheelEntityPtr = nullptr;
         AZ::ComponentApplicationBus::BroadcastResult(wheelEntityPtr, &AZ::ComponentApplicationRequests::FindEntity, wheelEntityId);
         AZ_Assert(wheelEntityPtr, "The wheelEntity should not be null here");
-        out.wheelControllerComponentPtr = ROS2::Utils::GetGameOrEditorComponent<WheelControllerComponent>(wheelEntityPtr);
+        out.wheelControllerComponentPtr = wheelEntityPtr->FindComponent<WheelControllerComponent>();
         out.wheelData = VehicleDynamics::Utilities::GetWheelData(wheelEntityId, axle.m_wheelRadius);
         if (out.wheelControllerComponentPtr)
         {

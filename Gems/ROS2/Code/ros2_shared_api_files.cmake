@@ -21,5 +21,4 @@ set(FILES
     Source/Sensor/Events/TickBasedSource.cpp
     Source/Utilities/ROS2Conversions.cpp
     Source/Utilities/ROS2Names.cpp
-    Source/ROS2GemUtilities.cpp
 )

@@ -12,6 +12,12 @@
 
 namespace ROS2Controllers::JointUtils
 {
+    //! Checks whether the entity has a component of the given type
+    //! @param entity pointer to entity
+    //! @param typeId type of the component
+    //! @returns true if entity has component with given type
+    bool HasComponentOfType(const AZ::Entity* entity, const AZ::Uuid& typeId);
+
     //! Check if the entity has any of the non fixed joint or articulation components.
     //! @param entity Entity to check.
     //! @return True if the entity has any of the joint or articulation components.

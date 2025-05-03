@@ -13,6 +13,7 @@
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/std/functional.h>
+#include <AzToolsFramework/ToolsComponents/GenericComponentWrapper.h>
 #include <ROS2/Frame/ROS2FrameEditorComponent.h>
 #include <ROS2/ROS2GemUtilities.h>
 #include <ROS2/Utilities/ROS2Names.h>
@@ -104,8 +105,7 @@ namespace ROS2Controllers
 
         AZStd::function<void(const AZ::Entity* entity)> getAllJointsHierarchy = [&](const AZ::Entity* entity)
         {
-            auto* frameEditorComponent =
-                azrtti_cast<ROS2::ROS2FrameEditorComponent*>(ROS2::Utils::GetGameOrEditorComponent<ROS2::ROS2FrameEditorComponent>(entity));
+            auto* frameEditorComponent = AzToolsFramework::FindWrappedComponentForEntity<ROS2::ROS2FrameEditorComponent>(entity);
             AZ_Assert(frameEditorComponent, "ROS2FrameEditorComponent does not exist!");
 
             const bool hasNonFixedJoints = JointUtils::HasNonFixedJoints(entity);

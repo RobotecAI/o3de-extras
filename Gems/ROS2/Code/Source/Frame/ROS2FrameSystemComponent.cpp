@@ -92,8 +92,7 @@ namespace ROS2
             return nullptr;
         }
 
-        auto* interface = Utils::GetGameOrEditorComponent<AzToolsFramework::Components::TransformComponent>(entity);
-
+        auto* interface = AzToolsFramework::FindWrappedComponentForEntity<AzToolsFramework::Components::TransformComponent>(entity);
         return interface;
     }
 

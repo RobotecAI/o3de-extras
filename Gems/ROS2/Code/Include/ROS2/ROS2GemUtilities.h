@@ -18,22 +18,6 @@ namespace ROS2
 {
     namespace Utils
     {
-        //! Checks whether the entity has a component of the given type
-        //! @param entity pointer to entity
-        //! @param typeId type of the component
-        //! @returns true if entity has component with given type
-        inline bool HasComponentOfType(const AZ::Entity* entity, const AZ::Uuid typeId)
-        {
-            auto components = AZ::EntityUtils::FindDerivedComponents(entity, typeId);
-            return !components.empty();
-        }
-
-        /// Create component for a given entity in safe way.
-        /// @param entityId entity that will own component
-        /// @param componentType Uuid of component to create
-        /// @return The created componentId if successful, otherwise returns an invalid id
-        AZ::ComponentId CreateComponent(const AZ::EntityId entityId, const AZ::Uuid componentType);
-
         /// Retrieve component from entity given by a pointer. It is a way to get game components and wrapped components.
         /// We should use that that we are not sure if we access eg ROS2FrameComponent in game mode or from Editor
         /// @param entity pointer to entity eg with GetEntity()
