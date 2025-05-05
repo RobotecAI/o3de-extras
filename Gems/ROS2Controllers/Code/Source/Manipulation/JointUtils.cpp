@@ -8,7 +8,6 @@
 
 #include "JointUtils.h"
 
-#include <ROS2/ROS2GemUtilities.h>
 #include <Source/EditorArticulationLinkComponent.h>
 #include <Source/EditorBallJointComponent.h>
 #include <Source/EditorFixedJointComponent.h>

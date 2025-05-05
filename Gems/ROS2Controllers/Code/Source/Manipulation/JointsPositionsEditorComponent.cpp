@@ -18,7 +18,6 @@
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
 #include <AzToolsFramework/ToolsComponents/GenericComponentWrapper.h>
 #include <ROS2/Frame/ROS2FrameEditorComponent.h>
-#include <ROS2/ROS2GemUtilities.h>
 #include <ROS2Controllers/Manipulation/JointsManipulationRequests.h>
 
 namespace ROS2Controllers

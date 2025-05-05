@@ -14,7 +14,6 @@
 #include <AzFramework/Physics/RigidBodyBus.h>
 #include <HingeJointComponent.h>
 #include <PhysX/Joint/PhysXJointRequestsBus.h>
-#include <ROS2/ROS2GemUtilities.h>
 #include <VehicleDynamics/Utilities.h>
 
 namespace ROS2Controllers::VehicleDynamics
