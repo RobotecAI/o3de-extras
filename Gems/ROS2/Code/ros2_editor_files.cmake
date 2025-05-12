@@ -14,6 +14,8 @@ set(FILES
     Source/Lidar/LidarRegistrarEditorSystemComponent.h
     Source/Manipulation/JointsPositionsEditorComponent.cpp
     Source/Manipulation/JointsPositionsEditorComponent.h
+    Source/Manipulation/JointsStateFollowerEditorComponent.cpp
+    Source/Manipulation/JointsStateFollowerEditorComponent.h
     Source/Manipulation/JointsManipulationEditorComponent.cpp
     Source/Manipulation/JointsManipulationEditorComponent.h
     Source/Manipulation/JointUtils.cpp

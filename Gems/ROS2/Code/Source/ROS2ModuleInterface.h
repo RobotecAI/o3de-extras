@@ -25,6 +25,7 @@
 #include <Manipulation/Controllers/JointsPIDControllerComponent.h>
 #include <Manipulation/JointsManipulationComponent.h>
 #include <Manipulation/JointsPositionsComponent.h>
+#include <Manipulation/JointsStateFollowerComponent.h>
 #include <Manipulation/JointsTrajectoryComponent.h>
 #include <Odometry/ROS2OdometrySensorComponent.h>
 #include <Odometry/ROS2WheelOdometry.h>
@@ -44,9 +45,9 @@
 #include <VehicleDynamics/VehicleModelComponent.h>
 #include <VehicleDynamics/WheelControllerComponent.h>
 #ifdef WITH_GAZEBO_MSGS
+#include <ContactSensor/ROS2ContactSensorComponent.h>
 #include <Spawner/ROS2SpawnPointComponent.h>
 #include <Spawner/ROS2SpawnerComponent.h>
-#include <ContactSensor/ROS2ContactSensorComponent.h>
 #endif
 namespace ROS2
 {
@@ -87,6 +88,7 @@ namespace ROS2
                     ManualMotorControllerComponent::CreateDescriptor(),
                     JointsManipulationComponent::CreateDescriptor(),
                     JointsPositionsComponent::CreateDescriptor(),
+                    JointsStateFollowerComponent::CreateDescriptor(),
                     JointsArticulationControllerComponent::CreateDescriptor(),
                     JointsPIDControllerComponent::CreateDescriptor(),
                     JointsTrajectoryComponent::CreateDescriptor(),

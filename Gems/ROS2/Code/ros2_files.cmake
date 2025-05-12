@@ -87,6 +87,8 @@ set(FILES
         Source/Manipulation/JointPositionsSubscriptionHandler.h
         Source/Manipulation/JointsPositionsComponent.cpp
         Source/Manipulation/JointsPositionsComponent.h
+        Source/Manipulation/JointsStateFollowerComponent.cpp
+        Source/Manipulation/JointsStateFollowerComponent.h
         Source/Manipulation/JointsManipulationComponent.cpp
         Source/Manipulation/JointsManipulationComponent.h
         Source/Manipulation/JointsTrajectoryComponent.cpp

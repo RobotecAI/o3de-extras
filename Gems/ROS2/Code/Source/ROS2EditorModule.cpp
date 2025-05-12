@@ -12,6 +12,7 @@
 #include <Lidar/LidarRegistrarEditorSystemComponent.h>
 #include <Manipulation/JointsManipulationEditorComponent.h>
 #include <Manipulation/JointsPositionsEditorComponent.h>
+#include <Manipulation/JointsStateFollowerEditorComponent.h>
 #include <QtCore/qglobal.h>
 #include <ROS2/Frame/ROS2FrameEditorComponent.h>
 #include <ROS2ModuleInterface.h>
@@ -54,6 +55,7 @@ namespace ROS2
                   SdfAssetBuilderSystemComponent::CreateDescriptor(),
                   JointsManipulationEditorComponent::CreateDescriptor(),
                   JointsPositionsEditorComponent::CreateDescriptor(),
+                  JointsStateFollowerEditorComponent::CreateDescriptor(),
                   ROS2FrameSystemComponent::CreateDescriptor(),
                   ROS2FrameEditorComponent::CreateDescriptor() });
         }
