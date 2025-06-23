@@ -21,6 +21,8 @@
 #include <gazebo_msgs/srv/get_world_properties.hpp>
 #include <gazebo_msgs/srv/spawn_entity.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 namespace ROS2
 {
@@ -66,6 +68,9 @@ namespace ROS2
         rclcpp::Service<gazebo_msgs::srv::DeleteEntity>::SharedPtr m_deleteService;
         rclcpp::Service<gazebo_msgs::srv::GetModelState>::SharedPtr m_getSpawnPointInfoService;
 
+        std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
+        std::shared_ptr<tf2_ros::TransformListener> m_tf_listener{ nullptr };
+
         void GetAvailableSpawnableNames(const GetAvailableSpawnableNamesRequest request, GetAvailableSpawnableNamesResponse response);
         void SpawnEntity(
             const SpawnEntityServiceHandle service_handle,
@@ -84,6 +89,9 @@ namespace ROS2
 
         void GetSpawnPointsNames(const GetSpawnPointsNamesRequest request, GetSpawnPointsNamesResponse response);
         void GetSpawnPointInfo(const GetSpawnPointInfoRequest request, GetSpawnPointInfoResponse response);
+
+        AZ::Outcome<AZ::Transform, AZStd::string> CalculateTransform(
+            const AZStd::string& referenceFrame, const AZStd::string& spawnPointName, const SpawnEntityRequest request, const bool isWGS);
 
         AZStd::unordered_map<AZStd::string, SpawnPointInfo> GetSpawnPoints();
     };

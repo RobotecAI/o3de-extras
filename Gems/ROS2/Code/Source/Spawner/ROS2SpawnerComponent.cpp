@@ -76,11 +76,17 @@ namespace ROS2
             {
                 GetSpawnPointsNames(request, response);
             });
+
+        m_tf_buffer = std::make_unique<tf2_ros::Buffer>(ros2Node->get_clock());
+        m_tf_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
     }
 
     void ROS2SpawnerComponent::Deactivate()
     {
         ROS2SpawnerComponentBase::Deactivate();
+
+        m_tf_buffer.reset();
+        m_tf_listener.reset();
 
         m_getSpawnablesNamesService.reset();
         m_spawnService.reset();
@@ -107,6 +113,90 @@ namespace ROS2
         {
             response->model_names.emplace_back(spawnable.first.c_str());
         }
+    }
+
+    AZ::Outcome<AZ::Transform, AZStd::string> ROS2SpawnerComponent::CalculateTransform(
+        const AZStd::string& referenceFrame, const AZStd::string& spawnPointName, const SpawnEntityRequest request, const bool isWGS)
+    {
+        AZ::Transform transform;
+        if (isWGS)
+        {
+            ROS2::WGS::WGS84Coordinate coordinate;
+            AZ::Vector3 coordinateInLevel = AZ::Vector3(-1);
+            AZ::Quaternion rotationInENU = AZ::Quaternion::CreateIdentity();
+            coordinate.m_latitude = request->initial_pose.position.x;
+            coordinate.m_longitude = request->initial_pose.position.y;
+            coordinate.m_altitude = request->initial_pose.position.z;
+            ROS2::GeoreferenceRequestsBus::BroadcastResult(rotationInENU, &ROS2::GeoreferenceRequests::GetRotationFromLevelToENU);
+            ROS2::GeoreferenceRequestsBus::BroadcastResult(
+                coordinateInLevel, &ROS2::GeoreferenceRequests::ConvertFromWGS84ToLevel, coordinate);
+
+            rotationInENU = (rotationInENU.GetInverseFast() *
+                             AZ::Quaternion(
+                                 request->initial_pose.orientation.x,
+                                 request->initial_pose.orientation.y,
+                                 request->initial_pose.orientation.z,
+                                 request->initial_pose.orientation.w))
+                                .GetNormalized();
+
+            transform = { coordinateInLevel, rotationInENU, 1.0f };
+        }
+        else if (referenceFrame != "wgs84" && !referenceFrame.empty())
+        {
+            auto ros2Node = ROS2Interface::Get()->GetNode();
+            if (!ros2Node)
+            {
+                return AZ::Failure("ROS2 node is not available");
+            }
+            std::string errorMessage;
+            const AZStd::string targetFrameName{ "odom" };
+            if (m_tf_buffer->canTransform(targetFrameName.c_str(), referenceFrame.c_str(), tf2::TimePointZero, &errorMessage))
+            {
+                const geometry_msgs::msg::TransformStamped transformStamped =
+                    m_tf_buffer->lookupTransform(targetFrameName.c_str(), referenceFrame.c_str(), tf2::TimePointZero);
+                const AZ::Transform lookupTransform{ ROS2::ROS2Conversions::FromROS2Vector3(transformStamped.transform.translation),
+                                                     ROS2::ROS2Conversions::FromROS2Quaternion(transformStamped.transform.rotation),
+                                                     1.0 };
+                const AZ::Transform requestedTransform = {
+                    AZ::Vector3(request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
+                    AZ::Quaternion(
+                        request->initial_pose.orientation.x,
+                        request->initial_pose.orientation.y,
+                        request->initial_pose.orientation.z,
+                        request->initial_pose.orientation.w)
+                        .GetNormalized(),
+                    1.0f
+                };
+
+                transform = lookupTransform * requestedTransform;
+            }
+            else
+            {
+                return AZ::Failure(AZStd::string::format(
+                    "Could not transform reference frame '%s' to '%s', error: %s", referenceFrame.c_str(), targetFrameName.c_str(), errorMessage.c_str()));
+            }
+        }
+        else
+        {
+            if (auto spawnPoints = GetSpawnPoints(); spawnPoints.contains(spawnPointName))
+            {
+                transform = spawnPoints.at(spawnPointName).pose;
+            }
+            else
+            {
+                transform = { AZ::Vector3(
+                                  request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
+                              AZ::Quaternion(
+                                  request->initial_pose.orientation.x,
+                                  request->initial_pose.orientation.y,
+                                  request->initial_pose.orientation.z,
+                                  request->initial_pose.orientation.w)
+                                  .GetNormalized(),
+                              1.0f };
+            }
+        }
+
+        return AZ::Success(AZStd::move(transform));
     }
 
     void ROS2SpawnerComponent::SpawnEntity(
@@ -194,49 +284,16 @@ namespace ROS2
 
         AzFramework::SpawnAllEntitiesOptionalArgs optionalArgs;
 
-        AZ::Transform transform;
-
-        if (isWGS)
+        const AZ::Outcome<AZ::Transform, AZStd::string> result = CalculateTransform(referenceFrame, spawnPointName, request, isWGS);
+        if (!result.IsSuccess())
         {
-            ROS2::WGS::WGS84Coordinate coordinate;
-            AZ::Vector3 coordinateInLevel = AZ::Vector3(-1);
-            AZ::Quaternion rotationInENU = AZ::Quaternion::CreateIdentity();
-            coordinate.m_latitude = request->initial_pose.position.x;
-            coordinate.m_longitude = request->initial_pose.position.y;
-            coordinate.m_altitude = request->initial_pose.position.z;
-            ROS2::GeoreferenceRequestsBus::BroadcastResult(rotationInENU, &ROS2::GeoreferenceRequests::GetRotationFromLevelToENU);
-            ROS2::GeoreferenceRequestsBus::BroadcastResult(
-                coordinateInLevel, &ROS2::GeoreferenceRequests::ConvertFromWGS84ToLevel, coordinate);
-
-            rotationInENU = (rotationInENU.GetInverseFast() *
-                             AZ::Quaternion(
-                                 request->initial_pose.orientation.x,
-                                 request->initial_pose.orientation.y,
-                                 request->initial_pose.orientation.z,
-                                 request->initial_pose.orientation.w))
-                                .GetNormalized();
-
-            transform = { coordinateInLevel, rotationInENU, 1.0f };
+            response.success = false;
+            response.status_message = result.GetError().data();
+            service_handle->send_response(*header, response);
+            return;
         }
-        else
-        {
-            if (auto spawnPoints = GetSpawnPoints(); spawnPoints.contains(spawnPointName))
-            {
-                transform = spawnPoints.at(spawnPointName).pose;
-            }
-            else
-            {
-                transform = { AZ::Vector3(
-                                  request->initial_pose.position.x, request->initial_pose.position.y, request->initial_pose.position.z),
-                              AZ::Quaternion(
-                                  request->initial_pose.orientation.x,
-                                  request->initial_pose.orientation.y,
-                                  request->initial_pose.orientation.z,
-                                  request->initial_pose.orientation.w)
-                                  .GetNormalized(),
-                              1.0f };
-            }
-        }
+
+        const AZ::Transform transform = result.GetValue();
 
         optionalArgs.m_preInsertionCallback = [this, transform, spawnableName, spawnableNamespace](auto id, auto view)
         {
