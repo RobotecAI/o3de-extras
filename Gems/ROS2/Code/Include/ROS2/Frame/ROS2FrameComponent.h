@@ -9,6 +9,7 @@
 
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/Json/BaseJsonSerializer.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzFramework/Components/TransformComponent.h>
 #include <ROS2/Frame/NamespaceConfiguration.h>
@@ -32,6 +33,9 @@ namespace ROS2
             const rapidjson::Value& inputValue,
             AZ::JsonDeserializerContext& context) override;
     };
+
+    inline constexpr const char* DefaultGlobalFrameName = "odom";
+    inline constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
 
     //! This component marks an interesting reference frame for ROS2 ecosystem.
     //! It serves as sensor data frame of reference and is responsible, through ROS2Transform, for publishing
@@ -126,6 +130,7 @@ namespace ROS2
         AZStd::string m_jointName;
 
         bool m_publishTransform;
+        bool m_forceDynamic;
         bool m_isDynamic;
 
         AZStd::unique_ptr<ROS2Transform> m_ros2Transform;

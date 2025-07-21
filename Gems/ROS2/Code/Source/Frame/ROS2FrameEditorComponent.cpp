@@ -51,7 +51,17 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
     {
-        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string("odom"));
+        AZStd::string globalFrameName;
+        auto* registry = AZ::SettingsRegistry::Get();
+        AZ_Assert(registry, "No Registry available.");
+        if (registry)
+        {
+            if (!registry->Get(globalFrameName, DefaultGlobalFrameNameConfigurationKey))
+            {
+                globalFrameName = DefaultGlobalFrameName;
+            }
+        }
+        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string(globalFrameName));
     }
 
     bool ROS2FrameEditorComponent::IsTopLevel() const
