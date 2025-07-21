@@ -26,6 +26,7 @@ namespace ROS2
         AZStd::string m_jointName;
 
         bool m_publishTransform = true;
+        bool m_forceDynamic = false;
         bool m_isDynamic = false;
 
         //! Sets the effective namespace shown in the Editor.

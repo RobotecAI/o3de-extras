@@ -143,8 +143,8 @@ namespace ROS2
         {
             AZ_TracePrintf("ROS2FrameComponent", "Setting up %s", GetFrameID().data());
 
-            // The frame will always be dynamic if it's a top entity.
-            if (IsTopLevel())
+            // The frame will always be dynamic if it's a top entity or if it is forced to be dynamic by its configuration
+            if (IsTopLevel() || m_forceDynamic)
             {
                 m_isDynamic = true;
             }
@@ -196,7 +196,17 @@ namespace ROS2
 
     AZStd::string ROS2FrameComponent::GetGlobalFrameName() const
     {
-        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string("odom"));
+        AZStd::string globalFrameName;
+        auto* registry = AZ::SettingsRegistry::Get();
+        AZ_Assert(registry, "No Registry available.");
+        if (registry)
+        {
+            if (!registry->Get(globalFrameName, DefaultGlobalFrameNameConfigurationKey))
+            {
+                globalFrameName = DefaultGlobalFrameName;
+            }
+        }
+        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string(globalFrameName));
     }
 
     void ROS2FrameComponent::UpdateNamespaceConfiguration(
@@ -292,6 +302,7 @@ namespace ROS2
                 ->Field("Frame Name", &ROS2FrameComponent::m_frameName)
                 ->Field("Joint Name", &ROS2FrameComponent::m_jointName)
                 ->Field("Publish Transform", &ROS2FrameComponent::m_publishTransform)
+                ->Field("Force Dynamic", &ROS2FrameComponent::m_forceDynamic)
                 ->Field("Namespace Configuration", &ROS2FrameComponent::m_namespaceConfiguration);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
@@ -315,6 +326,11 @@ namespace ROS2
                         &ROS2FrameComponent::m_publishTransform,
                         "Publish Transform",
                         "Publish the transform of this frame.")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2FrameComponent::m_forceDynamic,
+                        "Force dynamic",
+                        "Force this frame to be dynamic.")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2FrameComponent::m_namespaceConfiguration,
@@ -346,7 +362,8 @@ namespace ROS2
         , m_frameName(configuration.m_frameName)
         , m_jointName(configuration.m_jointName)
         , m_publishTransform(configuration.m_publishTransform)
-        , m_isDynamic(configuration.m_isDynamic){};
+        , m_isDynamic(configuration.m_isDynamic)
+        , m_forceDynamic(configuration.m_forceDynamic){};
 
     ROS2FrameConfiguration ROS2FrameComponent::GetConfiguration() const
     {
