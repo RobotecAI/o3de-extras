@@ -15,6 +15,7 @@
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
 #include <ROS2/Frame/ROS2FrameBus.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
@@ -25,6 +26,9 @@
 
 namespace ROS2
 {
+    static constexpr const char* DefaultGlobalFrameName = "odom";
+    static constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
+
     ROS2FrameEditorComponent::ROS2FrameEditorComponent(const ROS2FrameConfiguration ros2FrameConfiguration)
     {
         m_configuration = ros2FrameConfiguration;
@@ -51,17 +55,16 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
     {
-        AZStd::string globalFrameName;
+        AZStd::string globalFrameNameRegistry;
+        bool isReadRegistrySuccessful = false;
         auto* registry = AZ::SettingsRegistry::Get();
         AZ_Assert(registry, "No Registry available.");
         if (registry)
         {
-            if (!registry->Get(globalFrameName, DefaultGlobalFrameNameConfigurationKey))
-            {
-                globalFrameName = DefaultGlobalFrameName;
-            }
+            isReadRegistrySuccessful = registry->Get(globalFrameNameRegistry, DefaultGlobalFrameNameConfigurationKey);
         }
-        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string(globalFrameName));
+        const AZStd::string globalFrameName = isReadRegistrySuccessful ? globalFrameNameRegistry : DefaultGlobalFrameName;
+        return ROS2Names::GetNamespacedName(GetNamespace(), globalFrameName);
     }
 
     bool ROS2FrameEditorComponent::IsTopLevel() const

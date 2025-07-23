@@ -15,6 +15,7 @@
 #include <AzCore/Serialization/Json/JsonSerializationResult.h>
 #include <AzCore/Serialization/Json/RegistrationContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/ROS2Bus.h>
@@ -28,6 +29,9 @@
 
 namespace ROS2
 {
+    static constexpr const char* DefaultGlobalFrameName = "odom";
+    static constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
+
     namespace Internal
     {
         AZ::TransformInterface* GetEntityTransformInterface(const AZ::Entity* entity)
@@ -196,17 +200,16 @@ namespace ROS2
 
     AZStd::string ROS2FrameComponent::GetGlobalFrameName() const
     {
-        AZStd::string globalFrameName;
+        AZStd::string globalFrameNameRegistry;
+        bool isReadRegistrySuccessful = false;
         auto* registry = AZ::SettingsRegistry::Get();
         AZ_Assert(registry, "No Registry available.");
         if (registry)
         {
-            if (!registry->Get(globalFrameName, DefaultGlobalFrameNameConfigurationKey))
-            {
-                globalFrameName = DefaultGlobalFrameName;
-            }
+            isReadRegistrySuccessful = registry->Get(globalFrameNameRegistry, DefaultGlobalFrameNameConfigurationKey);
         }
-        return ROS2Names::GetNamespacedName(GetNamespace(), AZStd::string(globalFrameName));
+        const AZStd::string globalFrameName = isReadRegistrySuccessful ? globalFrameNameRegistry : DefaultGlobalFrameName;
+        return ROS2Names::GetNamespacedName(GetNamespace(), globalFrameName);
     }
 
     void ROS2FrameComponent::UpdateNamespaceConfiguration(
