@@ -20,6 +20,8 @@ namespace SimulationInterfaces
     inline constexpr const char* SimulationFeaturesAggregatorTypeId = "{5c5ae765-1776-4ba0-8e32-b66c8f4edafe}";
     inline constexpr const char* SimulationFeaturesAggregatorEditorTypeId = "{504A86EF-DF0A-45EC-B69D-315FF4EC8121}";
 
+    inline constexpr const char* LevelManagerTypeId = "{A9D5953D-F266-46D4-AD08-82CF10F426F7}";
+    inline constexpr const char* LevelManagerEditorTypeId = "{16C16216-279D-4215-9DF8-8AB4F15AC4C8}";
     // Module derived classes TypeIds
     inline constexpr const char* SimulationInterfacesModuleInterfaceTypeId = "{675797BF-E5D5-438A-BF86-4B4554F09CEF}";
     inline constexpr const char* SimulationInterfacesModuleTypeId = "{8D6741FD-3105-4CB0-9700-152123B6D135}";
@@ -32,5 +34,6 @@ namespace SimulationInterfaces
     inline constexpr const char* SimulationManagerRequestsTypeId = "{056477BA-8153-4901-9401-0146A5E3E9ED}";
     inline constexpr const char* SimulationFeaturesAggregatorRequestsTypeId = "{099FD08B-B0E2-4705-9C35-CC09C8E45076}";
     inline constexpr const char* SimulationManagerNotificationsTypeId = "{0201067B-9D52-4AB7-9A45-284287F53B00}";
+    inline constexpr const char* LevelManagerRequestsTypeId = "{88519292-D032-4A2F-B323-FEDFE2E277EA}";
 
 } // namespace SimulationInterfaces
