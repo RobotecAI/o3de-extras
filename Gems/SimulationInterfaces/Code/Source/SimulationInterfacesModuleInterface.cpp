@@ -8,6 +8,7 @@
 
 #include "SimulationInterfacesModuleInterface.h"
 #include <AzCore/Memory/Memory.h>
+#include <Clients/LevelManager.h>
 
 #include <SimulationInterfaces/SimulationInterfacesTypeIds.h>
 
@@ -31,6 +32,7 @@ namespace SimulationInterfaces
                 SimulationEntitiesManager::CreateDescriptor(),
                 SimulationManager::CreateDescriptor(),
                 SimulationFeaturesAggregator::CreateDescriptor(),
+                LevelManager::CreateDescriptor(),
                 ROS2SimulationInterfaces::ROS2SimulationInterfacesSystemComponent::CreateDescriptor(),
             });
     }
@@ -41,6 +43,7 @@ namespace SimulationInterfaces
             azrtti_typeid<SimulationEntitiesManager>(),
             azrtti_typeid<SimulationManager>(),
             azrtti_typeid<SimulationFeaturesAggregator>(),
+            azrtti_typeid<LevelManager>(),
             azrtti_typeid<ROS2SimulationInterfaces::ROS2SimulationInterfacesSystemComponent>(),
         };
     }
