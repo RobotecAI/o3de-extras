@@ -19,18 +19,22 @@
 #include <SimulationInterfaces/ROS2SimulationInterfacesTypeIds.h>
 
 #include <Services/DeleteEntityServiceHandler.h>
+#include <Services/GetAvailableWorldsServiceHandler.h>
+#include <Services/GetCurrentWorldServiceHandler.h>
 #include <Services/GetEntitiesServiceHandler.h>
 #include <Services/GetEntitiesStatesServiceHandler.h>
 #include <Services/GetEntityStateServiceHandler.h>
-#include <Services/GetSimulatorFeaturesServiceHandler.h>
 #include <Services/GetSimulationStateServiceHandler.h>
+#include <Services/GetSimulatorFeaturesServiceHandler.h>
 #include <Services/GetSpawnablesServiceHandler.h>
+#include <Services/LoadWorldServiceHandler.h>
 #include <Services/ROS2ServiceBase.h>
 #include <Services/ResetSimulationServiceHandler.h>
 #include <Services/SetEntityStateServiceHandler.h>
 #include <Services/SetSimulationStateServiceHandler.h>
 #include <Services/SpawnEntityServiceHandler.h>
 #include <Services/StepSimulationServiceHandler.h>
+#include <Services/UnloadWorldServiceHandler.h>
 
 namespace ROS2SimulationInterfaces
 {
@@ -86,6 +90,10 @@ namespace ROS2SimulationInterfaces
         RegisterInterface<SetSimulationStateServiceHandler>(ros2Node);
         RegisterInterface<GetSimulationStateServiceHandler>(ros2Node);
         RegisterInterface<StepSimulationServiceHandler>(ros2Node);
+        RegisterInterface<GetAvailableWorldsServiceHandler>(ros2Node);
+        RegisterInterface<GetCurrentWorldServiceHandler>(ros2Node);
+        RegisterInterface<LoadWorldServiceHandler>(ros2Node);
+        RegisterInterface<UnloadWorldServiceHandler>(ros2Node);
     }
 
     void ROS2SimulationInterfacesSystemComponent::Deactivate()
