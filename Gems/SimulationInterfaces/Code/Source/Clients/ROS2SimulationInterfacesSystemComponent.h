@@ -49,6 +49,8 @@ namespace ROS2SimulationInterfaces
     private:
         AZStd::unordered_map<AZStd::string, AZStd::shared_ptr<IROS2HandlerBase>> m_availableRos2Interface;
 
+        bool m_isAppEditor = false;
+        
         template<typename T>
         void RegisterInterface(rclcpp::Node::SharedPtr ros2Node)
         {
