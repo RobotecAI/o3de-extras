@@ -6,6 +6,7 @@
  *
  */
 
+#include "LevelManagerEditor.h"
 #include "ROS2SimulationInterfacesEditorSystemComponent.h"
 #include "SimulationEntitiesManagerEditor.h"
 #include "SimulationFeaturesAggregatorEditor.h"
@@ -28,18 +29,29 @@ namespace SimulationInterfaces
                     SimulationEntitiesManagerEditor::CreateDescriptor(),
                     SimulationManagerEditor::CreateDescriptor(),
                     SimulationFeaturesAggregatorEditor::CreateDescriptor(),
+                    LevelManagerEditor::CreateDescriptor(),
                     ROS2SimulationInterfaces::ROS2SimulationInterfacesEditorSystemComponent::CreateDescriptor(),
                 });
         }
 
         AZ::ComponentTypeList GetRequiredSystemComponents() const override
         {
-            return AZ::ComponentTypeList{
-                azrtti_typeid<SimulationEntitiesManagerEditor>(),
-                azrtti_typeid<SimulationManagerEditor>(),
-                azrtti_typeid<SimulationFeaturesAggregatorEditor>(),
-                azrtti_typeid<ROS2SimulationInterfaces::ROS2SimulationInterfacesEditorSystemComponent>(),
-            };
+            // add system components only if application is editor. In other case editor system components break other tools like material
+            // Canvas, material editor etc.
+            AZ::ApplicationTypeQuery appType;
+            AZ::ComponentApplicationBus::Broadcast(&AZ::ComponentApplicationBus::Events::QueryApplicationType, appType);
+            if (appType.IsEditor())
+            {
+                return AZ::ComponentTypeList{
+                    azrtti_typeid<SimulationEntitiesManagerEditor>(),
+                    azrtti_typeid<SimulationManagerEditor>(),
+                    azrtti_typeid<SimulationFeaturesAggregatorEditor>(),
+                    azrtti_typeid<LevelManagerEditor>(),
+                    azrtti_typeid<ROS2SimulationInterfaces::ROS2SimulationInterfacesEditorSystemComponent>(),
+                };
+            }
+
+            return AZ::ComponentTypeList{};
         }
     };
 } // namespace SimulationInterfaces
