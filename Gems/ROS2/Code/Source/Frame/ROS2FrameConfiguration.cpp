@@ -26,7 +26,8 @@ namespace ROS2
                 ->Field("Namespace Configuration", &ROS2FrameConfiguration::m_namespaceConfiguration)
                 ->Field("Frame Name", &ROS2FrameConfiguration::m_frameName)
                 ->Field("Joint Name", &ROS2FrameConfiguration::m_jointName)
-                ->Field("Publish Transform", &ROS2FrameConfiguration::m_publishTransform);
+                ->Field("Publish Transform", &ROS2FrameConfiguration::m_publishTransform)
+                ->Field("Force Dynamic", &ROS2FrameConfiguration::m_forceDynamic);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -44,6 +45,7 @@ namespace ROS2
                         &ROS2FrameConfiguration::m_publishTransform,
                         "Publish Transform",
                         "Publish Transform")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2FrameConfiguration::m_forceDynamic, "Force Dynamic", "Force Dynamic")
                     ->ClassElement(AZ::Edit::ClassElements::Group, "Info")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->UIElement(AZ::Edit::UIHandlers::Label, "Effective namespace", "")
