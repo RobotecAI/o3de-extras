@@ -267,7 +267,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                     PRIVATE
                         AZ::AzTest
                         AZ::AzManipulatorTestFramework.Static
-                        Gem::${gem_name}.Editor.Private.Object
+                        Gem::${gem_name}.Editor.Static
             )
 
             # Add ROS2.Editor.Tests to googletest
