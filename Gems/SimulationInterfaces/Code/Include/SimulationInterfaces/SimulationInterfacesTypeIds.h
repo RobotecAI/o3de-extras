@@ -20,6 +20,9 @@ namespace SimulationInterfaces
     inline constexpr const char* SimulationFeaturesAggregatorTypeId = "{5c5ae765-1776-4ba0-8e32-b66c8f4edafe}";
     inline constexpr const char* SimulationFeaturesAggregatorEditorTypeId = "{504A86EF-DF0A-45EC-B69D-315FF4EC8121}";
 
+    inline constexpr const char* LevelManagerTypeId = "{A9D5953D-F266-46D4-AD08-82CF10F426F7}";
+    inline constexpr const char* LevelManagerEditorTypeId = "{16C16216-279D-4215-9DF8-8AB4F15AC4C8}";
+
     // Module derived classes TypeIds
     inline constexpr const char* SimulationInterfacesModuleInterfaceTypeId = "{675797BF-E5D5-438A-BF86-4B4554F09CEF}";
     inline constexpr const char* SimulationInterfacesModuleTypeId = "{8D6741FD-3105-4CB0-9700-152123B6D135}";
