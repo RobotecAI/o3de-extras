@@ -136,7 +136,7 @@ namespace SimulationInterfaces
             return AZ::Failure(FailedResult(simulation_interfaces::msg::Result::RESULT_FEATURE_UNSUPPORTED, errorMsg));
         }
 
-        constexpr const char* errorMsg = "Online search is not implemented yet, only offline search is performed";
+        [[maybe_unused]] constexpr const char* errorMsg = "Online search is not implemented yet, only offline search is performed";
         AZ_Warning("SimulationInterfaces", request.offlineOnly, errorMsg);
 
         const auto allLevels = GetAllAvailableLevels();
@@ -297,7 +297,7 @@ namespace SimulationInterfaces
     {
         if (m_isAppEditor)
         {
-            constexpr const char* errorMsg = "ReloadWorld is not supported in Editor";
+            [[maybe_unused]] constexpr const char* errorMsg = "ReloadWorld is not supported in Editor";
             AZ_Warning("SimulationInterfaces", false, errorMsg);
             return;
         }
