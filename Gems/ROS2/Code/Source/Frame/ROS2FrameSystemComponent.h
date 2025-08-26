@@ -7,7 +7,9 @@
  */
 #pragma once
 
+#include "AzCore/Component/TickBus.h"
 #include "ROS2FrameSystemBus.h"
+
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityId.h>
@@ -17,6 +19,7 @@
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
+#include <ROS2/Frame/ROS2FrameConfiguration.h>
 
 namespace ROS2
 {
@@ -54,6 +57,8 @@ namespace ROS2
     class ROS2FrameSystemComponent
         : public AZ::Component
         , public ROS2FrameSystemInterface::Registrar
+        , public AZ::TransformNotificationBus::MultiHandler
+        , private AZ::TickBus::Handler
     {
     public:
         AZ_COMPONENT(ROS2FrameSystemComponent, "{360c4b45-ac02-42d2-9e1a-1d77eb22a054}");
@@ -71,12 +76,21 @@ namespace ROS2
         bool IsTopLevel(const AZ::EntityId& frameEntityId) const override;
         AZ::EntityId GetParentEntityId(const AZ::EntityId& frameEntityId) const override;
         AZStd::set<AZ::EntityId> GetChildrenEntityId(const AZ::EntityId& frameEntityId) const override;
+        AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
+        AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
+
+        // AZ::TransformNotificationBus::Handler overrides
+        void CanParentChange(bool &parentCanChange, AZ::EntityId oldParent, AZ::EntityId newParent) override;
+
 
         ROS2FrameSystemComponent();
 
         ~ROS2FrameSystemComponent();
 
     private:
+        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
+
+        AZStd::set<AZ::EntityId> m_dirtyFrames; //!< Set of entities that need to have their namespace updated.
         //! Find the path from the frameEntity to the frame parent of that entity.
         //! This path will include the frameEntity and the frame parent.
         //! If there is no frame parent, path to the root entity (included) will be returned.
@@ -102,15 +116,5 @@ namespace ROS2
         void MoveFrameAttach(
             const AZ::EntityId& frameEntityId, const AZ::EntityId& newFrameParent, const AZStd::vector<AZ::EntityId>& newPathToParentFrame);
 
-        AZStd::vector<AZ::EntityId> GetAllPredecessors(const AZ::EntityId& frameEntityId) const;
-        AZStd::vector<AZ::EntityId> GetAllSuccessors(const AZ::EntityId& frameEntityId) const;
-
-        AZStd::map<AZ::EntityId, AZStd::set<AZ::EntityId>> m_frameChildren;
-        AZStd::map<AZ::EntityId, AZ::EntityId> m_frameParent;
-        AZStd::map<AZ::EntityId, AZStd::set<AZ::EntityId>> m_watchedEntities;
-        AZStd::map<AZ::EntityId, ROS2FrameSystemTransformHandler> m_watchedEntitiesHandlers;
-
-        //! Check to prevent multiple conversions at the same time.
-        bool m_conversionNeeded = false;
     };
 } // namespace ROS2

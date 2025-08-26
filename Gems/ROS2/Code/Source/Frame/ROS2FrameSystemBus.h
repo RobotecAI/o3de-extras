@@ -14,6 +14,7 @@
 #include <AzCore/RTTI/RTTIMacros.h>
 #include <AzCore/std/containers/set.h>
 #include <AzCore/std/string/string.h>
+#include <ROS2/Frame/ROS2FrameConfiguration.h>
 
 namespace ROS2
 {
@@ -60,6 +61,13 @@ namespace ROS2
         //! @param frameEntityId entityId of the frame to check.
         //! @return set of all entityIds of children. Empty if no children or the frameEntityId is invalid.
         virtual AZStd::set<AZ::EntityId> GetChildrenEntityId(const AZ::EntityId& frameEntityId) const = 0;
+
+        //! Resolves the ROS 2 frame name based on configuration and entity ID
+        virtual AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
+
+        //! Resolves the ROS 2 namespace based on configuration and entity ID
+        virtual AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
+
     };
 
     class ROS2FrameSystemBusTraits : public AZ::EBusTraits

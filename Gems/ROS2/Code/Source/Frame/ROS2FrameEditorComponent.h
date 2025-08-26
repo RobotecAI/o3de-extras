@@ -66,5 +66,8 @@ namespace ROS2
         AZ::Crc32 OnFrameConfigurationChange();
 
         ROS2FrameConfiguration m_configuration;
+
+        AZStd::string m_effectiveNamespace; //! <! Full namespace to show in the Editor
+        AZStd::string m_fullName; //! <! Full frame name to show in the Editor (that will pbe published to ROS 2)
     };
 } // namespace ROS2

@@ -31,7 +31,7 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::Init()
     {
-        m_configuration.m_namespaceConfiguration.Init();
+
     }
 
     void ROS2FrameEditorComponent::Activate()
@@ -42,6 +42,8 @@ namespace ROS2
         {
             frameSystemInterface->RegisterFrame(GetEntityId());
         }
+        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
+        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
     }
 
     void ROS2FrameEditorComponent::Deactivate()
@@ -78,19 +80,19 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetNamespace() const
     {
-        return m_configuration.m_namespaceConfiguration.GetNamespace();
+        return "";//m_configuration.m_namespaceConfiguration.GetNamespace();
     }
 
     void ROS2FrameEditorComponent::UpdateNamespace(const AZStd::string& parentNamespace)
     {
-        m_configuration.m_namespaceConfiguration.SetParentNamespace(parentNamespace);
-        m_configuration.m_namespaceConfiguration.PopulateNamespace(IsTopLevel(), GetEntity()->GetName());
-        m_configuration.SetEffectiveNamespace(GetNamespace());
+        AZ_Printf("ROS2FrameEditorComponent", "Updating namespace for entity %s", GetEntity()->GetName().c_str());
+
+        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
+        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
+
         AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Event(
             GetEntityId(), &AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Events::OnEntityComponentPropertyChanged, GetId());
 
-        ROS2FrameEditorComponentNotificationBus::Event(
-            GetEntityId(), &ROS2FrameEditorComponentNotificationBus::Events::OnConfigurationChange);
     }
 
     AZ::Name ROS2FrameEditorComponent::GetNamespacedJointName() const
@@ -129,7 +131,14 @@ namespace ROS2
                         "Configuration of ROS 2 reference frame")
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ->Attribute(AZ::Edit::Attributes::ChangeNotify, &ROS2FrameEditorComponent::OnFrameConfigurationChange)
-                    ->Attribute(AZ::Edit::Attributes::ChangeNotify, AZ::Edit::PropertyRefreshLevels::AttributesAndValues);
+                    ->Attribute(AZ::Edit::Attributes::ChangeNotify, AZ::Edit::PropertyRefreshLevels::AttributesAndValues)
+                    ->ClassElement(AZ::Edit::ClassElements::Group, "Info")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->UIElement(AZ::Edit::UIHandlers::Label, "Effective namespace", "")
+                    ->Attribute(AZ::Edit::Attributes::ValueText, &ROS2FrameEditorComponent::m_effectiveNamespace)
+                    ->UIElement(AZ::Edit::UIHandlers::Label, "Full name", "")
+                    ->Attribute(AZ::Edit::Attributes::ValueText, &ROS2FrameEditorComponent::m_fullName);
+
             }
         }
     }
@@ -147,6 +156,9 @@ namespace ROS2
     AZ::Crc32 ROS2FrameEditorComponent::OnFrameConfigurationChange()
     {
         ROS2FrameSystemInterface::Get()->NotifyChange(GetEntityId());
+        // Update effective namespace and full name for display in the Editor
+        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
+        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }
 

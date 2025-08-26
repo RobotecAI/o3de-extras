@@ -30,12 +30,7 @@ namespace ROS2
         bool m_isDynamic = false;
         bool m_forceDynamic = false;
 
-        //! Sets the effective namespace shown in the Editor.
-        //! @param effectiveNamespace namespace to be set.
-        void SetEffectiveNamespace(const AZStd::string& effectiveNamespace);
-
     private:
-        AZStd::string m_effectiveNamespace = "";
         AZStd::string m_fullName = m_frameName;
     };
 

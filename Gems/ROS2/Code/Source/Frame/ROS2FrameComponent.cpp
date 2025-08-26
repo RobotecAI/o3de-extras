@@ -134,12 +134,12 @@ namespace ROS2
 
     void ROS2FrameComponent::Init()
     {
-        m_namespaceConfiguration.Init();
+        // m_namespaceConfiguration.Init();
     }
 
     void ROS2FrameComponent::Activate()
     {
-        m_namespaceConfiguration.PopulateNamespace(IsTopLevel(), GetEntity()->GetName());
+        // m_namespaceConfiguration.PopulateNamespace(IsTopLevel(), GetEntity()->GetName());
 
         if (m_publishTransform)
         {
@@ -212,7 +212,7 @@ namespace ROS2
     void ROS2FrameComponent::UpdateNamespaceConfiguration(
         const AZStd::string& ros2Namespace, NamespaceConfiguration::NamespaceStrategy strategy)
     {
-        m_namespaceConfiguration.SetNamespace(ros2Namespace, strategy);
+        // m_namespaceConfiguration.SetNamespace(ros2Namespace, strategy);
     }
 
     bool ROS2FrameComponent::IsTopLevel() const
@@ -276,7 +276,8 @@ namespace ROS2
         {
             parentNamespace = parentFrame->GetNamespace();
         }
-        return m_namespaceConfiguration.GetNamespace(parentNamespace);
+        return "";
+        // return m_namespaceConfiguration.GetNamespace(parentNamespace);
     }
 
     AZ::Name ROS2FrameComponent::GetNamespacedJointName() const
