@@ -25,7 +25,7 @@ namespace ROS2
 
     namespace
     {
-        AZStd::string GetName(AZ::EntityId id)
+        [[maybe_unused]] AZStd::string GetName(AZ::EntityId id)
         {
             AZStd::string name;
             AZ::ComponentApplicationBus::BroadcastResult(name, &AZ::ComponentApplicationRequests::GetEntityName, id);
@@ -74,18 +74,6 @@ namespace ROS2
     }
 
 
-    void ROS2FrameSystemComponent::CanParentChange(bool &parentCanChange, AZ::EntityId oldParent, AZ::EntityId newParent)
-    {
-        (void)parentCanChange; (void)oldParent; (void)newParent;
-        // get all children of the old parent
-        AZStd::vector<AZ::EntityId> children;
-        AZ::TransformBus::EventResult(children, oldParent, &AZ::TransformInterface::GetAllDescendants);
-        for (const auto& predecessor : children)
-        {
-            m_dirtyFrames.insert(predecessor);
-        }
-    }
-
     void ROS2FrameSystemTransformHandler::AddFrameEntity(AZ::EntityId frameEntityId)
     {
         if (!m_frameEntities.contains(frameEntityId))
@@ -133,13 +121,16 @@ namespace ROS2
 
     void ROS2FrameSystemComponent::Activate()
     {
-        AZ::TickBus::Handler::BusConnect();
     }
 
     void ROS2FrameSystemComponent::Deactivate()
     {
-        AZ::TransformNotificationBus::MultiHandler::BusDisconnect();
-        AZ::TickBus::Handler::BusDisconnect();
+        for (const auto& id : m_registeredEntities)
+        {
+            AZ::TransformNotificationBus::MultiHandler::BusDisconnect(id);
+            AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusDisconnect(id);
+        }
+        m_registeredEntities.clear();
     }
 
     AZ::TransformInterface* ROS2FrameSystemComponent::GetEntityTransformInterface(const AZ::Entity* entity)
@@ -172,31 +163,20 @@ namespace ROS2
         return {};
     }
 
-    void ROS2FrameSystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
-    {
-        for (const auto id : m_dirtyFrames)
-        {
-            AZ_Printf("ROS2FrameSystemComponent", "Processing dirty frame for entity %s", GetName(id).c_str());
-            ROS2::ROS2FrameEditorComponentBus::Event(id, &ROS2::ROS2FrameEditorComponentRequests::UpdateNamespace, "");
-        }
-        m_dirtyFrames.clear();
-    }
-
 
     void ROS2FrameSystemComponent::RegisterFrame(const AZ::EntityId& frameToRegister)
     {
+        m_registeredEntities.insert(frameToRegister);
+        AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusConnect(frameToRegister);
         AZ::TransformNotificationBus::MultiHandler::BusConnect(frameToRegister);
-        AZStd::vector<AZ::EntityId> predecessors;
-        GetAllAncestorTransformBus(frameToRegister, predecessors);
-        for (const auto& predecessor : predecessors)
-        {
-            AZ::TransformNotificationBus::MultiHandler::BusConnect(predecessor);
-        }
     }
 
     void ROS2FrameSystemComponent::UnregisterFrame(const AZ::EntityId& frameToUnregister)
     {
         AZ::TransformNotificationBus::MultiHandler::BusDisconnect(frameToUnregister);
+        AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusDisconnect(frameToUnregister);
+        m_registeredEntities.erase(frameToUnregister);
+
     }
 
     void ROS2FrameSystemComponent::MoveFrameDetach(
@@ -245,53 +225,53 @@ namespace ROS2
 
 
     //! Resolves the ROS 2 frame name based on configuration and entity ID
-    AZStd::string ROS2FrameSystemComponent::GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const
-    {
-        // An empty, blank namespace
-        if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Empty)
+        AZStd::string ROS2FrameSystemComponent::GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const
         {
-            return "";
-        }
+            // An empty, blank namespace
+            if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Empty)
+            {
+                return "";
+            }
 
-        // Non-empty and based on user-provided value.
-        if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Custom)
-        {
-            return configuration.m_namespaceConfiguration.GetCustomNamespace();
-        }
+            // Non-empty and based on user-provided value.
+            if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Custom)
+            {
+                return configuration.m_namespaceConfiguration.GetCustomNamespace();
+            }
 
 
-        AZStd::string thisEntityName;
+            AZStd::string thisEntityName;
 
-        AZ::ComponentApplicationBus::BroadcastResult(thisEntityName, &AZ::ComponentApplicationRequests::GetEntityName, entity);
-        ROS2NamesRequestBus::BroadcastResult(thisEntityName, &ROS2NamesRequests::RosifyName, thisEntityName);
+            AZ::ComponentApplicationBus::BroadcastResult(thisEntityName, &AZ::ComponentApplicationRequests::GetEntityName, entity);
+            ROS2NamesRequestBus::BroadcastResult(thisEntityName, &ROS2NamesRequests::RosifyName, thisEntityName);
 
-        // Generate from Entity name, but substitute disallowed characters through RosifyName.
-        if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
-        {
-            return thisEntityName;
-        }
-
-        // FromEntityName for top-level frames, Empty otherwise.
-        if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Default)
-        {
-            AZStd::vector<AZ::EntityId> predecessors;
-            GetAllAncestorTransformBus(entity, predecessors);
-
-            const auto superParentId = GetOldestAncestorWithRos2FrameComponent(predecessors);
-            const bool is_root = (superParentId == entity);
-            if (is_root)
+            // Generate from Entity name, but substitute disallowed characters through RosifyName.
+            if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
             {
                 return thisEntityName;
             }
 
-            AZStd::string superParentName;
-            AZ::ComponentApplicationBus::BroadcastResult(superParentName, &AZ::ComponentApplicationRequests::GetEntityName, superParentId);
+            // FromEntityName for top-level frames, Empty otherwise.
+            if (configuration.m_namespaceConfiguration.GetNamespaceStrategy() == NamespaceConfiguration::NamespaceStrategy::Default)
+            {
+                AZStd::vector<AZ::EntityId> predecessors;
+                GetAllAncestorTransformBus(entity, predecessors);
 
-            ROS2NamesRequestBus::BroadcastResult(superParentName, &ROS2NamesRequests::RosifyName, superParentName);
-            return superParentName;
+                const auto superParentId = GetOldestAncestorWithRos2FrameComponent(predecessors);
+                const bool is_root = (superParentId == entity);
+                if (is_root)
+                {
+                    return thisEntityName;
+                }
+
+                AZStd::string superParentName;
+                AZ::ComponentApplicationBus::BroadcastResult(superParentName, &AZ::ComponentApplicationRequests::GetEntityName, superParentId);
+
+                ROS2NamesRequestBus::BroadcastResult(superParentName, &ROS2NamesRequests::RosifyName, superParentName);
+                return superParentName;
+            }
+            return "";
         }
-        return "";
-    }
 
     AZStd::string ROS2FrameSystemComponent::GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const
     {
@@ -302,4 +282,32 @@ namespace ROS2
         }
         return nameSpace +"/"+ configuration.m_frameName;
     }
+
+    void ROS2FrameSystemComponent::OnSelected()
+    {
+        // find which frame entity was selected
+        AZStd::vector<AZ::EntityId> selectedEntityId;
+        AzToolsFramework::ToolsApplicationRequests::Bus::BroadcastResult(
+            selectedEntityId, &AzToolsFramework::ToolsApplicationRequests::GetSelectedEntities);
+        // update
+        for (const auto& selectedEntityId : selectedEntityId)
+        {
+            ROS2FrameEditorComponentBus::Event(
+               selectedEntityId, &ROS2FrameEditorComponentRequests::UpdateNamespace, "");
+        }
+
+    }
+
+    void ROS2FrameSystemComponent::OnParentChanged([[maybe_unused]]AZ::EntityId oldParent, AZ::EntityId newParent)
+    {
+        AZStd::vector<AZ::EntityId> children;
+        AZ::TransformBus::EventResult(children, newParent, &AZ::TransformBus::Events::GetEntityAndAllDescendants);
+        // update
+        for (const auto& child : children)
+        {
+            ROS2FrameEditorComponentBus::Event(child, &ROS2FrameEditorComponentRequests::UpdateNamespace, "");
+        }
+    }
+
+
 } // namespace ROS2

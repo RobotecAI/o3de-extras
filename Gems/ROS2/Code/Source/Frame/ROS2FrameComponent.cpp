@@ -6,7 +6,6 @@
  *
  */
 
-#include "ROS2FrameSystemComponent.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
 #include <AzCore/RTTI/ReflectContext.h>

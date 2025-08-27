@@ -20,6 +20,7 @@
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
+#include <AzToolsFramework/API/ToolsApplicationAPI.h>
 
 namespace ROS2
 {
@@ -56,9 +57,9 @@ namespace ROS2
     //! Used to register, unregister, track the frame entities in the level entity tree.
     class ROS2FrameSystemComponent
         : public AZ::Component
-        , public ROS2FrameSystemInterface::Registrar
-        , public AZ::TransformNotificationBus::MultiHandler
-        , private AZ::TickBus::Handler
+        , protected ROS2FrameSystemInterface::Registrar
+        , protected AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler
+        , protected AZ::TransformNotificationBus::MultiHandler
     {
     public:
         AZ_COMPONENT(ROS2FrameSystemComponent, "{360c4b45-ac02-42d2-9e1a-1d77eb22a054}");
@@ -68,6 +69,11 @@ namespace ROS2
         void Activate() override;
         void Deactivate() override;
 
+        ROS2FrameSystemComponent();
+
+        ~ROS2FrameSystemComponent();
+
+    private:
         // ROS2FrameSystemInterface::Registrar overrides.
         void RegisterFrame(const AZ::EntityId& frameEntityId) override;
         void UnregisterFrame(const AZ::EntityId& frameEntityId) override;
@@ -79,19 +85,14 @@ namespace ROS2
         AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
         AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
 
-        // AZ::TransformNotificationBus::Handler overrides
-        void CanParentChange(bool &parentCanChange, AZ::EntityId oldParent, AZ::EntityId newParent) override;
+        // EntitySelectionEvents::Bus::MultiHandler overrides.
+        void OnSelected() override;
+        //! AZ::TransformNotificationBus::MultiHandler overrides.
+        void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
 
 
-        ROS2FrameSystemComponent();
-
-        ~ROS2FrameSystemComponent();
-
-    private:
-        void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
-
-        AZStd::set<AZ::EntityId> m_dirtyFrames; //!< Set of entities that need to have their namespace updated.
-        //! Find the path from the frameEntity to the frame parent of that entity.
+        AZStd::set<AZ::EntityId> m_registeredEntities; //!< Set of all registered frame entities.
+         //! Find the path from the frameEntity to the frame parent of that entity.
         //! This path will include the frameEntity and the frame parent.
         //! If there is no frame parent, path to the root entity (included) will be returned.
         //! @param frameEntityId frame to find the path to the parent.
@@ -115,6 +116,7 @@ namespace ROS2
         void MoveFrameDetach(const AZ::EntityId& frameEntityId, const AZStd::set<AZ::EntityId>& newPathToParentFrameSet);
         void MoveFrameAttach(
             const AZ::EntityId& frameEntityId, const AZ::EntityId& newFrameParent, const AZStd::vector<AZ::EntityId>& newPathToParentFrame);
+
 
     };
 } // namespace ROS2
