@@ -51,6 +51,7 @@ set(FILES
         Include/ROS2/Sensor/SensorConfiguration.h
         Include/ROS2/Sensor/SensorConfigurationRequestBus.h
         Include/ROS2/Sensor/SensorHelper.h
+        Include/ROS2/Sensor/ROS2OdometrySensorRequestBus.h
         Include/ROS2/Spawner/SpawnerBus.h
         Include/ROS2/Spawner/SpawnerBusHandler.h
         Include/ROS2/Utilities/Controllers/PidConfiguration.h

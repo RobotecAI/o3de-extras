@@ -60,7 +60,14 @@ namespace ROS2
         incompatible.push_back(AZ_CRC("ArticulationLinkService"));
     }
 
-    void ROS2OdometrySensorComponent::OnOdometryEvent(AzPhysics::SceneHandle sceneHandle)
+    Odometry ROS2OdometrySensorComponent::GetOdometry()
+    {
+        auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
+        AzPhysics::SceneHandle sceneHandle = sceneInterface->GetSceneHandle(AzPhysics::DefaultPhysicsSceneName);
+        return ReadOdometry(sceneHandle);
+    }
+
+    Odometry ROS2OdometrySensorComponent::ReadOdometry(AzPhysics::SceneHandle sceneHandle)
     {
         if (m_bodyHandle == AzPhysics::InvalidSimulatedBodyHandle)
         {
@@ -90,14 +97,18 @@ namespace ROS2
         const auto transform = rigidbodyPtr->GetTransform().GetInverse();
         const auto localAngular = transform.TransformVector(rigidbodyPtr->GetAngularVelocity());
         const auto localLinear = transform.TransformVector(rigidbodyPtr->GetLinearVelocity());
-
-        m_odometryMsg.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
-        m_odometryMsg.twist.twist.linear = ROS2Conversions::ToROS2Vector3(localLinear);
-        m_odometryMsg.twist.twist.angular = ROS2Conversions::ToROS2Vector3(localAngular);
-
         const auto odometry = m_initialTransform.GetInverse() * rigidbodyPtr->GetTransform();
 
-        m_odometryMsg.pose.pose = ROS2Conversions::ToROS2Pose(odometry);
+        return { localAngular, localLinear, odometry };
+    }
+
+    void ROS2OdometrySensorComponent::OnOdometryEvent(AzPhysics::SceneHandle sceneHandle)
+    {
+        const auto odometry = ReadOdometry(sceneHandle);
+        m_odometryMsg.header.stamp = ROS2Interface::Get()->GetROSTimestamp();
+        m_odometryMsg.twist.twist.linear = ROS2Conversions::ToROS2Vector3(odometry.m_twistLinear);
+        m_odometryMsg.twist.twist.angular = ROS2Conversions::ToROS2Vector3(odometry.m_twistAngular);
+        m_odometryMsg.pose.pose = ROS2Conversions::ToROS2Pose(odometry.m_pose);
         m_odometryPublisher->publish(m_odometryMsg);
     }
     void ROS2OdometrySensorComponent::Activate()
@@ -123,12 +134,15 @@ namespace ROS2
                 }
                 OnOdometryEvent(sceneHandle);
             });
+
+        ROS2OdometrySensorRequestBus::Handler::BusConnect(GetEntityId());
     }
 
     void ROS2OdometrySensorComponent::Deactivate()
     {
         StopSensor();
         m_odometryPublisher.reset();
+        ROS2OdometrySensorRequestBus::Handler::BusDisconnect();
         ROS2SensorComponentBase::Deactivate();
     }
 } // namespace ROS2

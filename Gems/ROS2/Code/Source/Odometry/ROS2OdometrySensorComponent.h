@@ -11,6 +11,7 @@
 #include <AzCore/Math/Transform.h>
 #include <AzCore/Math/Vector3.h>
 #include <ROS2/Sensor/Events/PhysicsBasedSource.h>
+#include <ROS2/Sensor/ROS2OdometrySensorRequestBus.h>
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/publisher.hpp>
@@ -21,7 +22,7 @@ namespace ROS2
     //! It constructs and publishes an odometry message, which contains information about vehicle velocity and position in space.
     //! This is a ground truth "sensor", which can be helpful for development and machine learning.
     //! @see <a href="https://index.ros.org/p/nav_msgs/"> nav_msgs package. </a>
-    class ROS2OdometrySensorComponent : public ROS2SensorComponentBase<PhysicsBasedSource>
+    class ROS2OdometrySensorComponent : public ROS2SensorComponentBase<PhysicsBasedSource>, public ROS2OdometrySensorRequestBus::Handler
     {
     public:
         AZ_COMPONENT(ROS2OdometrySensorComponent, "{61387448-63AA-4563-AF87-60C72B05B863}", SensorBaseType);
@@ -36,7 +37,12 @@ namespace ROS2
         void Deactivate() override;
         //////////////////////////////////////////////////////////////////////////
 
+        // ROS2OdometrySensorRequestBus::Handler overrides
+        Odometry GetOdometry() override;
+
     private:
+        Odometry ReadOdometry(AzPhysics::SceneHandle sceneHandle);
+
         AzPhysics::SimulatedBodyHandle m_bodyHandle = AzPhysics::InvalidSimulatedBodyHandle;
         std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> m_odometryPublisher;
         nav_msgs::msg::Odometry m_odometryMsg;
