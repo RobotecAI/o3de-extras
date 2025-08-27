@@ -7,7 +7,9 @@
  */
 
 #include "ROS2FrameSystemComponent.h"
+
 #include "AzCore/std/containers/vector.h"
+#include "ROS2FrameEditorComponent.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/ComponentBus.h>
@@ -32,17 +34,21 @@ namespace ROS2
             return name;
         }
 
-        [[maybe_unused]] bool HasRos2FrameComponent(AZ::EntityId id)
+        [[maybe_unused]] ROS2FrameEditorComponent* GetROS2FrameEditorComponent(AZ::EntityId id)
         {
-            // get entity
             AZ::Entity* entity = nullptr;
             AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
             if (!entity)
             {
-                return false;
+                return nullptr;
             }
-            auto* componentEditor = entity->FindComponent(AZ::Uuid(ROS2FrameEditorComponentTypeId));
-            return componentEditor != nullptr;
+            return entity->FindComponent<ROS2FrameEditorComponent>();
+
+        }
+
+        [[maybe_unused]] bool HasRos2FrameComponent(AZ::EntityId id)
+        {
+            return GetROS2FrameEditorComponent(id) != nullptr;
         }
 
         AZStd::vector<AZ::EntityId> GetAllAncestorTransformBus(AZ::EntityId id, AZStd::vector<AZ::EntityId>& predecessors)
@@ -68,6 +74,26 @@ namespace ROS2
             }
 
             return GetAllAncestorTransformBus(parentId, predecessors);
+        }
+
+        AZStd::vector<AZ::EntityId> GetAncestorRos2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors)
+        {
+            AZStd::vector<AZ::EntityId> ancestorsWithRos2Frame;
+            for (auto it = predecessors.begin(); it != predecessors.end(); ++it)
+                {
+                    AZ::Entity* entity = nullptr;
+                    AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, *it);
+                    if (!entity)
+                    {
+                        continue;
+                    }
+                    auto* componentEditor = entity->FindComponent(AZ::Uuid(ROS2FrameEditorComponentTypeId));
+                    if (componentEditor)
+                    {
+                        ancestorsWithRos2Frame.push_back(*it);
+                    }
+                }
+            return ancestorsWithRos2Frame;
         }
 
         AZ::EntityId GetOldestAncestorWithRos2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors)
@@ -225,19 +251,74 @@ namespace ROS2
         {
             AZStd::vector<AZ::EntityId> predecessors;
             GetAllAncestorTransformBus(entity, predecessors);
-
-            const auto superParentId = GetOldestAncestorWithRos2FrameComponent(predecessors);
-            const bool is_root = (superParentId == entity);
-            if (is_root)
+            const AZStd::vector<AZ::EntityId> predecessorsRos2 =  GetAncestorRos2FrameComponent(predecessors);
+            AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolving namespace for entity %s", thisEntityName.c_str());
+            for (auto it = predecessors.rbegin(); it != predecessors.rend(); ++it)
             {
+                const auto id = *it;
+                auto component = GetROS2FrameEditorComponent(id);
+                AZStd::string strategyName;
+                if (component)
+                {
+                    const auto strategy = component->GetConfiguration().m_namespaceConfiguration.GetNamespaceStrategy();
+                    if (strategy == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
+                    {
+                            strategyName = "FromEntityName";
+                    }
+                    else if (strategy == NamespaceConfiguration::NamespaceStrategy::Custom)
+                    {
+                            strategyName = "Custom";
+                    }
+                    else if (strategy == NamespaceConfiguration::NamespaceStrategy::Empty)
+                    {
+                            strategyName = "Empty";
+                    }
+                    else if (strategy == NamespaceConfiguration::NamespaceStrategy::Default)
+                    {
+                            strategyName = "Default";
+                    }
+                }
+                AZ_Printf("ROS2FrameSystemComponent::GetNamespace", " - %s  [%s]", GetName(id).c_str(), strategyName.c_str());
+            }
+            if (predecessorsRos2.empty())
+            {
+                // No ROS2Frame components in ancestors, so we are top-level.
                 return thisEntityName;
             }
 
-            AZStd::string superParentName;
-            AZ::ComponentApplicationBus::BroadcastResult(superParentName, &AZ::ComponentApplicationRequests::GetEntityName, superParentId);
-
-            ROS2NamesRequestBus::BroadcastResult(superParentName, &ROS2NamesRequests::RosifyName, superParentName);
-            return superParentName;
+            const auto topLevelParentId  = predecessorsRos2.back();
+            AZStd::string topLevelParentName;
+            AZ::ComponentApplicationBus::BroadcastResult(topLevelParentName, &AZ::ComponentApplicationRequests::GetEntityName, topLevelParentId);
+            AZStd::string resolvedName = "";
+            for (auto it = predecessorsRos2.rbegin(); it != predecessorsRos2.rend(); ++it)
+            {
+                const auto id = *it;
+                auto component = GetROS2FrameEditorComponent(id);
+                AZ_Assert(component != nullptr, "ROS2FrameEditorComponent could not be found");
+                const auto strategy = component->GetConfiguration().m_namespaceConfiguration.GetNamespaceStrategy();
+                if (strategy == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
+                {
+                    resolvedName += "/" + GetName(id);
+                }
+                else if (strategy == NamespaceConfiguration::NamespaceStrategy::Custom)
+                {
+                    resolvedName += "/" + component->GetConfiguration().m_namespaceConfiguration.GetCustomNamespace();
+                }
+                else if (strategy == NamespaceConfiguration::NamespaceStrategy::Empty)
+                {
+                    void();
+                    // do nothing
+                }
+                else if (strategy == NamespaceConfiguration::NamespaceStrategy::Default)
+                {
+                    if (id == topLevelParentId)
+                    {
+                        resolvedName = GetName(id);
+                    }
+                }
+            }
+            AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolved namespace %s entity %s",  resolvedName.c_str(), thisEntityName.c_str());
+            return resolvedName;
         }
         return "";
     }

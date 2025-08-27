@@ -111,9 +111,18 @@ namespace ROS2
             }
             else
             {
+
                 m_parentFrame = AZStd::nullopt;
                 // TODO (mpelka) get this global frame from set reg
-                m_sourceFrame = "odom";
+                constexpr char odometryFrame[] = "odom";
+                if (m_namespace.empty())
+                {
+                    m_sourceFrame = odometryFrame;
+                }
+                else
+                {
+                    m_sourceFrame = AZStd::string::format("%s/%s", m_namespace.c_str(), odometryFrame);
+                }
             }
         }
 
@@ -126,7 +135,8 @@ namespace ROS2
 
         if (m_ros2Transform == nullptr && m_sourceFrame.has_value())
         {
-            m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, m_targetFrame, m_isDynamic);
+            AZ_Printf("m_ros2Transform", "publishing transform from %s to %s", m_sourceFrame->c_str(), GetNamespacedFrameID().c_str());
+            m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, GetNamespacedFrameID(), m_isDynamic);
         }
 
         if (m_ros2Transform != nullptr)
@@ -216,9 +226,11 @@ namespace ROS2
     ROS2FrameComponent::ROS2FrameComponent() {};
 
     ROS2FrameComponent::ROS2FrameComponent(
-        const AZStd::string& targetFrame, const AZStd::string& jointName, const AZStd::string nameSpace, bool isDynamic)
+        const AZStd::string& targetFrame, const AZStd::string& jointName, const AZStd::string nameSpace,bool publishTransform, bool isDynamic)
         : m_targetFrame(targetFrame)
+        , m_namespace(nameSpace)
         , m_jointName(jointName)
+        , m_publishTransform(publishTransform)
         , m_isDynamic(isDynamic)
     {
     }

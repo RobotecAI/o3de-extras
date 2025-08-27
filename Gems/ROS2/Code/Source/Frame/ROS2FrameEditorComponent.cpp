@@ -36,18 +36,18 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::Activate()
     {
+        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::Activate for entity %s", this->GetEntityId().ToString().c_str());
         ROS2FrameEditorComponentBus::Handler::BusConnect(GetEntityId());
         AZ::EntityBus::Handler::BusConnect(GetEntityId());
         if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
         {
             frameSystemInterface->RegisterFrame(GetEntityId());
         }
-        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
-        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
     }
 
     void ROS2FrameEditorComponent::Deactivate()
     {
+        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::Deactivate for entity %s", this->GetEntityId().ToString().c_str());
         if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
         {
             frameSystemInterface->UnregisterFrame(GetEntityId());
@@ -182,10 +182,13 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
+        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::BuildGameEntity for entity %s", this->GetEntityId().ToString().c_str());
         const auto nameSpace  = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
         const auto frameName = m_configuration.m_frameName;
         const auto jointName = m_configuration.m_jointName;
-        gameEntity->CreateComponent<ROS2FrameComponent>(frameName, jointName, nameSpace, true);
+        AZ_Printf("ROS2FrameEditorComponent", "Creating ROS2FrameComponent on entity %s, fn: %s, jn: %s, ns: %s", gameEntity->GetName().c_str(), frameName.c_str(), jointName.c_str(), nameSpace.c_str());
+        const bool publishTransform = m_configuration.m_publishTransform;
+        gameEntity->CreateComponent<ROS2FrameComponent>(frameName, jointName, nameSpace, publishTransform, true);
     }
 
     ROS2FrameConfiguration ROS2FrameEditorComponent::GetConfiguration() const

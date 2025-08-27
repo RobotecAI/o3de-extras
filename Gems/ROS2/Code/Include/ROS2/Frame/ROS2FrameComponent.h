@@ -38,6 +38,7 @@ namespace ROS2
         ROS2FrameComponent(const AZStd::string& targetFrame,
             const AZStd::string& jointName = "",
             const AZStd::string nameSpace = "",
+            bool publishTransform = true,
             bool isDynamic= true);
 
         //////////////////////////////////////////////////////////////////////////
