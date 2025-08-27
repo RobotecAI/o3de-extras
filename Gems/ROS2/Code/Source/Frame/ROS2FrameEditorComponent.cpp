@@ -155,8 +155,6 @@ namespace ROS2
 
     AZ::Crc32 ROS2FrameEditorComponent::OnFrameConfigurationChange()
     {
-        ROS2FrameSystemInterface::Get()->NotifyChange(GetEntityId());
-        // Update effective namespace and full name for display in the Editor
         m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
         m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
@@ -184,7 +182,10 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
-        gameEntity->CreateComponent<ROS2FrameComponent>(m_configuration);
+        const auto nameSpace  = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
+        const auto frameName = m_configuration.m_frameName;
+        const auto jointName = m_configuration.m_jointName;
+        gameEntity->CreateComponent<ROS2FrameComponent>(frameName, jointName, nameSpace, true);
     }
 
     ROS2FrameConfiguration ROS2FrameEditorComponent::GetConfiguration() const

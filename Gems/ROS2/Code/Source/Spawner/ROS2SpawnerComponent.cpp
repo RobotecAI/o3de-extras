@@ -301,7 +301,8 @@ namespace ROS2
                 entity->SetName(instanceName);
                 if (!spawnableNamespace.empty())
                 {
-                    frameComponent->UpdateNamespaceConfiguration(spawnableNamespace, NamespaceConfiguration::NamespaceStrategy::Custom);
+                    // TODO Mpelka - fix
+                    //frameComponent->UpdateNamespaceConfiguration(spawnableNamespace, NamespaceConfiguration::NamespaceStrategy::Custom);
                 }
                 break;
             }

@@ -34,19 +34,6 @@ namespace ROS2
         //! @param frameEntityId entityId containing the frame to unregister.
         virtual void UnregisterFrame(const AZ::EntityId& frameEntityId) = 0;
 
-        //! Move the frame in the entity tree.
-        //! Moves the frame entity and updates all namespaces.
-        //! Used by the ROS2FrameSystemComponent to change the frames configuration after entity move in the editor.
-        //! @param frameEntityId entityId of the frame to move.
-        //! @param newParent entityId of the new parent of the moved frame (does not need to be a entity
-        //! containing a frame component).
-        virtual void MoveFrame(const AZ::EntityId& frameEntityId, const AZ::EntityId& newParent) = 0;
-
-        //! Notify the system entity about frames configuration change.
-        //! This function should be called when a frame entity has changed its reflected configuration.
-        //! @param frameEntityId entityId of the frame components entity that has changed its configuration.
-        virtual void NotifyChange(const AZ::EntityId& frameEntityId) = 0;
-
         //! Check if the frame is the highest frame in the entity tree.
         //! @param frameEntityId entityId of the frame to check.
         //! @return boolean value of the check. True for top level.
@@ -64,6 +51,9 @@ namespace ROS2
 
         //! Resolves the ROS 2 frame name based on configuration and entity ID
         virtual AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
+
+        //! Resolves the ROS 2 namespace based on configuration and entity ID
+        virtual AZStd::string GetJointName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
 
         //! Resolves the ROS 2 namespace based on configuration and entity ID
         virtual AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;

@@ -24,32 +24,6 @@
 
 namespace ROS2
 {
-    //! Handler class for the ROS2FrameEditorComponent. It watches for changes in the entity tree and notifies about moves.
-    //! Used by the ROS2FrameSystemComponent, to track changes in the entity tree. It notifies the ROS2FrameSystemComponent
-    //! and calls the appropriate functions to update the changes.
-    class ROS2FrameSystemTransformHandler : public AZ::TransformNotificationBus::Handler
-    {
-    public:
-        AZ_RTTI(ROS2FrameSystemTransformHandler, "{0b4324bb-4c36-4a86-8827-a044a6ac44e8}");
-
-        //! Override of the AZ::TransformNotificationBus.
-        void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
-
-        //! Add a frame entity which should be notified about a change in the tree.
-        //! @param frameEntityId frame to notify.
-        void AddFrameEntity(AZ::EntityId frameEntityId);
-
-        //! Remove a frame entity which shouldn't be notified about a change in the tree.
-        //! @param frameEntityId frame to remove.
-        void RemoveFrameEntity(AZ::EntityId frameEntityId);
-
-        //! Get the number of frame entities which will be notified about a change in the tree.
-        //! @return size of the m_frameEntities.
-        unsigned int GetFrameCount();
-
-    private:
-        AZStd::set<AZ::EntityId> m_frameEntities;
-    };
 
     //! Component which manages the frame entities and their hierarchy.
     //! It is responsible for updating the namespaces of the frame entities and their children.
@@ -77,12 +51,11 @@ namespace ROS2
         // ROS2FrameSystemInterface::Registrar overrides.
         void RegisterFrame(const AZ::EntityId& frameEntityId) override;
         void UnregisterFrame(const AZ::EntityId& frameEntityId) override;
-        void MoveFrame(const AZ::EntityId& frameEntityId, const AZ::EntityId& newParent) override;
-        void NotifyChange(const AZ::EntityId& frameEntityId) override;
         bool IsTopLevel(const AZ::EntityId& frameEntityId) const override;
         AZ::EntityId GetParentEntityId(const AZ::EntityId& frameEntityId) const override;
         AZStd::set<AZ::EntityId> GetChildrenEntityId(const AZ::EntityId& frameEntityId) const override;
         AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
+        AZStd::string GetJointName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
         AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
 
         // EntitySelectionEvents::Bus::MultiHandler overrides.
