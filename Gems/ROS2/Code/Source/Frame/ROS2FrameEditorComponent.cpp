@@ -21,7 +21,7 @@
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
-
+#include <AzCore/Component/TransformBus.h>
 namespace ROS2
 {
     ROS2FrameEditorComponent::ROS2FrameEditorComponent(const ROS2FrameConfiguration ros2FrameConfiguration)
@@ -179,10 +179,37 @@ namespace ROS2
     {
         required.push_back(AZ_CRC_CE("TransformService"));
     }
+    void test(AZ::EntityId id)
+    {
+        // Get the transform component
+        // get entity
+        AZ::Entity* entity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
+        if (!entity)
+        {
+            return ;
+        }
+
+        AZ_Printf("TESTFOOO", "%s", entity->GetName().c_str());
+        auto* transform = entity->GetTransform();
+        if (!transform)
+        {
+            return;
+        }
+        AZ::EntityId parentId = transform->GetParentId();
+        if (!parentId.IsValid())
+        {
+            return ;
+        }
+        return test(parentId);
+    }
+
 
     void ROS2FrameEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
+
         AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::BuildGameEntity for entity %s", this->GetEntityId().ToString().c_str());
+        test(GetEntityId());
         const auto nameSpace  = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
         const auto frameName = m_configuration.m_frameName;
         const auto jointName = m_configuration.m_jointName;

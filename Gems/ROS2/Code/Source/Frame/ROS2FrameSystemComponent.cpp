@@ -317,7 +317,7 @@ namespace ROS2
                     }
                 }
             }
-            AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolved namespace %s entity %s",  resolvedName.c_str(), thisEntityName.c_str());
+            AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolved namespace %s for entity %s",  resolvedName.c_str(), thisEntityName.c_str());
             return resolvedName;
         }
         return "";
