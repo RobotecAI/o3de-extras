@@ -112,6 +112,8 @@ set(FILES
         Source/RobotControl/Controllers/AckermannController/AckermannControlComponent.h
         Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponent.cpp
         Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponent.h
+        Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponentConfig.cpp
+        Source/RobotControl/Controllers/RigidBodyController/RigidBodyTwistControlComponentConfig.h
         Source/RobotControl/Controllers/SkidSteeringController/SkidSteeringControlComponent.cpp
         Source/RobotControl/Controllers/SkidSteeringController/SkidSteeringControlComponent.h
         Source/RobotControl/ROS2RobotControlComponent.cpp
