@@ -6,6 +6,7 @@
  *
  */
 
+#include "NamespaceComputation.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
 #include <AzCore/RTTI/ReflectContext.h>
@@ -21,7 +22,6 @@
 #include <ROS2/ROS2NamesBus.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
-
 namespace ROS2
 {
 
@@ -84,10 +84,11 @@ namespace ROS2
         // reset cache
         m_parentFrame.reset();
         m_sourceFrame.reset();
-
-        // connect ontick bus
-
-        AZ::TickBus::Handler::BusConnect();
+        ComputeNamespaceAndFrameName();
+        if (!m_disabled)
+        {
+            AZ::TickBus::Handler::BusConnect();
+        }
     }
 
     void ROS2FrameComponent::Deactivate()
@@ -96,6 +97,13 @@ namespace ROS2
         m_sourceFrame.reset();
         m_ros2Transform.reset();
         AZ::TickBus::Handler::BusDisconnect();
+    }
+
+    void ROS2FrameComponent::ComputeNamespaceAndFrameName()
+    {
+        m_computedNamespace = ComputeNamespace(m_configuration, GetEntityId(), true);
+        m_computedFrameName = GetNamespacedName(m_computedNamespace, m_configuration.m_frameName);
+        m_computedJointName = GetNamespacedName(m_computedNamespace, m_configuration.m_jointName);
     }
 
     void ROS2FrameComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
@@ -111,23 +119,22 @@ namespace ROS2
             }
             else
             {
-
                 m_parentFrame = AZStd::nullopt;
                 // TODO (mpelka) get this global frame from set reg
                 constexpr char odometryFrame[] = "odom";
-                if (m_namespace.empty())
+                if (m_computedNamespace.empty())
                 {
                     m_sourceFrame = odometryFrame;
                 }
                 else
                 {
-                    m_sourceFrame = AZStd::string::format("%s/%s", m_namespace.c_str(), odometryFrame);
+                    m_sourceFrame = GetNamespacedName(m_computedNamespace, odometryFrame);
                 }
             }
         }
 
         // if we don't have to send transforms stop handler
-        if (!m_publishTransform)
+        if (!m_configuration.m_publishTransform)
         {
             AZ::TickBus::Handler::BusDisconnect();
             return;
@@ -136,19 +143,17 @@ namespace ROS2
         if (m_ros2Transform == nullptr && m_sourceFrame.has_value())
         {
             AZ_Printf("m_ros2Transform", "publishing transform from %s to %s", m_sourceFrame->c_str(), GetNamespacedFrameID().c_str());
-            m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, GetNamespacedFrameID(), m_isDynamic);
-        }
-
-        if (m_ros2Transform != nullptr)
-        {
+            const bool dynamic = m_configuration.m_isDynamic || m_configuration.m_forceDynamic;
+            m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, GetNamespacedFrameID(), dynamic);
             m_ros2Transform->Publish(GetFrameTransform());
+            if (!dynamic)
+            {
+                // static transform published, no need to keep ticking
+                AZ::TickBus::Handler::BusDisconnect();
+                return;
+            }
         }
-
-        if (!m_isDynamic)
-        {
-            // if the transform is static disconnect the tick bus
-            AZ::TickBus::Handler::BusDisconnect();
-        }
+        m_ros2Transform->Publish(GetFrameTransform());
     }
 
     const ROS2FrameComponent* ROS2FrameComponent::GetParentROS2FrameComponent() const
@@ -185,14 +190,7 @@ namespace ROS2
         ROS2FrameConfiguration::Reflect(context);
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serialize->Class<ROS2FrameComponent, AZ::Component>()
-                ->Version(1)
-                ->Field("Target Frame", &ROS2FrameComponent::m_targetFrame)
-                ->Field("Joint Name", &ROS2FrameComponent::m_jointName)
-                ->Field("Namespace", &ROS2FrameComponent::m_namespace)
-                ->Field("Is Dynamic", &ROS2FrameComponent::m_isDynamic)
-                ->Field("Publish Transform", &ROS2FrameComponent::m_publishTransform);
-
+            serialize->Class<ROS2FrameComponent, AZ::Component>()->Version(1)->Field("ROS2FrameConfiguration", &ROS2FrameComponent::m_configuration);
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
                 ec->Class<ROS2FrameComponent>(
@@ -225,14 +223,10 @@ namespace ROS2
 
     ROS2FrameComponent::ROS2FrameComponent() {};
 
-    ROS2FrameComponent::ROS2FrameComponent(
-        const AZStd::string& targetFrame, const AZStd::string& jointName, const AZStd::string nameSpace,bool publishTransform, bool isDynamic)
-        : m_targetFrame(targetFrame)
-        , m_namespace(nameSpace)
-        , m_jointName(jointName)
-        , m_publishTransform(publishTransform)
-        , m_isDynamic(isDynamic)
+    ROS2FrameComponent::ROS2FrameComponent(const ROS2FrameConfiguration& ros2FrameConfiguration)
+        : m_configuration(ros2FrameConfiguration)
     {
     }
+
 
 } // namespace ROS2

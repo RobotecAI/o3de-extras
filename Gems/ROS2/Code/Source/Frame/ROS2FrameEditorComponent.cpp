@@ -22,6 +22,7 @@
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
 #include <AzCore/Component/TransformBus.h>
+#include "NamespaceComputation.h"
 namespace ROS2
 {
     ROS2FrameEditorComponent::ROS2FrameEditorComponent(const ROS2FrameConfiguration ros2FrameConfiguration)
@@ -69,7 +70,8 @@ namespace ROS2
 
     bool ROS2FrameEditorComponent::IsTopLevel() const
     {
-        return ROS2FrameSystemInterface::Get()->IsTopLevel(GetEntityId());
+        AZ_Warning("ROS2FrameComponent", false, "Not implemented yet");
+        return false;
     }
 
     AZStd::string ROS2FrameEditorComponent::GetNamespacedFrameID() const
@@ -82,15 +84,15 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetNamespace() const
     {
-        return  ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
+        return ComputeNamespace(m_configuration, GetEntityId());
     }
 
     void ROS2FrameEditorComponent::UpdateNamespace()
     {
         AZ_Printf("ROS2FrameEditorComponent", "Updating namespace for entity %s", GetEntity()->GetName().c_str());
 
-        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
-        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
+        m_effectiveNamespace = ComputeNamespace(m_configuration, GetEntityId());
+        m_fullName = GetNamespacedName(m_effectiveNamespace, m_configuration.m_frameName);
 
         AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Event(
             GetEntityId(), &AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Events::OnEntityComponentPropertyChanged, GetId());
@@ -147,18 +149,20 @@ namespace ROS2
 
     AZ::EntityId ROS2FrameEditorComponent::GetFrameParent() const
     {
-        return ROS2FrameSystemInterface::Get()->GetParentEntityId(GetEntityId());
+        AZ_Warning("ROS2FrameEditorComponent", false, "GetFrameParent not implemented yet");
+        return AZ::EntityId();
     }
 
     AZStd::set<AZ::EntityId> ROS2FrameEditorComponent::GetFrameChildren() const
     {
-        return ROS2FrameSystemInterface::Get()->GetChildrenEntityId(GetEntityId());
+        AZ_Warning("ROS2FrameEditorComponent", false, "GetFrameParent not implemented yet");
+        return {};
     }
 
     AZ::Crc32 ROS2FrameEditorComponent::OnFrameConfigurationChange()
     {
-        m_effectiveNamespace = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
-        m_fullName = ROS2FrameSystemInterface::Get()->GetFrameName(m_configuration, GetEntityId());
+        m_effectiveNamespace = ComputeNamespace(m_configuration, GetEntityId(), true);
+        m_fullName = GetNamespacedName(m_effectiveNamespace, m_configuration.m_frameName);
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }
 
@@ -184,17 +188,19 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
-        const auto nameSpace  = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
-        const auto frameName = m_configuration.m_frameName;
-        const auto jointName = m_configuration.m_jointName;
-        AZ_Printf("ROS2FrameEditorComponent", "Creating ROS2FrameComponent on entity %s, fn: %s, jn: %s, ns: %s", gameEntity->GetName().c_str(), frameName.c_str(), jointName.c_str(), nameSpace.c_str());
-        const bool publishTransform = m_configuration.m_publishTransform;
-        gameEntity->CreateComponent<ROS2FrameComponent>(frameName, jointName, nameSpace, publishTransform, true);
+        gameEntity->CreateComponent<ROS2FrameComponent>(m_configuration);
     }
 
     ROS2FrameConfiguration ROS2FrameEditorComponent::GetConfiguration() const
     {
         return m_configuration;
     }
+
+    void ROS2FrameEditorComponent::SetConfiguration(const ROS2FrameConfiguration& config)
+    {
+        AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
+        m_configuration = config;
+    }
+
 
 } // namespace ROS2

@@ -51,44 +51,14 @@ namespace ROS2
         // ROS2FrameSystemInterface::Registrar overrides.
         void RegisterFrame(const AZ::EntityId& frameEntityId) override;
         void UnregisterFrame(const AZ::EntityId& frameEntityId) override;
-        bool IsTopLevel(const AZ::EntityId& frameEntityId) const override;
-        AZ::EntityId GetParentEntityId(const AZ::EntityId& frameEntityId) const override;
-        AZStd::set<AZ::EntityId> GetChildrenEntityId(const AZ::EntityId& frameEntityId) const override;
-        AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
-        AZStd::string GetJointName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
-        AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const override;
 
         // EntitySelectionEvents::Bus::MultiHandler overrides.
         void OnSelected() override;
         //! AZ::TransformNotificationBus::MultiHandler overrides.
         void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
 
-
         AZStd::set<AZ::EntityId> m_registeredEntities; //!< Set of all registered frame entities.
-         //! Find the path from the frameEntity to the frame parent of that entity.
-        //! This path will include the frameEntity and the frame parent.
-        //! If there is no frame parent, path to the root entity (included) will be returned.
-        //! @param frameEntityId frame to find the path to the parent.
-        //! @return vector of entityIds which represent the path to the parent. frameEntityId is first, parent is last.
-        AZStd::vector<AZ::EntityId> FindFrameParentPath(AZ::EntityId frameEntityId);
 
-        AZ::TransformInterface* GetEntityTransformInterface(const AZ::Entity* entity);
-
-        //! Updates the namespaces of all children of the frameEntity.
-        //! @param frameEntity frame to be updated.
-        //! @param parentNamespace namespace of the parent frame. Empty if no parent is present.
-        //! @param isActive boolean value describing if the frameEntity is currently active.
-        void UpdateNamespaces(AZ::EntityId frameEntity, AZStd::string parentNamespace = "", bool isActive = true);
-
-        //! Updates the namespaces of all children of the frameEntity.
-        //! @param frameEntity frame to be updated.
-        //! @param frameParentEntity entityId of the parent frame.
-        //! @param isActive boolean value describing if the frameEntity is currently active.
-        void UpdateNamespaces(AZ::EntityId frameEntity, AZ::EntityId frameParentEntity, bool isActive = true);
-
-        void MoveFrameDetach(const AZ::EntityId& frameEntityId, const AZStd::set<AZ::EntityId>& newPathToParentFrameSet);
-        void MoveFrameAttach(
-            const AZ::EntityId& frameEntityId, const AZ::EntityId& newFrameParent, const AZStd::vector<AZ::EntityId>& newPathToParentFrame);
 
 
     };

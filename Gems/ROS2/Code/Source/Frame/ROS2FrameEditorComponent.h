@@ -48,8 +48,9 @@ namespace ROS2
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
 
 
+        // ROSFrameInterface overrides
         ROS2FrameConfiguration GetConfiguration() const override;
-
+        void SetConfiguration(const ROS2FrameConfiguration& config) override;
 
     private:
         // ROS2FrameEditorComponentBus::Handler overrides

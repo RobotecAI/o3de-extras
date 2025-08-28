@@ -184,7 +184,8 @@ namespace ROS2
         {
             AZStd::vector<AZ::EntityId> predecessors;
             GetAllAncestorTransformBus(entity, predecessors);
-
+            const AZStd::vector<AZ::EntityId> predecessorsWithRos2Frame = GetEntitiesWithROS2FrameComponent(predecessors);
+            const auto topLevelParentId = predecessorsWithRos2Frame.empty() ? AZ::EntityId() : predecessorsWithRos2Frame.back();
             if (debug)
             {
                 AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolving namespace for entity %s", thisEntityName.c_str());
@@ -197,18 +198,20 @@ namespace ROS2
                     {
                         thisStrategyName = strategyToString.at(thisFrameConfig->m_namespaceConfiguration.GetNamespaceStrategy());
                     }
-                    AZ_Printf("ROS2FrameSystemComponent::GetNamespace", " - %s  [%s]", GetName(entityId).c_str(), thisStrategyName.c_str());
+                    AZ_Printf(
+                        "ROS2FrameSystemComponent::GetNamespace",
+                        " - %s  [%s] %s",
+                        GetName(entityId).c_str(),
+                        thisStrategyName.c_str(),
+                        ((topLevelParentId == entityId) ? " (ros2 root frame)" : ""));
                 }
             }
-
-            const AZStd::vector<AZ::EntityId> predecessorsWithRos2Frame = GetEntitiesWithROS2FrameComponent(predecessors);
             if (predecessorsWithRos2Frame.empty())
             {
                 // No ROS2Frame components in ancestors, so we are top-level.
                 return thisEntityName;
             }
 
-            const auto topLevelParentId = predecessorsWithRos2Frame.back();
             const AZStd::string topLevelParentName = GetName(topLevelParentId);
 
             AZStd::string resolvedName = "";

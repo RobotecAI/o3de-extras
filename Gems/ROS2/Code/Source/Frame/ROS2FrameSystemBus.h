@@ -34,30 +34,6 @@ namespace ROS2
         //! @param frameEntityId entityId containing the frame to unregister.
         virtual void UnregisterFrame(const AZ::EntityId& frameEntityId) = 0;
 
-        //! Check if the frame is the highest frame in the entity tree.
-        //! @param frameEntityId entityId of the frame to check.
-        //! @return boolean value of the check. True for top level.
-        virtual bool IsTopLevel(const AZ::EntityId& frameEntityId) const = 0;
-
-        //! Find the parent frame of the entity.
-        //! @param frameEntityId entityId of the frame to check.
-        //! @return entityId of the parent frame or an invalid entityId if the frame is top level.
-        virtual AZ::EntityId GetParentEntityId(const AZ::EntityId& frameEntityId) const = 0;
-
-        //! Find all frame children of the frame.
-        //! @param frameEntityId entityId of the frame to check.
-        //! @return set of all entityIds of children. Empty if no children or the frameEntityId is invalid.
-        virtual AZStd::set<AZ::EntityId> GetChildrenEntityId(const AZ::EntityId& frameEntityId) const = 0;
-
-        //! Resolves the ROS 2 frame name based on configuration and entity ID
-        virtual AZStd::string GetFrameName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
-
-        //! Resolves the ROS 2 namespace based on configuration and entity ID
-        virtual AZStd::string GetJointName(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
-
-        //! Resolves the ROS 2 namespace based on configuration and entity ID
-        virtual AZStd::string GetNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity) const = 0;
-
     };
 
     class ROS2FrameSystemBusTraits : public AZ::EBusTraits
