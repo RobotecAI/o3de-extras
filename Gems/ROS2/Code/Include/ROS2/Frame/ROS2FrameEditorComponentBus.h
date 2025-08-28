@@ -49,10 +49,9 @@ namespace ROS2
         //! @return set of all entityIds of children. Empty if no children or the frameEntityId is invalid.
         virtual AZStd::set<AZ::EntityId> GetFrameChildren() const = 0;
 
-        //! Update the parent namespace and effective namespace.
-        //! This method should be called when updating the namespaces of all children of the frameEntity with changed namespace.
-        //! @param parentNamespace The namespace of the parent frame.
-        virtual void UpdateNamespace(const AZStd::string& parentNamespace) = 0;
+        //! Ask component to recompute its namespace based on the parent namespace.
+        //! called when some changes happen in the o3de transform tree.
+        virtual void UpdateNamespace() = 0;
 
         //! Global frame name in ros2 ecosystem.
         //! @return The name of the global frame with namespace attached. It is typically "odom", "map", "world".

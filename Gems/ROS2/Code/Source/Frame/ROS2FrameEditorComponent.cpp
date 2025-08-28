@@ -26,6 +26,7 @@ namespace ROS2
 {
     ROS2FrameEditorComponent::ROS2FrameEditorComponent(const ROS2FrameConfiguration ros2FrameConfiguration)
     {
+
         m_configuration = ros2FrameConfiguration;
     }
 
@@ -43,6 +44,7 @@ namespace ROS2
         {
             frameSystemInterface->RegisterFrame(GetEntityId());
         }
+        UpdateNamespace();
     }
 
     void ROS2FrameEditorComponent::Deactivate()
@@ -80,10 +82,10 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetNamespace() const
     {
-        return "";//m_configuration.m_namespaceConfiguration.GetNamespace();
+        return  ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
     }
 
-    void ROS2FrameEditorComponent::UpdateNamespace(const AZStd::string& parentNamespace)
+    void ROS2FrameEditorComponent::UpdateNamespace()
     {
         AZ_Printf("ROS2FrameEditorComponent", "Updating namespace for entity %s", GetEntity()->GetName().c_str());
 
@@ -179,37 +181,9 @@ namespace ROS2
     {
         required.push_back(AZ_CRC_CE("TransformService"));
     }
-    void test(AZ::EntityId id)
-    {
-        // Get the transform component
-        // get entity
-        AZ::Entity* entity = nullptr;
-        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
-        if (!entity)
-        {
-            return ;
-        }
-
-        AZ_Printf("TESTFOOO", "%s", entity->GetName().c_str());
-        auto* transform = entity->GetTransform();
-        if (!transform)
-        {
-            return;
-        }
-        AZ::EntityId parentId = transform->GetParentId();
-        if (!parentId.IsValid())
-        {
-            return ;
-        }
-        return test(parentId);
-    }
-
 
     void ROS2FrameEditorComponent::BuildGameEntity(AZ::Entity* gameEntity)
     {
-
-        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::BuildGameEntity for entity %s", this->GetEntityId().ToString().c_str());
-        test(GetEntityId());
         const auto nameSpace  = ROS2FrameSystemInterface::Get()->GetNamespace(m_configuration, GetEntityId());
         const auto frameName = m_configuration.m_frameName;
         const auto jointName = m_configuration.m_jointName;

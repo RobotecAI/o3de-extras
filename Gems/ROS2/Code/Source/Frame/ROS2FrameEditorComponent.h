@@ -14,6 +14,7 @@
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
 #include <ROS2/ROS2TypeIds.h>
+#include <ROS2/Frame/ROS2FrameComponentInterface.h>
 
 namespace ROS2
 {
@@ -26,9 +27,10 @@ namespace ROS2
         : public AzToolsFramework::Components::EditorComponentBase
         , public ROS2FrameEditorComponentBus::Handler
         , public AZ::EntityBus::Handler
+        , public ROSFrameInterface
     {
     public:
-        AZ_COMPONENT(ROS2FrameEditorComponent, ROS2FrameEditorComponentTypeId, AzToolsFramework::Components::EditorComponentBase);
+        AZ_EDITOR_COMPONENT(ROS2FrameEditorComponent, ROS2FrameEditorComponentTypeId, AzToolsFramework::Components::EditorComponentBase, ROSFrameInterface);
 
         ROS2FrameEditorComponent() = default;
         ~ROS2FrameEditorComponent() = default;
@@ -45,15 +47,16 @@ namespace ROS2
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
 
-        //! Get the configuration of this component.
-        ROS2FrameConfiguration GetConfiguration() const;
+
+        ROS2FrameConfiguration GetConfiguration() const override;
+
 
     private:
         // ROS2FrameEditorComponentBus::Handler overrides
         AZStd::string GetNamespacedFrameID() const override;
         AZ::Name GetNamespacedJointName() const override;
         AZStd::string GetNamespace() const override;
-        void UpdateNamespace(const AZStd::string& parentNamespace) override;
+        void UpdateNamespace() override;
         AZStd::string GetGlobalFrameName() const override;
         bool IsTopLevel() const override; //!< True if this entity does not have a parent entity with ROS2.
         AZ::EntityId GetFrameParent() const override;

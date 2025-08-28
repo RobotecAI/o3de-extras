@@ -26,6 +26,7 @@ namespace ROS2
     inline constexpr const char* ROS2EditorModuleTypeId = ROS2ModuleTypeId;
 
     // Interface TypeIds
+    inline constexpr const char* ROSFrameInterfaceTypeId = "{7B3F4BD0-83F4-11F0-B558-0800200C9A66}";
     inline constexpr const char* ROS2RequestsTypeId = "{A9BDBFF6-E644-430D-8096-CDB53C88E8FC}";
     inline constexpr const char* ROS2EditorRequestsTypeId = "{E8A645D7-B0A4-4D6A-827B-64A44211BDB4}";
     inline constexpr const char* TFInterfaceTypeId = "{BC0C8C08-DC47-44AB-9A84-D853751D15F1}";

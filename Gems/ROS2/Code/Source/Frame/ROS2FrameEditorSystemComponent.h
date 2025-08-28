@@ -29,23 +29,23 @@ namespace ROS2
     //! It is responsible for updating the namespaces of the frame entities and their children.
     //! It also notifies the ROS2FrameEditorComponent about changes in the tree.
     //! Used to register, unregister, track the frame entities in the level entity tree.
-    class ROS2FrameSystemComponent
+    class ROS2FrameEditorSystemComponent
         : public AZ::Component
         , protected ROS2FrameSystemInterface::Registrar
         , protected AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler
         , protected AZ::TransformNotificationBus::MultiHandler
     {
     public:
-        AZ_COMPONENT(ROS2FrameSystemComponent, "{360c4b45-ac02-42d2-9e1a-1d77eb22a054}");
+        AZ_COMPONENT(ROS2FrameEditorSystemComponent, "{360c4b45-ac02-42d2-9e1a-1d77eb22a054}");
         static void Reflect(AZ::ReflectContext* context);
 
         // AZ::Component overrides.
         void Activate() override;
         void Deactivate() override;
 
-        ROS2FrameSystemComponent();
+        ROS2FrameEditorSystemComponent();
 
-        ~ROS2FrameSystemComponent();
+        ~ROS2FrameEditorSystemComponent();
 
     private:
         // ROS2FrameSystemInterface::Registrar overrides.

@@ -15,9 +15,11 @@
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>
 #include <ROS2/ROS2TypeIds.h>
+#include <ROS2/Frame/ROS2FrameComponentInterface.h>
 
 namespace ROS2
 {
+
 
     //! This component marks an interesting reference frame for ROS2 ecosystem.
     //! It serves as sensor data frame of reference and is responsible, through ROS2Transform, for publishing
@@ -27,11 +29,12 @@ namespace ROS2
     class ROS2FrameComponent
         : public AZ::Component
         , public AZ::TickBus::Handler
+        , public ROSFrameInterface
     {
         friend class JsonFrameComponentConfigSerializer;
 
     public:
-        AZ_COMPONENT(ROS2FrameComponent, "{EE743472-3E25-41EA-961B-14096AC1D66F}");
+        AZ_COMPONENT(ROS2FrameComponent, ROS2FrameComponentTypeId, ROSFrameInterface);
 
         ROS2FrameComponent();
 
@@ -112,6 +115,10 @@ namespace ROS2
             return m_namespace;
         }
 
+        ROS2FrameConfiguration GetConfiguration() const override
+        {
+            return ROS2FrameConfiguration();
+        }
     private:
         AZ::Transform GetFrameTransform() const;
         const ROS2FrameComponent* GetParentROS2FrameComponent() const;
