@@ -61,11 +61,9 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
     {
-        AZStd::string namespacedFrameName;
-        ROS2NamesRequestBus::BroadcastResult(
-            namespacedFrameName, &ROS2NamesRequests::GetNamespacedName, GetNamespace(), AZStd::string("odom"));
-
-        return namespacedFrameName;
+        const auto name_space = ComputeNamespace(m_configuration, GetEntityId());
+        //TODO mpelka - get this global frame from set reg
+        return GetNamespacedName(name_space, "odom");
     }
 
     bool ROS2FrameEditorComponent::IsTopLevel() const
@@ -76,10 +74,8 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetNamespacedFrameID() const
     {
-        AZStd::string namespacedFrameID;
-        ROS2NamesRequestBus::BroadcastResult(
-            namespacedFrameID, &ROS2NamesRequests::GetNamespacedName, GetNamespace(), m_configuration.m_frameName);
-        return namespacedFrameID;
+        auto name_space = ComputeNamespace(m_configuration, GetEntityId());
+        return GetNamespacedName(name_space, m_configuration.m_frameName);
     }
 
     AZStd::string ROS2FrameEditorComponent::GetNamespace() const
@@ -101,10 +97,8 @@ namespace ROS2
 
     AZ::Name ROS2FrameEditorComponent::GetNamespacedJointName() const
     {
-        AZStd::string namespacedJointName;
-        ROS2NamesRequestBus::BroadcastResult(
-            namespacedJointName, &ROS2NamesRequests::GetNamespacedName, GetNamespace(), m_configuration.m_jointName);
-        return AZ::Name(namespacedJointName.c_str());
+        auto name_space = ComputeNamespace(m_configuration, GetEntityId());
+        return AZ::Name(GetNamespacedName(name_space, m_configuration.m_jointName));
     }
 
     void ROS2FrameEditorComponent::SetJointName(const AZStd::string& jointName)
@@ -149,14 +143,18 @@ namespace ROS2
 
     AZ::EntityId ROS2FrameEditorComponent::GetFrameParent() const
     {
-        AZ_Warning("ROS2FrameEditorComponent", false, "GetFrameParent not implemented yet");
-        return AZ::EntityId();
+        const auto ancestors = GetAllAncestorTransformBus(GetEntityId());
+        return GetFirstEntityWithROS2FrameComponent(ancestors);
     }
 
     AZStd::set<AZ::EntityId> ROS2FrameEditorComponent::GetFrameChildren() const
     {
-        AZ_Warning("ROS2FrameEditorComponent", false, "GetFrameParent not implemented yet");
-        return {};
+        // get all descendants
+        AZStd::vector<AZ::EntityId> children;
+        AZ::TransformBus::EventResult(children, GetEntityId(), &AZ::TransformBus::Events::GetAllDescendants);
+        // filter only those with ROS2FrameComponent
+        const auto ros2Children = GetEntitiesWithROS2FrameComponent(children);
+        return AZStd::set<AZ::EntityId>(ros2Children.begin(), ros2Children.end());
     }
 
     AZ::Crc32 ROS2FrameEditorComponent::OnFrameConfigurationChange()

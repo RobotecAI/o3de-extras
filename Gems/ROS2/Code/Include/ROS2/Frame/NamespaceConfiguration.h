@@ -35,18 +35,9 @@ namespace ROS2
             Custom //!< Non-empty and based on user-provided value.
         };
 
-
-        AZStd::string GetNamespace() const { return m_namespace; }
-        AZStd::string GetParentNamespace() const { return m_parentNamespace; }
-        AZStd::string GetCustomNamespace() const { return m_customNamespace; }
-        NamespaceStrategy GetNamespaceStrategy() const { return m_namespaceStrategy; }
-
-    private:
         AZStd::string m_customNamespace = ""; //!< Custom namespace that can be set by the user
-        AZStd::string m_namespace = ""; //!< Current namespace (might be custom); set automatically
-        AZStd::string m_parentNamespace = ""; //!< Parent namespace (might be custom); set automatically
         NamespaceStrategy m_namespaceStrategy = NamespaceStrategy::Default;
-
+    private:
         //! Determine if namespace is using the Custom namespace strategy
         bool IsNamespaceCustom() const;
 

@@ -28,9 +28,9 @@ namespace ROS2
     bool HasROS2FrameComponent(AZ::EntityId id);
 
     //! Returns all ancestor entities of the given entity that have a TransformComponent, including the entity itself.
-    //! the root entity (e.g. level) is the first element, in the vector
+    //! the root entity (e.g. level) is the last element in the vector
     //! @note to be used in Game and Editor contexts
-    AZStd::vector<AZ::EntityId> GetAllAncestorTransformBus(AZ::EntityId id, AZStd::vector<AZ::EntityId>& predecessors);
+    AZStd::vector<AZ::EntityId> GetAllAncestorTransformBus(const AZ::EntityId& id);
 
     //! Filters the given list of entity IDs and returns only those that have a ROS2FrameComponent or ROS2FrameEditorComponent.
     //! @note to be used in Game and Editor contexts

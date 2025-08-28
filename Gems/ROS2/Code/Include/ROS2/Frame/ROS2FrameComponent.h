@@ -30,18 +30,6 @@ namespace ROS2
         , public AZ::TickBus::Handler
         , public ROSFrameInterface
     {
-        friend class JsonFrameComponentConfigSerializer;
-
-    private:
-        AZStd::string m_computedNamespace; //!< Cached namespace
-        AZStd::string m_computedFrameName; //!< Cached full frame name, including namespace
-        AZStd::string m_computedJointName; //!< Cached full joint name, including namespace
-        ROS2FrameConfiguration m_configuration; //!< Configuration for this frame component
-        bool m_disabled = false;
-        AZStd::optional<AZ::EntityId> m_parentFrame; //!< Cached parent entity with ROS2FrameComponent, if any
-        AZStd::optional<AZStd::string> m_sourceFrame; //!< If not set, the source frame is assumed to be the parent frame in the TF tree
-        AZStd::unique_ptr<ROS2Transform> m_ros2Transform;
-
     public:
         AZ_COMPONENT(ROS2FrameComponent, ROS2FrameComponentTypeId, ROSFrameInterface);
 
@@ -61,78 +49,37 @@ namespace ROS2
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
 
-        //! Get a source frame (the frame id in the header of send tf message)
-        AZStd::string GetSourceFrame() const
-        {
-            return m_sourceFrame.value_or("");
-        }
-
         //! Disable publishing the transform. It allows to tinker with the transform without spamming /tf_static
         //! you can disable it inactive state, and then enable it again.
-        void DisablePublishingTransform()
-        {
-            m_disabled = true;
-            m_parentFrame.reset();
-            m_ros2Transform.reset();
-            m_sourceFrame.reset();
-            if (AZ::TickBus::Handler::BusIsConnected())
-            {
-                AZ::TickBus::Handler::BusDisconnect();
-            }
-        }
-
+        void DisablePublishingTransform();
         //! Enable publishing the transform. It will compute the namespace and frame name again.
         //! Note that other won't be notified of the change.
-        void EnablePublishingTransform()
-        {
-            ComputeNamespaceAndFrameName();
-            m_disabled = false;
-            AZ::TickBus::Handler::BusDisconnect();
-        }
+        void EnablePublishingTransform();
 
-        ROS2FrameConfiguration GetConfiguration() const override
-        {
-            return m_configuration;
-        }
+        const AZStd::string& GetNamespace() const;
+        const AZStd::string& GetNamespacedFrameID() const;
+        const AZStd::string& GetNamespacedJointName() const;
+        const AZStd::string& GetJointName() const;
+        const AZStd::string& GetFrameName() const;
 
-        void SetConfiguration(const ROS2FrameConfiguration& config) override
-        {
-            AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
-            m_configuration = config;
-        }
-
-
-        const AZStd::string& GetNamespace() const
-        {
-            return m_computedNamespace;
-        }
-
-        const AZStd::string& GetNamespacedFrameID() const
-        {
-            return m_computedFrameName;
-        }
-
-        const AZStd::string& GetNamespacedJointName() const
-        {
-            return m_computedJointName;
-        }
-
-        const AZStd::string& GetJointName()
-        {
-            return m_configuration.m_jointName;
-        }
-
-        const AZStd::string& GetFrameName()
-        {
-            return m_configuration.m_frameName;
-        }
+        // ROSFrameInterface overrides
+        ROS2FrameConfiguration GetConfiguration() const override;
+        void SetConfiguration(const ROS2FrameConfiguration& config) override;
     private:
+        AZStd::string m_computedNamespace; //!< Cached namespace
+        AZStd::string m_computedFrameName; //!< Cached full frame name, including namespace
+        AZStd::string m_computedJointName; //!< Cached full joint name, including namespace
+        ROS2FrameConfiguration m_configuration; //!< Configuration for this frame component
+        bool m_disabled = false;
+        AZStd::optional<AZ::EntityId> m_parentFrame; //!< Cached parent entity with ROS2FrameComponent, if any
+        AZStd::optional<AZStd::string> m_sourceFrame; //!< If not set, the source frame is assumed to be the parent frame in the TF tree
+        AZStd::unique_ptr<ROS2Transform> m_ros2Transform;
+
         AZ::Transform GetFrameTransform() const;
         const ROS2FrameComponent* GetParentROS2FrameComponent() const;
-        //////////////////////////////////////////////////////////////////////////
+
         // AZ::TickBus::Handler overrides
         void OnTick(float deltaTime, AZ::ScriptTimePoint time) override;
-        //////////////////////////////////////////////////////////////////////////
 
         void ComputeNamespaceAndFrameName();
     };

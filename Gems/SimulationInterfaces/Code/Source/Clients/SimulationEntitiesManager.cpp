@@ -686,23 +686,20 @@ namespace SimulationInterfaces
                 return;
             }
 
-            // TODO fixme: this is a workaround for the fact that the spawnable system does not support namespaces
-            // for (auto* entity : view)
-            // {
-            //     ROS2::ROS2FrameComponent* frameComponent = entity->template FindComponent<ROS2::ROS2FrameComponent>();
-            //     if (frameComponent)
-            //     {
-            //         const AZStd::string f = frameComponent->GetNamespacedFrameID();
-            //         if (f.empty())
-            //         {
-            //             frameComponent->SetFrameID(name);
-            //         }
-            //         else
-            //         {
-            //             frameComponent->SetFrameID(AZStd::string::format("%s/%s", entityNamespace.c_str(), f.c_str()));
-            //         }
-            //     }
-            // }
+            for (auto* entity : view)
+            {
+                ROS2::ROS2FrameComponent* frameComponent = entity->template FindComponent<ROS2::ROS2FrameComponent>();
+                if (frameComponent)
+                {
+                    const AZStd::string f = frameComponent->GetNamespacedFrameID();
+                    auto config = frameComponent->GetConfiguration();
+                    config.m_namespaceConfiguration.m_customNamespace = entityNamespace;
+                    config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+                    AZ_Printf("ROS2::ROS2FrameComponent", "Setting namespace to %s for entity %s\n", entityNamespace.c_str(), entity->GetName().c_str());
+                    frameComponent->SetConfiguration(config);
+                    break;
+                }
+            }
             const AZ::Entity* root = *view.begin();
             auto* transformInterface = root->FindComponent<AzFramework::TransformComponent>();
             if (transformInterface)
