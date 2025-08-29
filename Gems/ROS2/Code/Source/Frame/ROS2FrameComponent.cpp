@@ -118,7 +118,7 @@ namespace ROS2
 
     void ROS2FrameComponent::ComputeNamespaceAndFrameName()
     {
-        m_computedNamespace = ComputeNamespace(m_configuration, GetEntityId(), true);
+        m_computedNamespace = ComputeNamespace(m_configuration, GetEntityId());
         m_computedFrameName = GetNamespacedName(m_computedNamespace, m_configuration.m_frameName);
         m_computedJointName = GetNamespacedName(m_computedNamespace, m_configuration.m_jointName);
     }

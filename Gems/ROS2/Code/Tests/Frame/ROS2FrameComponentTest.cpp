@@ -85,12 +85,12 @@ namespace UnitTest
         entity.Init();
         entity.Activate();
 
-        const std::string jointName(frame->GetNamespacedJointName().GetCStr());
+        const std::string jointName(frame->GetNamespacedJointName().c_str());
         const std::string frameId(frame->GetNamespacedFrameID().c_str());
 
         EXPECT_EQ(entity.GetState(), AZ::Entity::State::Active);
-        EXPECT_STRCASEEQ(jointName.c_str(), ("o3de_" + entityName + "/").c_str());
-        EXPECT_STRCASEEQ(frameId.c_str(), ("o3de_" + entityName + "/sensor_frame").c_str());
+        EXPECT_STRCASEEQ(jointName.c_str(), (entityName + "/").c_str());
+        EXPECT_STRCASEEQ(frameId.c_str(), (entityName + "/sensor_frame").c_str());
     }
 
     TEST_F(ROS2FrameComponentFixture, ThreeFramesDefault)
@@ -127,7 +127,7 @@ namespace UnitTest
 
         for (int i = 0; i < numOfEntities; i++)
         {
-            const std::string jointName(frames[i]->GetNamespacedJointName().GetCStr());
+            const std::string jointName(frames[i]->GetNamespacedJointName().c_str());
             const std::string frameId(frames[i]->GetNamespacedFrameID().c_str());
 
             EXPECT_EQ(entities[i]->GetState(), AZ::Entity::State::Active);
@@ -148,21 +148,47 @@ namespace UnitTest
         entity.Init();
         entity.Activate();
 
-        auto rosifiedName = "o3de_" + entityName;
+        auto rosifiedName = entityName;
         ASSERT_STREQ(frame->GetNamespace().c_str(), rosifiedName.c_str());
 
         // Note that namespace parameter is only applied using Custom strategy
-        frame->UpdateNamespaceConfiguration("MyCustomNamespace", ROS2::NamespaceConfiguration::NamespaceStrategy::Custom);
-        EXPECT_STREQ(frame->GetNamespace().c_str(), "MyCustomNamespace");
+        {
+            auto configuration = frame->GetConfiguration();
+            entity.Deactivate();
+            configuration.m_namespaceConfiguration.m_customNamespace = "MyCustomNamespace";
+            configuration.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+            frame->SetConfiguration(configuration);
+            entity.Activate();
+            EXPECT_STREQ(frame->GetNamespace().c_str(), "MyCustomNamespace");
+        }
+
         // Empty strategy clears the namespace
-        frame->UpdateNamespaceConfiguration("MyCustomNamespace", ROS2::NamespaceConfiguration::NamespaceStrategy::Empty);
-        EXPECT_STREQ(frame->GetNamespace().c_str(), "");
+        {
+            auto configuration = frame->GetConfiguration();
+            configuration.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Empty;
+            entity.Deactivate();
+            frame->SetConfiguration(configuration);
+            entity.Activate();
+            EXPECT_STREQ(frame->GetNamespace().c_str(), "");
+        }
         // From Entity Name strategy uses rosified version of Entity Name
-        frame->UpdateNamespaceConfiguration("MyCustomNamespace", ROS2::NamespaceConfiguration::NamespaceStrategy::FromEntityName);
-        EXPECT_STREQ(frame->GetNamespace().c_str(), rosifiedName.c_str());
+        {
+            auto configuration = frame->GetConfiguration();
+            configuration.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::FromEntityName;
+            entity.Deactivate();
+            frame->SetConfiguration(configuration);
+            entity.Activate();
+            EXPECT_STREQ(frame->GetNamespace().c_str(), rosifiedName.c_str());
+        }
         // Default strategy is like From Entity Name strategy if the entity is on top of hierarchy ...
-        frame->UpdateNamespaceConfiguration("MyCustomNamespace", ROS2::NamespaceConfiguration::NamespaceStrategy::Default);
-        EXPECT_STREQ(frame->GetNamespace().c_str(), rosifiedName.c_str());
+        {
+            auto configuration = frame->GetConfiguration();
+            configuration.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+            entity.Deactivate();
+            frame->SetConfiguration(configuration);
+            entity.Activate();
+            EXPECT_STREQ(frame->GetNamespace().c_str(), rosifiedName.c_str());
+        }
 
         AZ::Entity newRootEntity;
         AZStd::string newRootName = "new_root";
@@ -174,8 +200,14 @@ namespace UnitTest
         AZ::TransformBus::Event(entity.GetId(), &AZ::TransformBus::Events::SetParent, newRootEntity.GetId());
 
         // If there is a parent Default strategy concatenates parent's namespace with rosified name
-        frame->UpdateNamespaceConfiguration("MyCustomNamespace", ROS2::NamespaceConfiguration::NamespaceStrategy::Default);
-        EXPECT_STREQ(frame->GetNamespace().c_str(), AZStd::string::format("%s/%s", newRootName.c_str(), rosifiedName.c_str()).c_str());
+        {
+            auto configuration = frame->GetConfiguration();
+            configuration.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+            entity.Deactivate();
+            frame->SetConfiguration(configuration);
+            entity.Activate();
+            EXPECT_STREQ(frame->GetNamespace().c_str(), newRootName.c_str());
+        }
     }
 
 } // namespace UnitTest

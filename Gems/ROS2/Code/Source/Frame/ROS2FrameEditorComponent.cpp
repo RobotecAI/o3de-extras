@@ -61,7 +61,6 @@ namespace ROS2
 
     AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
     {
-        const auto name_space = ComputeNamespace(m_configuration, GetEntityId());
         // Get odometry frame, from settings registry
         AZStd::string odometryFrame;
         auto* registry = AZ::SettingsRegistry::Get();
@@ -73,6 +72,9 @@ namespace ROS2
                 odometryFrame = DefaultGlobalFrameName;
             }
         }
+
+        const auto name_space = ComputeNamespace(m_configuration, GetEntityId());
+
         return GetNamespacedName(name_space, odometryFrame);
     }
 
@@ -167,7 +169,7 @@ namespace ROS2
 
     AZ::Crc32 ROS2FrameEditorComponent::OnFrameConfigurationChange()
     {
-        m_effectiveNamespace = ComputeNamespace(m_configuration, GetEntityId(), true);
+        m_effectiveNamespace = ComputeNamespace(m_configuration, GetEntityId());
         m_fullName = GetNamespacedName(m_effectiveNamespace, m_configuration.m_frameName);
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }

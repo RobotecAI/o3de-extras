@@ -16,7 +16,7 @@ namespace ROS2
 {
     //! This method computes the namespace for a given entity based on the provided configuration.
     //! It considers the namespace strategy defined in the configuration and the entity's position in the hierarchy
-    AZStd::string ComputeNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity, bool debug = false);
+    AZStd::string ComputeNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity);
 
     //! Gets the namespaced name for the given entity, combining its namespace and frame name.
     //! for empty namespace, it returns just the name
