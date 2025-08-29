@@ -16,12 +16,14 @@
 #include <AzCore/Serialization/Json/JsonSerializationResult.h>
 #include <AzCore/Serialization/Json/RegistrationContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
+
 namespace ROS2
 {
 
@@ -80,11 +82,11 @@ namespace ROS2
                 return true;
             }
             const bool hasJoints =
-                               Internal::HasComponentOfType(entity, AZ::Uuid("{B01FD1D2-1D91-438D-874A-BF5EB7E919A8}")); // PhysX::JointComponent;
-            const bool hasFixedJoints = Internal::HasComponentOfType(
-                entity, AZ::Uuid("{02E6C633-8F44-4CEE-AE94-DCB06DE36422}")); // PhysX::FixedJointComponent
-            const bool hasArticulations = Internal::HasComponentOfType(
-                entity, AZ::Uuid("{48751E98-B35F-4A2F-A908-D9CDD5230264}")); // PhysX::ArticulationComponent
+                Internal::HasComponentOfType(entity, AZ::Uuid("{B01FD1D2-1D91-438D-874A-BF5EB7E919A8}")); // PhysX::JointComponent;
+            const bool hasFixedJoints =
+                Internal::HasComponentOfType(entity, AZ::Uuid("{02E6C633-8F44-4CEE-AE94-DCB06DE36422}")); // PhysX::FixedJointComponent
+            const bool hasArticulations =
+                Internal::HasComponentOfType(entity, AZ::Uuid("{48751E98-B35F-4A2F-A908-D9CDD5230264}")); // PhysX::ArticulationComponent
             return (hasJoints && !hasFixedJoints) || hasArticulations;
         }
 
@@ -92,7 +94,6 @@ namespace ROS2
 
     void ROS2FrameComponent::Init()
     {
-        // m_namespaceConfiguration.Init();
     }
 
     void ROS2FrameComponent::Activate()
@@ -136,8 +137,19 @@ namespace ROS2
             else
             {
                 m_parentFrame = AZStd::nullopt;
-                // TODO (mpelka) get this global frame from set reg
-                constexpr char odometryFrame[] = "odom";
+
+                // Get odometry frame, from settings registry
+                AZStd::string odometryFrame;
+                auto* registry = AZ::SettingsRegistry::Get();
+                AZ_Error("ROS2FrameComponent", registry, "No settings registry found, using default odometry frame name");
+                if (registry)
+                {
+                    if (!registry->Get(odometryFrame, DefaultGlobalFrameNameConfigurationKey))
+                    {
+                        odometryFrame = DefaultGlobalFrameName;
+                    }
+                }
+
                 if (m_computedNamespace.empty())
                 {
                     m_sourceFrame = odometryFrame;
@@ -159,8 +171,13 @@ namespace ROS2
         if (m_ros2Transform == nullptr && m_sourceFrame.has_value())
         {
             const bool isTopLevel = !m_parentFrame.has_value();
-            const bool dynamic = m_configuration.m_forceDynamic || Internal::IsDynamicHeuristic(isTopLevel, GetEntity()) ;
-            AZ_Printf("m_ros2Transform", "publishing transform from %s to %s, type %s", m_sourceFrame->c_str(), GetNamespacedFrameID().c_str(), dynamic? "dynamic":"static" );
+            const bool dynamic = m_configuration.m_forceDynamic || Internal::IsDynamicHeuristic(isTopLevel, GetEntity());
+            AZ_Printf(
+                "m_ros2Transform",
+                "publishing transform from %s to %s, type %s",
+                m_sourceFrame->c_str(),
+                GetNamespacedFrameID().c_str(),
+                dynamic ? "dynamic" : "static");
 
             m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, GetNamespacedFrameID(), dynamic);
             m_ros2Transform->Publish(GetFrameTransform());
@@ -240,7 +257,7 @@ namespace ROS2
         required.push_back(AZ_CRC_CE("TransformService"));
     }
 
-    ROS2FrameComponent::ROS2FrameComponent() {};
+    ROS2FrameComponent::ROS2FrameComponent(){};
 
     ROS2FrameComponent::ROS2FrameComponent(const ROS2FrameConfiguration& ros2FrameConfiguration)
         : m_configuration(ros2FrameConfiguration)

@@ -20,6 +20,12 @@
 namespace ROS2
 {
 
+    namespace
+    {
+        inline constexpr const char* DefaultGlobalFrameName = "odom";
+        inline constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
+    } // namespace
+
     //! This component marks an interesting reference frame for ROS2 ecosystem.
     //! It serves as sensor data frame of reference and is responsible, through ROS2Transform, for publishing
     //! ros2 static and dynamic transforms (/tf_static, /tf). It also facilitates namespace handling.

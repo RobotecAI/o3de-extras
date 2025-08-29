@@ -18,49 +18,48 @@
 namespace ROS2
 {
 
-        AZStd::string GetName(AZ::EntityId id)
+    AZStd::string GetName(AZ::EntityId id)
+    {
+        AZStd::string name;
+        AZ::ComponentApplicationBus::BroadcastResult(name, &AZ::ComponentApplicationRequests::GetEntityName, id);
+        return name;
+    }
+
+    AZStd::optional<ROS2FrameConfiguration> GetConfigurationFromComponent(AZ::EntityId id)
+    {
+        AZ::Entity* entity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
+        if (!entity)
         {
-            AZStd::string name;
-            AZ::ComponentApplicationBus::BroadcastResult(name, &AZ::ComponentApplicationRequests::GetEntityName, id);
-            return name;
+            return ROS2FrameConfiguration();
         }
-
-        AZStd::optional<ROS2FrameConfiguration> GetConfigurationFromComponent(AZ::EntityId id)
+        const auto* componentEditor = entity->FindComponent(AZ::Uuid(ROS2FrameEditorComponentTypeId));
+        if (componentEditor)
         {
-            AZ::Entity* entity = nullptr;
-            AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
-            if (!entity)
+            const auto* intreface = dynamic_cast<const ROSFrameInterface*>(componentEditor);
+            if (intreface)
             {
-                return ROS2FrameConfiguration();
+                return intreface->GetConfiguration();
             }
-            const auto* componentEditor = entity->FindComponent(AZ::Uuid(ROS2FrameEditorComponentTypeId));
-            if (componentEditor)
-            {
-                const auto* intreface = dynamic_cast<const ROSFrameInterface *>(componentEditor);
-                if (intreface)
-                {
-                    return intreface->GetConfiguration();
-                }
-            }
-            const auto* componentGame = entity->FindComponent(AZ::Uuid(ROS2FrameComponentTypeId));
-            if (componentGame)
-            {
-                const auto* intreface = dynamic_cast<const ROSFrameInterface *>(componentGame);
-                if (intreface)
-                {
-                    return intreface->GetConfiguration();
-                }
-            }
-            return AZStd::nullopt;
         }
+        const auto* componentGame = entity->FindComponent(AZ::Uuid(ROS2FrameComponentTypeId));
+        if (componentGame)
+        {
+            const auto* intreface = dynamic_cast<const ROSFrameInterface*>(componentGame);
+            if (intreface)
+            {
+                return intreface->GetConfiguration();
+            }
+        }
+        return AZStd::nullopt;
+    }
 
-
-        const AZStd::unordered_map<NamespaceConfiguration::NamespaceStrategy, AZStd::string_view> strategyToString = {
-            { NamespaceConfiguration::NamespaceStrategy::Default, "Default" },
-            { NamespaceConfiguration::NamespaceStrategy::Empty, "Empty" },
-            { NamespaceConfiguration::NamespaceStrategy::FromEntityName, "FromEntityName" },
-            { NamespaceConfiguration::NamespaceStrategy::Custom, "Custom" },
-        };
+    const AZStd::unordered_map<NamespaceConfiguration::NamespaceStrategy, AZStd::string_view> strategyToString = {
+        { NamespaceConfiguration::NamespaceStrategy::Default, "Default" },
+        { NamespaceConfiguration::NamespaceStrategy::Empty, "Empty" },
+        { NamespaceConfiguration::NamespaceStrategy::FromEntityName, "FromEntityName" },
+        { NamespaceConfiguration::NamespaceStrategy::Custom, "Custom" },
+    };
 
     bool HasROS2FrameComponent(AZ::EntityId id)
     {
@@ -88,17 +87,17 @@ namespace ROS2
         AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
         if (!entity)
         {
-            return ;
+            return;
         }
         auto* transformInterface = entity->GetTransform();
         if (!transformInterface)
         {
-            return ;
+            return;
         }
         AZ::EntityId parentId = transformInterface->GetParentId();
         if (!parentId.IsValid())
         {
-            return ;
+            return;
         }
         TraverseTransforms(parentId, predecessors);
     }
@@ -164,117 +163,78 @@ namespace ROS2
 
     AZStd::string ComputeNamespace(const ROS2FrameConfiguration& configuration, AZ::EntityId entity, bool debug)
     {
-        if (configuration.m_namespaceConfiguration.m_namespaceStrategy == NamespaceConfiguration::NamespaceStrategy::Empty)
+        // Compute namespace based on ancestor frames.
+        const AZStd::vector<AZ::EntityId> predecessors = GetAllAncestorTransformBus(entity);
+        const AZStd::vector<AZ::EntityId> predecessorsWithRos2Frame = GetEntitiesWithROS2FrameComponent(predecessors);
+        const auto topLevelParentId = predecessorsWithRos2Frame.empty() ? AZ::EntityId() : predecessorsWithRos2Frame.back();
+        if (debug)
         {
-            return "";
-        }
-
-        // Non-empty and based on user-provided value.
-        if (configuration.m_namespaceConfiguration.m_namespaceStrategy == NamespaceConfiguration::NamespaceStrategy::Custom)
-        {
-            return configuration.m_namespaceConfiguration.m_customNamespace;
-        }
-
-        AZStd::string thisEntityName;
-
-        AZ::ComponentApplicationBus::BroadcastResult(thisEntityName, &AZ::ComponentApplicationRequests::GetEntityName, entity);
-        ROS2NamesRequestBus::BroadcastResult(thisEntityName, &ROS2NamesRequests::RosifyName, thisEntityName);
-
-        // Generate from Entity name, but substitute disallowed characters through RosifyName.
-        if (configuration.m_namespaceConfiguration.m_namespaceStrategy == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
-        {
-            return thisEntityName;
-        }
-
-        // FromEntityName for top-level frames, Empty otherwise.
-        if (configuration.m_namespaceConfiguration.m_namespaceStrategy == NamespaceConfiguration::NamespaceStrategy::Default)
-        {
-            const AZStd::vector<AZ::EntityId> predecessors = GetAllAncestorTransformBus(entity);
-            const AZStd::vector<AZ::EntityId> predecessorsWithRos2Frame = GetEntitiesWithROS2FrameComponent(predecessors);
-            const auto topLevelParentId = predecessorsWithRos2Frame.empty() ? AZ::EntityId() : predecessorsWithRos2Frame.back();
-            if (debug)
+            // AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolving namespace for entity %s", thisEntityName.c_str());
+            for (auto it = predecessors.rbegin(); it != predecessors.rend(); ++it)
             {
-                AZ_Printf("ROS2FrameSystemComponent::GetNamespace", "Resolving namespace for entity %s", thisEntityName.c_str());
-                for (auto it = predecessors.rbegin(); it != predecessors.rend(); ++it)
+                const auto entityId = *it;
+                const auto thisFrameConfig = GetConfigurationFromComponent(entityId);
+                AZStd::string thisStrategyName = "No ROS2FrameComponent";
+                if (thisFrameConfig)
                 {
-                    const auto entityId = *it;
-                    const auto thisFrameConfig = GetConfigurationFromComponent(entityId);
-                    AZStd::string thisStrategyName = "No ROS2FrameComponent";
-                    if (thisFrameConfig)
-                    {
-                        thisStrategyName = strategyToString.at(thisFrameConfig->m_namespaceConfiguration.m_namespaceStrategy);
-                    }
-                    AZ_Printf(
-                        "ROS2FrameSystemComponent::GetNamespace",
-                        " - %s  [%s] %s",
-                        GetName(entityId).c_str(),
-                        thisStrategyName.c_str(),
-                        ((topLevelParentId == entityId) ? " (ros2 root frame)" : ""));
+                    thisStrategyName = strategyToString.at(thisFrameConfig->m_namespaceConfiguration.m_namespaceStrategy);
                 }
-            }
-            if (predecessorsWithRos2Frame.empty())
-            {
-                // No ROS2Frame components in ancestors, so we are top-level.
-                return thisEntityName;
-            }
-
-            const AZStd::string topLevelParentName = GetName(topLevelParentId);
-
-            AZStd::string resolvedName = "";
-            for (auto it = predecessorsWithRos2Frame.rbegin(); it != predecessorsWithRos2Frame.rend(); ++it)
-            {
-                const auto ancestorId = *it;
-                const auto ancestorConfig = GetConfigurationFromComponent(ancestorId);
-                if (!ancestorConfig)
-                {
-                    continue;
-                }
-                const auto ancestorStrategy = ancestorConfig->m_namespaceConfiguration.m_namespaceStrategy;
-                if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
-                {
-                    if (ancestorId == topLevelParentId)
-                    {
-                        resolvedName = GetName(ancestorId);
-                    }
-                    else
-                    {
-                        resolvedName += "/" + GetName(ancestorId);
-                    }
-                }
-                else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Custom)
-                {
-                    if (ancestorId == topLevelParentId)
-                    {
-                        resolvedName = ancestorConfig->m_namespaceConfiguration.m_customNamespace;
-                    }
-                    else
-                    {
-                        resolvedName += "/" + ancestorConfig->m_namespaceConfiguration.m_customNamespace;
-                    }
-                }
-                else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Empty)
-                {
-                    void(); // do nothing
-                }
-                else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Default)
-                {
-                    if (ancestorId == topLevelParentId)
-                    {
-                        resolvedName = GetName(ancestorId);
-                    }
-                }
-            }
-            if (debug)
-            {
                 AZ_Printf(
                     "ROS2FrameSystemComponent::GetNamespace",
-                    "Resolved namespace %s for entity %s",
-                    resolvedName.c_str(),
-                    thisEntityName.c_str());
+                    " - %s  [%s] %s",
+                    GetName(entityId).c_str(),
+                    thisStrategyName.c_str(),
+                    ((topLevelParentId == entityId) ? " (ros2 root frame)" : ""));
             }
-            return resolvedName;
         }
 
-        return "";
+        const AZStd::string topLevelParentName = GetName(topLevelParentId);
+
+        AZStd::string resolvedName = "";
+        for (auto it = predecessorsWithRos2Frame.rbegin(); it != predecessorsWithRos2Frame.rend(); ++it)
+        {
+            const auto ancestorId = *it;
+            const auto ancestorConfig = GetConfigurationFromComponent(ancestorId);
+            if (!ancestorConfig)
+            {
+                continue;
+            }
+            const auto ancestorStrategy = ancestorConfig->m_namespaceConfiguration.m_namespaceStrategy;
+            if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::FromEntityName)
+            {
+                if (ancestorId == topLevelParentId)
+                {
+                    resolvedName = GetName(ancestorId);
+                }
+                else
+                {
+                    resolvedName += "/" + GetName(ancestorId);
+                }
+            }
+            else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Custom)
+            {
+                if (ancestorId == topLevelParentId)
+                {
+                    resolvedName = ancestorConfig->m_namespaceConfiguration.m_customNamespace;
+                }
+                else
+                {
+                    resolvedName += "/" + ancestorConfig->m_namespaceConfiguration.m_customNamespace;
+                }
+            }
+            else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Empty)
+            {
+                void(); // do nothing
+            }
+            else if (ancestorStrategy == NamespaceConfiguration::NamespaceStrategy::Default)
+            {
+                if (ancestorId == topLevelParentId)
+                {
+                    resolvedName = GetName(ancestorId);
+                }
+            }
+        }
+
+        return resolvedName;
     }
 } // namespace ROS2

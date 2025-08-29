@@ -7,33 +7,33 @@
  */
 
 #include "ROS2FrameEditorComponent.h"
+#include "NamespaceComputation.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityBus.h>
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Component/EntityUtils.h>
+#include <AzCore/Component/TransformBus.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
-#include <AzCore/Component/TransformBus.h>
-#include "NamespaceComputation.h"
+
 namespace ROS2
 {
     ROS2FrameEditorComponent::ROS2FrameEditorComponent(const ROS2FrameConfiguration ros2FrameConfiguration)
     {
-
         m_configuration = ros2FrameConfiguration;
     }
 
     void ROS2FrameEditorComponent::Init()
     {
-
     }
 
     void ROS2FrameEditorComponent::Activate()
@@ -62,8 +62,18 @@ namespace ROS2
     AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
     {
         const auto name_space = ComputeNamespace(m_configuration, GetEntityId());
-        //TODO mpelka - get this global frame from set reg
-        return GetNamespacedName(name_space, "odom");
+        // Get odometry frame, from settings registry
+        AZStd::string odometryFrame;
+        auto* registry = AZ::SettingsRegistry::Get();
+        AZ_Error("ROS2FrameComponent", registry, "No settings registry found, using default odometry frame name");
+        if (registry)
+        {
+            if (!registry->Get(odometryFrame, DefaultGlobalFrameNameConfigurationKey))
+            {
+                odometryFrame = DefaultGlobalFrameName;
+            }
+        }
+        return GetNamespacedName(name_space, odometryFrame);
     }
 
     bool ROS2FrameEditorComponent::IsTopLevel() const
@@ -92,7 +102,6 @@ namespace ROS2
 
         AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Event(
             GetEntityId(), &AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Events::OnEntityComponentPropertyChanged, GetId());
-
     }
 
     AZ::Name ROS2FrameEditorComponent::GetNamespacedJointName() const
@@ -136,7 +145,6 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::ValueText, &ROS2FrameEditorComponent::m_effectiveNamespace)
                     ->UIElement(AZ::Edit::UIHandlers::Label, "Full name", "")
                     ->Attribute(AZ::Edit::Attributes::ValueText, &ROS2FrameEditorComponent::m_fullName);
-
             }
         }
     }
@@ -199,6 +207,5 @@ namespace ROS2
         AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
         m_configuration = config;
     }
-
 
 } // namespace ROS2
