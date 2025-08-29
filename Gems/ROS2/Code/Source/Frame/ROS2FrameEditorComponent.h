@@ -11,10 +11,10 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzFramework/Components/TransformComponent.h>
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
+#include <ROS2/Frame/ROS2FrameComponentInterface.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
 #include <ROS2/ROS2TypeIds.h>
-#include <ROS2/Frame/ROS2FrameComponentInterface.h>
 
 namespace ROS2
 {
@@ -30,7 +30,8 @@ namespace ROS2
         , public ROSFrameInterface
     {
     public:
-        AZ_EDITOR_COMPONENT(ROS2FrameEditorComponent, ROS2FrameEditorComponentTypeId, AzToolsFramework::Components::EditorComponentBase, ROSFrameInterface);
+        AZ_EDITOR_COMPONENT(
+            ROS2FrameEditorComponent, ROS2FrameEditorComponentTypeId, AzToolsFramework::Components::EditorComponentBase, ROSFrameInterface);
 
         ROS2FrameEditorComponent() = default;
         ~ROS2FrameEditorComponent() = default;
@@ -46,7 +47,6 @@ namespace ROS2
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
         static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
-
 
         // ROSFrameInterface overrides
         ROS2FrameConfiguration GetConfiguration() const override;

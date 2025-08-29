@@ -19,8 +19,8 @@
 #include <AzCore/std/containers/map.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
-#include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
+#include <ROS2/Frame/ROS2FrameConfiguration.h>
 
 namespace ROS2
 {
@@ -58,8 +58,5 @@ namespace ROS2
         void OnParentChanged(AZ::EntityId oldParent, AZ::EntityId newParent) override;
 
         AZStd::set<AZ::EntityId> m_registeredEntities; //!< Set of all registered frame entities.
-
-
-
     };
 } // namespace ROS2
