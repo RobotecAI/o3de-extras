@@ -7,6 +7,7 @@
  *
  */
 
+#include "Frame/ROS2FrameGameSystemComponent.h"
 #include <AzCore/Asset/AssetManagerComponent.h>
 #include <AzCore/Component/ComponentApplication.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
@@ -26,6 +27,8 @@
 #include <AzToolsFramework/UnitTest/ToolsTestApplication.h>
 #include <Clients/ROS2SystemComponent.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
+#include <ROS2/Frame/ROS2FrameTrackingInterface.h>
 #include <ROS2/ROS2Bus.h>
 
 #include <QApplication>
@@ -53,9 +56,12 @@ namespace UnitTest
     {
         AddActiveGems(AZStd::to_array<AZStd::string_view>({ "ROS2" }));
         AddDynamicModulePaths({});
-        AddComponentDescriptors(AZStd::initializer_list<AZ::ComponentDescriptor*>{ ROS2::ROS2FrameComponent::CreateDescriptor(),
-                                                                                   ROS2::ROS2SystemComponent::CreateDescriptor() });
-        AddRequiredComponents(AZStd::to_array<AZ::TypeId const>({ ROS2::ROS2SystemComponent::TYPEINFO_Uuid() }));
+        AddComponentDescriptors(
+            AZStd::initializer_list<AZ::ComponentDescriptor*>{ ROS2::ROS2FrameComponent::CreateDescriptor(),
+                                                               ROS2::ROS2SystemComponent::CreateDescriptor(),
+                                                               ROS2::ROS2FrameGameSystemComponent::CreateDescriptor() });
+        AddRequiredComponents(AZStd::to_array<AZ::TypeId const>(
+            { ROS2::ROS2SystemComponent::TYPEINFO_Uuid(), ROS2::ROS2FrameGameSystemComponent::TYPEINFO_Uuid() }));
     }
 
     AZ::ComponentApplication* ROS2FrameComponentTestEnvironment::CreateApplicationInstance()
@@ -208,6 +214,234 @@ namespace UnitTest
             entity.Activate();
             EXPECT_STREQ(frame->GetNamespace().c_str(), newRootName.c_str());
         }
+    }
+
+    TEST_F(ROS2FrameComponentFixture, ComponentBusInterface)
+    {
+        ROS2::ROS2FrameConfiguration config;
+        config.m_frameName = "test_frame";
+        config.m_jointName = "test_joint";
+
+        AZ::Entity entity;
+        entity.SetName("test_entity");
+        entity.CreateComponent<AzFramework::TransformComponent>();
+        entity.CreateComponent<ROS2::ROS2FrameComponent>(config);
+
+        entity.Init();
+        entity.Activate();
+
+        // Test component bus interface
+        AZStd::string namespace_result;
+        AZStd::string frameId_result;
+        AZStd::string jointName_result;
+        AZStd::string jointNameRaw_result;
+        AZStd::string frameName_result;
+        AZStd::string globalFrameName_result;
+
+        ROS2::ROS2FrameComponentBus::EventResult(namespace_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetNamespace);
+        ROS2::ROS2FrameComponentBus::EventResult(frameId_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetNamespacedFrameID);
+        ROS2::ROS2FrameComponentBus::EventResult(
+            jointName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetNamespacedJointName);
+        ROS2::ROS2FrameComponentBus::EventResult(jointNameRaw_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetJointName);
+        ROS2::ROS2FrameComponentBus::EventResult(frameName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetFrameName);
+        ROS2::ROS2FrameComponentBus::EventResult(
+            globalFrameName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetGlobalFrameName);
+
+        EXPECT_EQ(namespace_result, "test_entity");
+        EXPECT_EQ(frameId_result, "test_entity/test_frame");
+        EXPECT_EQ(jointName_result, "test_entity/test_joint");
+        EXPECT_EQ(jointNameRaw_result, "test_joint");
+        EXPECT_EQ(frameName_result, "test_frame");
+        EXPECT_EQ(globalFrameName_result, "test_entity/odom"); // Uses default global frame name
+    }
+
+    TEST_F(ROS2FrameComponentFixture, FrameTrackingInterfaceBasic)
+    {
+        auto trackingInterface = ROS2::ROS2FrameTrackingInterface::Get();
+        ASSERT_NE(trackingInterface, nullptr);
+
+        // Initially no frames should be registered
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), 0);
+        EXPECT_TRUE(trackingInterface->GetRegisteredFrames().empty());
+        EXPECT_TRUE(trackingInterface->GetAllNamespacedFrameIds().empty());
+
+        // Create and activate a frame component
+        ROS2::ROS2FrameConfiguration config;
+        config.m_frameName = "tracked_frame";
+
+        AZ::Entity entity;
+        entity.SetName("tracked_entity");
+        entity.CreateComponent<AzFramework::TransformComponent>();
+        entity.CreateComponent<ROS2::ROS2FrameComponent>(config);
+
+        entity.Init();
+        entity.Activate();
+
+        // Frame should now be registered
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), 1);
+        EXPECT_TRUE(trackingInterface->IsFrameRegistered(entity.GetId()));
+        EXPECT_FALSE(trackingInterface->GetRegisteredFrames().empty());
+        EXPECT_EQ(trackingInterface->GetRegisteredFrames().size(), 1);
+        EXPECT_TRUE(trackingInterface->GetRegisteredFrames().contains(entity.GetId()));
+
+        // Check namespaced frame ID lookup
+        auto namespacedFrameId = trackingInterface->GetNamespacedFrameId(entity.GetId());
+        ASSERT_TRUE(namespacedFrameId.has_value());
+        EXPECT_STREQ(namespacedFrameId.value().c_str(), "tracked_entity/tracked_frame");
+
+        auto allFrameIds = trackingInterface->GetAllNamespacedFrameIds();
+        EXPECT_EQ(allFrameIds.size(), 1);
+        EXPECT_TRUE(allFrameIds.contains("tracked_entity/tracked_frame"));
+
+        // Check reverse lookup
+        auto foundEntityId = trackingInterface->GetFrameEntityByNamespacedId("tracked_entity/tracked_frame");
+        ASSERT_TRUE(foundEntityId.has_value());
+        EXPECT_EQ(foundEntityId.value(), entity.GetId());
+
+        // Deactivate entity and check frame is unregistered
+        entity.Deactivate();
+
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), 0);
+        EXPECT_FALSE(trackingInterface->IsFrameRegistered(entity.GetId()));
+        EXPECT_TRUE(trackingInterface->GetRegisteredFrames().empty());
+        EXPECT_TRUE(trackingInterface->GetAllNamespacedFrameIds().empty());
+    }
+
+    TEST_F(ROS2FrameComponentFixture, FrameTrackingInterfaceMultipleFrames)
+    {
+        auto trackingInterface = ROS2::ROS2FrameTrackingInterface::Get();
+        ASSERT_NE(trackingInterface, nullptr);
+
+        // Create multiple frame entities
+        constexpr int numFrames = 3;
+        std::vector<AZStd::unique_ptr<AZ::Entity>> entities;
+        std::vector<AZStd::string> expectedFrameIds;
+
+        for (int i = 0; i < numFrames; ++i)
+        {
+            ROS2::ROS2FrameConfiguration config;
+            config.m_frameName = AZStd::string::format("frame_%d", i);
+
+            auto entity = AZStd::make_unique<AZ::Entity>();
+            entity->SetName(AZStd::string::format("entity_%d", i));
+            entity->CreateComponent<AzFramework::TransformComponent>();
+            entity->CreateComponent<ROS2::ROS2FrameComponent>(config);
+
+            expectedFrameIds.push_back(AZStd::string::format("entity_%d/frame_%d", i, i));
+
+            entity->Init();
+            entity->Activate();
+
+            entities.push_back(AZStd::move(entity));
+        }
+
+        // Check all frames are registered
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), numFrames);
+        EXPECT_EQ(trackingInterface->GetRegisteredFrames().size(), numFrames);
+        EXPECT_EQ(trackingInterface->GetAllNamespacedFrameIds().size(), numFrames);
+
+        // Check each frame individually
+        for (int i = 0; i < numFrames; ++i)
+        {
+            EXPECT_TRUE(trackingInterface->IsFrameRegistered(entities[i]->GetId()));
+
+            auto namespacedFrameId = trackingInterface->GetNamespacedFrameId(entities[i]->GetId());
+            ASSERT_TRUE(namespacedFrameId.has_value());
+            EXPECT_EQ(namespacedFrameId.value(), expectedFrameIds[i]);
+
+            auto foundEntityId = trackingInterface->GetFrameEntityByNamespacedId(expectedFrameIds[i]);
+            ASSERT_TRUE(foundEntityId.has_value());
+            EXPECT_EQ(foundEntityId.value(), entities[i]->GetId());
+        }
+
+        // Deactivate one frame and check tracking updates
+        entities[1]->Deactivate();
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), numFrames - 1);
+        EXPECT_FALSE(trackingInterface->IsFrameRegistered(entities[1]->GetId()));
+        EXPECT_TRUE(trackingInterface->IsFrameRegistered(entities[0]->GetId()));
+        EXPECT_TRUE(trackingInterface->IsFrameRegistered(entities[2]->GetId()));
+
+        // Deactivate remaining frames
+        entities[0]->Deactivate();
+        entities[2]->Deactivate();
+        EXPECT_EQ(trackingInterface->GetRegisteredFrameCount(), 0);
+        EXPECT_TRUE(trackingInterface->GetRegisteredFrames().empty());
+    }
+
+    TEST_F(ROS2FrameComponentFixture, FrameTrackingInterfaceEdgeCases)
+    {
+        auto trackingInterface = ROS2::ROS2FrameTrackingInterface::Get();
+        ASSERT_NE(trackingInterface, nullptr);
+
+        // Test with invalid entity ID
+        AZ::EntityId invalidEntityId;
+        EXPECT_FALSE(trackingInterface->IsFrameRegistered(invalidEntityId));
+
+        auto invalidNamespacedFrameId = trackingInterface->GetNamespacedFrameId(invalidEntityId);
+        EXPECT_FALSE(invalidNamespacedFrameId.has_value());
+
+        // Test lookup with non-existent namespaced frame ID
+        auto invalidEntityLookup = trackingInterface->GetFrameEntityByNamespacedId("non_existent/frame");
+        EXPECT_FALSE(invalidEntityLookup.has_value());
+
+        // Test with entity that doesn't have a frame component
+        AZ::Entity entityWithoutFrame;
+        entityWithoutFrame.CreateComponent<AzFramework::TransformComponent>();
+        entityWithoutFrame.Init();
+        entityWithoutFrame.Activate();
+
+        EXPECT_FALSE(trackingInterface->IsFrameRegistered(entityWithoutFrame.GetId()));
+
+        auto noFrameNamespacedId = trackingInterface->GetNamespacedFrameId(entityWithoutFrame.GetId());
+        EXPECT_FALSE(noFrameNamespacedId.has_value());
+    }
+
+    TEST_F(ROS2FrameComponentFixture, FrameTrackingInterfaceNamespaceChanges)
+    {
+        auto trackingInterface = ROS2::ROS2FrameTrackingInterface::Get();
+        ASSERT_NE(trackingInterface, nullptr);
+
+        ROS2::ROS2FrameConfiguration config;
+        config.m_frameName = "dynamic_frame";
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+        config.m_namespaceConfiguration.m_customNamespace = "initial_namespace";
+
+        AZ::Entity entity;
+        entity.SetName("dynamic_entity");
+        entity.CreateComponent<AzFramework::TransformComponent>();
+        auto frame = entity.CreateComponent<ROS2::ROS2FrameComponent>(config);
+
+        entity.Init();
+        entity.Activate();
+
+        // Check initial registration
+        EXPECT_TRUE(trackingInterface->IsFrameRegistered(entity.GetId()));
+        auto initialFrameId = trackingInterface->GetNamespacedFrameId(entity.GetId());
+        ASSERT_TRUE(initialFrameId.has_value());
+        EXPECT_EQ(initialFrameId.value(), "initial_namespace/dynamic_frame");
+
+        // Change namespace configuration
+        auto newConfig = frame->GetConfiguration();
+        newConfig.m_namespaceConfiguration.m_customNamespace = "updated_namespace";
+
+        entity.Deactivate();
+        frame->SetConfiguration(newConfig);
+        entity.Activate();
+
+        // Check updated registration
+        EXPECT_TRUE(trackingInterface->IsFrameRegistered(entity.GetId()));
+        auto updatedFrameId = trackingInterface->GetNamespacedFrameId(entity.GetId());
+        ASSERT_TRUE(updatedFrameId.has_value());
+        EXPECT_EQ(updatedFrameId.value(), "updated_namespace/dynamic_frame");
+
+        // Old frame ID should not exist anymore
+        auto oldEntityLookup = trackingInterface->GetFrameEntityByNamespacedId("initial_namespace/dynamic_frame");
+        EXPECT_FALSE(oldEntityLookup.has_value());
+
+        // New frame ID should work
+        auto newEntityLookup = trackingInterface->GetFrameEntityByNamespacedId("updated_namespace/dynamic_frame");
+        ASSERT_TRUE(newEntityLookup.has_value());
+        EXPECT_EQ(newEntityLookup.value(), entity.GetId());
     }
 
 } // namespace UnitTest

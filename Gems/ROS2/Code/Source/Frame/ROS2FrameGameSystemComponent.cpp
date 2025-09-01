@@ -63,7 +63,7 @@ namespace ROS2
         m_registeredEntities.insert(frameEntityId);
 
         AZStd::string namespaceFrameId = "";
-        ROS2FrameComponentBus::EventResult(namespaceFrameId, frameEntityId, &ROS2FrameComponentBus::Events::GetNamespace);
+        ROS2FrameComponentBus::EventResult(namespaceFrameId, frameEntityId, &ROS2FrameComponentBus::Events::GetNamespacedFrameID);
         if (!namespaceFrameId.empty())
         {
             m_frameIdToEntityId[namespaceFrameId] = frameEntityId;
