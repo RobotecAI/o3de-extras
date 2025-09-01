@@ -11,6 +11,7 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzFramework/Components/TransformComponent.h>
 #include <AzToolsFramework/ToolsComponents/EditorComponentBase.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameComponentInterface.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
@@ -26,6 +27,7 @@ namespace ROS2
     class ROS2FrameEditorComponent
         : public AzToolsFramework::Components::EditorComponentBase
         , public ROS2FrameEditorComponentBus::Handler
+        , public ROS2FrameComponentBus::Handler
         , public AZ::EntityBus::Handler
         , public ROSFrameInterface
     {
@@ -55,8 +57,10 @@ namespace ROS2
     private:
         // ROS2FrameEditorComponentBus::Handler overrides
         AZStd::string GetNamespacedFrameID() const override;
-        AZ::Name GetNamespacedJointName() const override;
+        AZStd::string GetNamespacedJointName() const override;
         AZStd::string GetNamespace() const override;
+        AZStd::string GetJointName() const override;
+        AZStd::string GetFrameName() const override;
         void UpdateNamespace() override;
         AZStd::string GetGlobalFrameName() const override;
         bool IsTopLevel() const override; //!< True if this entity does not have a parent entity with ROS2.

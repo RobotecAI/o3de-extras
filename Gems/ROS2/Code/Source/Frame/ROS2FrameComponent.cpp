@@ -7,6 +7,7 @@
  */
 
 #include "NamespaceComputation.h"
+#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
@@ -108,6 +109,8 @@ namespace ROS2
             AZ::TickBus::Handler::BusConnect();
         }
 
+        ROS2FrameComponentBus::Handler::BusConnect(GetEntityId());
+
         if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
         {
             frameSystemInterface->RegisterFrame(GetEntityId());
@@ -120,6 +123,8 @@ namespace ROS2
         {
             frameSystemInterface->UnregisterFrame(GetEntityId());
         }
+
+        ROS2FrameComponentBus::Handler::BusDisconnect(GetEntityId());
 
         m_parentFrame.reset();
         m_sourceFrame.reset();
@@ -148,27 +153,8 @@ namespace ROS2
             else
             {
                 m_parentFrame = AZStd::nullopt;
-
-                // Get odometry frame, from settings registry
-                AZStd::string odometryFrame;
-                auto* registry = AZ::SettingsRegistry::Get();
-                AZ_Error("ROS2FrameComponent", registry, "No settings registry found, using default odometry frame name");
-                if (registry)
-                {
-                    if (!registry->Get(odometryFrame, DefaultGlobalFrameNameConfigurationKey))
-                    {
-                        odometryFrame = DefaultGlobalFrameName;
-                    }
-                }
-
-                if (m_computedNamespace.empty())
-                {
-                    m_sourceFrame = odometryFrame;
-                }
-                else
-                {
-                    m_sourceFrame = GetNamespacedName(m_computedNamespace, odometryFrame);
-                }
+                AZStd::string odometryFrame = GetGlobalFrameName();
+                m_sourceFrame = odometryFrame;
             }
         }
 
@@ -298,27 +284,27 @@ namespace ROS2
         AZ::TickBus::Handler::BusDisconnect();
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespace() const
+    AZStd::string ROS2FrameComponent::GetNamespace() const
     {
         return m_computedNamespace;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespacedFrameID() const
+    AZStd::string ROS2FrameComponent::GetNamespacedFrameID() const
     {
         return m_computedFrameName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespacedJointName() const
+    AZStd::string ROS2FrameComponent::GetNamespacedJointName() const
     {
         return m_computedJointName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetJointName() const
+    AZStd::string ROS2FrameComponent::GetJointName() const
     {
         return m_configuration.m_jointName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetFrameName() const
+    AZStd::string ROS2FrameComponent::GetFrameName() const
     {
         return m_configuration.m_frameName;
     }
@@ -335,6 +321,21 @@ namespace ROS2
             AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
         }
         m_configuration = config;
+    }
+
+    AZStd::string ROS2FrameComponent::GetGlobalFrameName() const
+    {
+        AZStd::string odometryFrame;
+        auto* registry = AZ::SettingsRegistry::Get();
+        AZ_Error("ROS2FrameComponent", registry, "No settings registry found, using default odometry frame name");
+        if (registry)
+        {
+            if (!registry->Get(odometryFrame, DefaultGlobalFrameNameConfigurationKey))
+            {
+                odometryFrame = DefaultGlobalFrameName;
+            }
+        }
+        return GetNamespacedName(m_computedNamespace, odometryFrame);
     }
 
 } // namespace ROS2

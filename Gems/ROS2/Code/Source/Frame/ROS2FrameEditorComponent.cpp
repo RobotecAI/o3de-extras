@@ -8,6 +8,7 @@
 
 #include "ROS2FrameEditorComponent.h"
 #include "NamespaceComputation.h"
+#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
@@ -46,11 +47,14 @@ namespace ROS2
             frameSystemInterface->RegisterFrame(GetEntityId());
         }
         UpdateNamespace();
+
+        ROS2FrameComponentBus::Handler::BusConnect(GetEntityId());
     }
 
     void ROS2FrameEditorComponent::Deactivate()
     {
-        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::Deactivate for entity %s", this->GetEntityId().ToString().c_str());
+        ROS2FrameComponentBus::Handler::BusDisconnect();
+
         if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
         {
             frameSystemInterface->UnregisterFrame(GetEntityId());
@@ -106,10 +110,10 @@ namespace ROS2
             GetEntityId(), &AzToolsFramework::PropertyEditorEntityChangeNotificationBus::Events::OnEntityComponentPropertyChanged, GetId());
     }
 
-    AZ::Name ROS2FrameEditorComponent::GetNamespacedJointName() const
+    AZStd::string ROS2FrameEditorComponent::GetNamespacedJointName() const
     {
         auto name_space = ComputeNamespace(m_configuration, GetEntityId());
-        return AZ::Name(GetNamespacedName(name_space, m_configuration.m_jointName));
+        return GetNamespacedName(name_space, m_configuration.m_jointName);
     }
 
     void ROS2FrameEditorComponent::SetJointName(const AZStd::string& jointName)
@@ -208,6 +212,16 @@ namespace ROS2
     {
         AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
         m_configuration = config;
+    }
+
+    AZStd::string ROS2FrameEditorComponent::GetJointName() const
+    {
+        return m_configuration.m_jointName;
+    }
+
+    AZStd::string ROS2FrameEditorComponent::GetFrameName() const
+    {
+        return m_configuration.m_frameName;
     }
 
 } // namespace ROS2

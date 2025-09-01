@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/Json/BaseJsonSerializer.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
@@ -34,6 +35,7 @@ namespace ROS2
     class ROS2FrameComponent
         : public AZ::Component
         , public AZ::TickBus::Handler
+        , public ROS2FrameComponentBus::Handler
         , public ROSFrameInterface
     {
     public:
@@ -62,11 +64,12 @@ namespace ROS2
         //! Note that other won't be notified of the change.
         void EnablePublishingTransform();
 
-        const AZStd::string& GetNamespace() const;
-        const AZStd::string& GetNamespacedFrameID() const;
-        const AZStd::string& GetNamespacedJointName() const;
-        const AZStd::string& GetJointName() const;
-        const AZStd::string& GetFrameName() const;
+        AZStd::string GetNamespace() const override;
+        AZStd::string GetNamespacedFrameID() const override;
+        AZStd::string GetNamespacedJointName() const override;
+        AZStd::string GetJointName() const override;
+        AZStd::string GetFrameName() const override;
+        AZStd::string GetGlobalFrameName() const override;
 
         // ROSFrameInterface overrides
         ROS2FrameConfiguration GetConfiguration() const override;
