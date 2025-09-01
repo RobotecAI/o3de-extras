@@ -7,7 +7,6 @@
  */
 
 #include "NamespaceComputation.h"
-#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
@@ -20,6 +19,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Settings/SettingsRegistry.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>

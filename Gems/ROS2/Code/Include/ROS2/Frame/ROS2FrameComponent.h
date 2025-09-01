@@ -7,12 +7,12 @@
  */
 #pragma once
 
-#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Serialization/Json/BaseJsonSerializer.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzFramework/Components/TransformComponent.h>
 #include <ROS2/Frame/NamespaceConfiguration.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameComponentInterface.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>

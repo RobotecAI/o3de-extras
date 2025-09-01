@@ -8,7 +8,6 @@
 
 #include "ROS2FrameEditorComponent.h"
 #include "NamespaceComputation.h"
-#include "ROS2/Frame/ROS2FrameComponentBus.h"
 #include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/Component/Entity.h>
@@ -22,6 +21,7 @@
 #include <AzCore/Settings/SettingsRegistry.h>
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameEditorComponentBus.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
