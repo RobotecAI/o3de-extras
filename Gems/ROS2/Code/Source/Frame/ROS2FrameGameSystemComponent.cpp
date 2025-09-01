@@ -7,7 +7,9 @@
  */
 
 #include "ROS2FrameGameSystemComponent.h"
+#include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/std/ranges/elements_view.h>
+#include <ROS2/Frame/ROS2FrameComponent.h>
 
 namespace ROS2
 {
@@ -58,14 +60,28 @@ namespace ROS2
     void ROS2FrameGameSystemComponent::RegisterFrame(const AZ::EntityId& frameEntityId)
     {
         m_registeredEntities.insert(frameEntityId);
-        // TODO register frame ID mapping
+
+        // FIXME: Temporary finding of ROS2 Frame Component, this should be done using an EBus
+        AZ::Entity* entity = nullptr;
+        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationBus::Events::FindEntity, frameEntityId);
+        if (entity)
+        {
+            auto* frameComponent = entity->FindComponent<ROS2FrameComponent>();
+            if (frameComponent)
+            {
+                AZStd::string namespacedFrameId = frameComponent->GetNamespacedFrameID();
+                m_entityIdToFrameId[frameEntityId] = namespacedFrameId;
+                m_frameIdToEntityId[namespacedFrameId] = frameEntityId;
+            }
+        }
     }
 
     void ROS2FrameGameSystemComponent::UnregisterFrame(const AZ::EntityId& frameEntityId)
     {
         m_registeredEntities.erase(frameEntityId);
+        AZStd::string namespacedFrameId = m_entityIdToFrameId[frameEntityId];
+        m_frameIdToEntityId.erase(namespacedFrameId);
         m_entityIdToFrameId.erase(frameEntityId);
-        // TODO unregister frame ID mapping
     }
 
     const AZStd::unordered_set<AZ::EntityId>& ROS2FrameGameSystemComponent::GetRegisteredFrames() const

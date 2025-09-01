@@ -7,6 +7,7 @@
  */
 
 #include "NamespaceComputation.h"
+#include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
 #include <AzCore/RTTI/ReflectContext.h>
@@ -106,10 +107,20 @@ namespace ROS2
         {
             AZ::TickBus::Handler::BusConnect();
         }
+
+        if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
+        {
+            frameSystemInterface->RegisterFrame(GetEntityId());
+        }
     }
 
     void ROS2FrameComponent::Deactivate()
     {
+        if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
+        {
+            frameSystemInterface->UnregisterFrame(GetEntityId());
+        }
+
         m_parentFrame.reset();
         m_sourceFrame.reset();
         m_ros2Transform.reset();
