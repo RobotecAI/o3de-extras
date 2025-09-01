@@ -33,7 +33,6 @@ namespace ROS2
         //! unregister using this function during deactivation.
         //! @param frameEntityId entityId containing the frame to unregister.
         virtual void UnregisterFrame(const AZ::EntityId& frameEntityId) = 0;
-
     };
 
     class ROS2FrameSystemBusTraits : public AZ::EBusTraits

@@ -12,6 +12,7 @@
 #include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzFramework/Components/TransformComponent.h>
 #include <ROS2/Frame/NamespaceConfiguration.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameComponentInterface.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/Frame/ROS2Transform.h>
@@ -19,6 +20,12 @@
 
 namespace ROS2
 {
+
+    namespace
+    {
+        inline constexpr const char* DefaultGlobalFrameName = "odom";
+        inline constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
+    } // namespace
 
     //! This component marks an interesting reference frame for ROS2 ecosystem.
     //! It serves as sensor data frame of reference and is responsible, through ROS2Transform, for publishing
@@ -28,6 +35,7 @@ namespace ROS2
     class ROS2FrameComponent
         : public AZ::Component
         , public AZ::TickBus::Handler
+        , public ROS2FrameComponentBus::Handler
         , public ROSFrameInterface
     {
     public:
@@ -56,11 +64,12 @@ namespace ROS2
         //! Note that other won't be notified of the change.
         void EnablePublishingTransform();
 
-        const AZStd::string& GetNamespace() const;
-        const AZStd::string& GetNamespacedFrameID() const;
-        const AZStd::string& GetNamespacedJointName() const;
-        const AZStd::string& GetJointName() const;
-        const AZStd::string& GetFrameName() const;
+        AZStd::string GetNamespace() const override;
+        AZStd::string GetNamespacedFrameID() const override;
+        AZStd::string GetNamespacedJointName() const override;
+        AZStd::string GetJointName() const override;
+        AZStd::string GetFrameName() const override;
+        AZStd::string GetGlobalFrameName() const override;
 
         // ROSFrameInterface overrides
         ROS2FrameConfiguration GetConfiguration() const override;

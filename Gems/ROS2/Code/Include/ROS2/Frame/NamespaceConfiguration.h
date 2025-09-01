@@ -41,11 +41,7 @@ namespace ROS2
         //! Determine if namespace is using the Custom namespace strategy
         bool IsNamespaceCustom() const;
 
-        //! Update the namespace based on the current attributes
-        void UpdateNamespace();
-
         //! Helpers methods for UI
-        AZ::Crc32 OnNamespaceStrategySelected();
         AZ::Outcome<void, AZStd::string> ValidateNamespaceField(void* newValue, const AZ::Uuid& valueType);
     };
 } // namespace ROS2

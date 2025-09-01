@@ -14,12 +14,6 @@
 namespace ROS2
 {
 
-
-    AZ::Crc32 NamespaceConfiguration::OnNamespaceStrategySelected()
-    {
-        return AZ::Edit::PropertyRefreshLevels::EntireTree;
-    }
-
     AZ::Outcome<void, AZStd::string> NamespaceConfiguration::ValidateNamespaceField(void* newValue, const AZ::Uuid& valueType)
     {
         AZ::Outcome<void, AZStd::string> outcome;

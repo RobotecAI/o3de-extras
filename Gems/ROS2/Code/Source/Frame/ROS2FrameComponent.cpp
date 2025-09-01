@@ -7,6 +7,7 @@
  */
 
 #include "NamespaceComputation.h"
+#include "ROS2FrameSystemBus.h"
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityUtils.h>
 #include <AzCore/RTTI/ReflectContext.h>
@@ -16,12 +17,15 @@
 #include <AzCore/Serialization/Json/JsonSerializationResult.h>
 #include <AzCore/Serialization/Json/RegistrationContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Settings/SettingsRegistry.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/ROS2Bus.h>
 #include <ROS2/ROS2NamesBus.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
+
 namespace ROS2
 {
 
@@ -80,11 +84,11 @@ namespace ROS2
                 return true;
             }
             const bool hasJoints =
-                               Internal::HasComponentOfType(entity, AZ::Uuid("{B01FD1D2-1D91-438D-874A-BF5EB7E919A8}")); // PhysX::JointComponent;
-            const bool hasFixedJoints = Internal::HasComponentOfType(
-                entity, AZ::Uuid("{02E6C633-8F44-4CEE-AE94-DCB06DE36422}")); // PhysX::FixedJointComponent
-            const bool hasArticulations = Internal::HasComponentOfType(
-                entity, AZ::Uuid("{48751E98-B35F-4A2F-A908-D9CDD5230264}")); // PhysX::ArticulationComponent
+                Internal::HasComponentOfType(entity, AZ::Uuid("{B01FD1D2-1D91-438D-874A-BF5EB7E919A8}")); // PhysX::JointComponent;
+            const bool hasFixedJoints =
+                Internal::HasComponentOfType(entity, AZ::Uuid("{02E6C633-8F44-4CEE-AE94-DCB06DE36422}")); // PhysX::FixedJointComponent
+            const bool hasArticulations =
+                Internal::HasComponentOfType(entity, AZ::Uuid("{48751E98-B35F-4A2F-A908-D9CDD5230264}")); // PhysX::ArticulationComponent
             return (hasJoints && !hasFixedJoints) || hasArticulations;
         }
 
@@ -92,7 +96,6 @@ namespace ROS2
 
     void ROS2FrameComponent::Init()
     {
-        // m_namespaceConfiguration.Init();
     }
 
     void ROS2FrameComponent::Activate()
@@ -105,10 +108,24 @@ namespace ROS2
         {
             AZ::TickBus::Handler::BusConnect();
         }
+
+        ROS2FrameComponentBus::Handler::BusConnect(GetEntityId());
+
+        if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
+        {
+            frameSystemInterface->RegisterFrame(GetEntityId());
+        }
     }
 
     void ROS2FrameComponent::Deactivate()
     {
+        if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
+        {
+            frameSystemInterface->UnregisterFrame(GetEntityId());
+        }
+
+        ROS2FrameComponentBus::Handler::BusDisconnect(GetEntityId());
+
         m_parentFrame.reset();
         m_sourceFrame.reset();
         m_ros2Transform.reset();
@@ -117,7 +134,7 @@ namespace ROS2
 
     void ROS2FrameComponent::ComputeNamespaceAndFrameName()
     {
-        m_computedNamespace = ComputeNamespace(m_configuration, GetEntityId(), true);
+        m_computedNamespace = ComputeNamespace(m_configuration, GetEntityId());
         m_computedFrameName = GetNamespacedName(m_computedNamespace, m_configuration.m_frameName);
         m_computedJointName = GetNamespacedName(m_computedNamespace, m_configuration.m_jointName);
     }
@@ -136,16 +153,8 @@ namespace ROS2
             else
             {
                 m_parentFrame = AZStd::nullopt;
-                // TODO (mpelka) get this global frame from set reg
-                constexpr char odometryFrame[] = "odom";
-                if (m_computedNamespace.empty())
-                {
-                    m_sourceFrame = odometryFrame;
-                }
-                else
-                {
-                    m_sourceFrame = GetNamespacedName(m_computedNamespace, odometryFrame);
-                }
+                AZStd::string odometryFrame = GetGlobalFrameName();
+                m_sourceFrame = odometryFrame;
             }
         }
 
@@ -159,8 +168,13 @@ namespace ROS2
         if (m_ros2Transform == nullptr && m_sourceFrame.has_value())
         {
             const bool isTopLevel = !m_parentFrame.has_value();
-            const bool dynamic = m_configuration.m_forceDynamic || Internal::IsDynamicHeuristic(isTopLevel, GetEntity()) ;
-            AZ_Printf("m_ros2Transform", "publishing transform from %s to %s, type %s", m_sourceFrame->c_str(), GetNamespacedFrameID().c_str(), dynamic? "dynamic":"static" );
+            const bool dynamic = m_configuration.m_forceDynamic || Internal::IsDynamicHeuristic(isTopLevel, GetEntity());
+            AZ_Printf(
+                "m_ros2Transform",
+                "publishing transform from %s to %s, type %s",
+                m_sourceFrame->c_str(),
+                GetNamespacedFrameID().c_str(),
+                dynamic ? "dynamic" : "static");
 
             m_ros2Transform = AZStd::make_unique<ROS2Transform>(*m_sourceFrame, GetNamespacedFrameID(), dynamic);
             m_ros2Transform->Publish(GetFrameTransform());
@@ -240,7 +254,7 @@ namespace ROS2
         required.push_back(AZ_CRC_CE("TransformService"));
     }
 
-    ROS2FrameComponent::ROS2FrameComponent() {};
+    ROS2FrameComponent::ROS2FrameComponent(){};
 
     ROS2FrameComponent::ROS2FrameComponent(const ROS2FrameConfiguration& ros2FrameConfiguration)
         : m_configuration(ros2FrameConfiguration)
@@ -270,27 +284,27 @@ namespace ROS2
         AZ::TickBus::Handler::BusDisconnect();
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespace() const
+    AZStd::string ROS2FrameComponent::GetNamespace() const
     {
         return m_computedNamespace;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespacedFrameID() const
+    AZStd::string ROS2FrameComponent::GetNamespacedFrameID() const
     {
         return m_computedFrameName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetNamespacedJointName() const
+    AZStd::string ROS2FrameComponent::GetNamespacedJointName() const
     {
         return m_computedJointName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetJointName() const
+    AZStd::string ROS2FrameComponent::GetJointName() const
     {
         return m_configuration.m_jointName;
     }
 
-    const AZStd::string& ROS2FrameComponent::GetFrameName() const
+    AZStd::string ROS2FrameComponent::GetFrameName() const
     {
         return m_configuration.m_frameName;
     }
@@ -307,6 +321,21 @@ namespace ROS2
             AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
         }
         m_configuration = config;
+    }
+
+    AZStd::string ROS2FrameComponent::GetGlobalFrameName() const
+    {
+        AZStd::string odometryFrame;
+        auto* registry = AZ::SettingsRegistry::Get();
+        AZ_Error("ROS2FrameComponent", registry, "No settings registry found, using default odometry frame name");
+        if (registry)
+        {
+            if (!registry->Get(odometryFrame, DefaultGlobalFrameNameConfigurationKey))
+            {
+                odometryFrame = DefaultGlobalFrameName;
+            }
+        }
+        return GetNamespacedName(m_computedNamespace, odometryFrame);
     }
 
 } // namespace ROS2
