@@ -10,6 +10,7 @@
 #include <AzCore/Component/ComponentApplicationBus.h>
 #include <AzCore/std/ranges/elements_view.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
+#include <ROS2/Frame/ROS2FrameComponentBus.h>
 
 namespace ROS2
 {
@@ -61,18 +62,12 @@ namespace ROS2
     {
         m_registeredEntities.insert(frameEntityId);
 
-        // FIXME: Temporary finding of ROS2 Frame Component, this should be done using an EBus
-        AZ::Entity* entity = nullptr;
-        AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationBus::Events::FindEntity, frameEntityId);
-        if (entity)
+        AZStd::string namespaceFrameId = "";
+        ROS2FrameComponentBus::EventResult(namespaceFrameId, frameEntityId, &ROS2FrameComponentBus::Events::GetNamespace);
+        if (!namespaceFrameId.empty())
         {
-            auto* frameComponent = entity->FindComponent<ROS2FrameComponent>();
-            if (frameComponent)
-            {
-                AZStd::string namespacedFrameId = frameComponent->GetNamespacedFrameID();
-                m_entityIdToFrameId[frameEntityId] = namespacedFrameId;
-                m_frameIdToEntityId[namespacedFrameId] = frameEntityId;
-            }
+            m_frameIdToEntityId[namespaceFrameId] = frameEntityId;
+            m_entityIdToFrameId[frameEntityId] = namespaceFrameId;
         }
     }
 
