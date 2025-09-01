@@ -40,7 +40,9 @@ namespace ROS2
     inline constexpr const char* NamespaceConfigurationTypeId = "{5E5BC6EA-DD01-480E-A4D1-6857CF70FDC8}";
     inline constexpr const char* ROS2FrameComponentTypeId = "{AC74CBC1-A5DC-4014-85D7-0E7934F352BD}";
     inline constexpr const char* ROS2FrameConfigurationTypeId = "{04882F01-5451-4EFA-B4F8-CD57E4B6CADF}";
+    inline constexpr const char* ROS2FrameGameSystemComponentTypeId = "{76644841-EA20-40F8-A3F5-40F41A386C30}";
     inline constexpr const char* ROS2FrameEditorComponentTypeId = "{F76D6F29-73C3-40B2-BCC2-47FC824C25DF}";
+    inline constexpr const char* ROS2FrameTrackingInterfaceTypeId = "{6B262459-BA1B-4C6C-A9FF-C21D2841CCC1}";
 
     // Sensors Interface TypeIds
     inline constexpr const char* SensorConfigurationTypeId = "{4755363D-0B5A-42D7-BBEF-152D87BA10D7}";

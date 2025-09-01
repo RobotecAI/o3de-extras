@@ -27,19 +27,8 @@ namespace ROS2
 {
 
     ROS2FrameEditorSystemComponent::ROS2FrameEditorSystemComponent()
+        : ROS2FrameGameSystemComponent()
     {
-        if (ROS2FrameSystemInterface::Get() == nullptr)
-        {
-            ROS2FrameSystemInterface::Register(this);
-        }
-    }
-
-    ROS2FrameEditorSystemComponent::~ROS2FrameEditorSystemComponent()
-    {
-        if (ROS2FrameSystemInterface::Get() == this)
-        {
-            ROS2FrameSystemInterface::Unregister(this);
-        }
     }
 
     void ROS2FrameEditorSystemComponent::Reflect(AZ::ReflectContext* context)
@@ -53,7 +42,7 @@ namespace ROS2
 
     void ROS2FrameEditorSystemComponent::Activate()
     {
-        AZ_Printf("ROS2FrameSystemComponent", "Activating ROS2FrameSystemComponent");
+        ROS2FrameGameSystemComponent::Activate();
     }
 
     void ROS2FrameEditorSystemComponent::Deactivate()
@@ -63,12 +52,14 @@ namespace ROS2
             AZ::TransformNotificationBus::MultiHandler::BusDisconnect(id);
             AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusDisconnect(id);
         }
-        m_registeredEntities.clear();
+
+        ROS2FrameGameSystemComponent::Deactivate();
     }
 
     void ROS2FrameEditorSystemComponent::RegisterFrame(const AZ::EntityId& frameToRegister)
     {
-        m_registeredEntities.insert(frameToRegister);
+        ROS2FrameGameSystemComponent::RegisterFrame(frameToRegister);
+
         AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusConnect(frameToRegister);
         AZ::TransformNotificationBus::MultiHandler::BusConnect(frameToRegister);
     }
@@ -77,7 +68,8 @@ namespace ROS2
     {
         AZ::TransformNotificationBus::MultiHandler::BusDisconnect(frameToUnregister);
         AzToolsFramework::EntitySelectionEvents::Bus::MultiHandler::BusDisconnect(frameToUnregister);
-        m_registeredEntities.erase(frameToUnregister);
+
+        ROS2FrameGameSystemComponent::UnregisterFrame(frameToUnregister);
     }
 
     void ROS2FrameEditorSystemComponent::OnSelected()

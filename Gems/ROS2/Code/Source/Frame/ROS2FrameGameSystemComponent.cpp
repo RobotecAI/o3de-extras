@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
+
+#include "ROS2FrameGameSystemComponent.h"
+#include <AzCore/std/ranges/elements_view.h>
+
+namespace ROS2
+{
+
+    ROS2FrameGameSystemComponent::ROS2FrameGameSystemComponent()
+    {
+        if (ROS2FrameSystemInterface::Get() == nullptr)
+        {
+            ROS2FrameSystemInterface::Register(this);
+        }
+        if (ROS2FrameTrackingInterface::Get() == nullptr)
+        {
+            ROS2FrameTrackingInterface::Register(this);
+        }
+    }
+
+    ROS2FrameGameSystemComponent::~ROS2FrameGameSystemComponent()
+    {
+        if (ROS2FrameSystemInterface::Get() == this)
+        {
+            ROS2FrameSystemInterface::Unregister(this);
+        }
+        if (ROS2FrameTrackingInterface::Get() == this)
+        {
+            ROS2FrameTrackingInterface::Unregister(this);
+        }
+    }
+
+    void ROS2FrameGameSystemComponent::Reflect(AZ::ReflectContext* context)
+    {
+        if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
+        {
+            serialize->Class<ROS2FrameGameSystemComponent, AZ::Component>()->Version(1);
+        }
+    }
+
+    void ROS2FrameGameSystemComponent::Activate()
+    {
+    }
+
+    void ROS2FrameGameSystemComponent::Deactivate()
+    {
+        m_registeredEntities.clear();
+        m_entityIdToFrameId.clear();
+        m_frameIdToEntityId.clear();
+    }
+
+    void ROS2FrameGameSystemComponent::RegisterFrame(const AZ::EntityId& frameEntityId)
+    {
+        m_registeredEntities.insert(frameEntityId);
+        // TODO register frame ID mapping
+    }
+
+    void ROS2FrameGameSystemComponent::UnregisterFrame(const AZ::EntityId& frameEntityId)
+    {
+        m_registeredEntities.erase(frameEntityId);
+        m_entityIdToFrameId.erase(frameEntityId);
+        // TODO unregister frame ID mapping
+    }
+
+    const AZStd::unordered_set<AZ::EntityId>& ROS2FrameGameSystemComponent::GetRegisteredFrames() const
+    {
+        return m_registeredEntities;
+    }
+
+    bool ROS2FrameGameSystemComponent::IsFrameRegistered(const AZ::EntityId& frameEntityId) const
+    {
+        return m_registeredEntities.find(frameEntityId) != m_registeredEntities.end();
+    }
+
+    size_t ROS2FrameGameSystemComponent::GetRegisteredFrameCount() const
+    {
+        return m_registeredEntities.size();
+    }
+
+    AZStd::optional<AZ::EntityId> ROS2FrameGameSystemComponent::GetFrameEntityByNamespacedId(const AZStd::string& namespacedFrameId) const
+    {
+        auto it = m_frameIdToEntityId.find(namespacedFrameId);
+        return (it != m_frameIdToEntityId.end()) ? AZStd::optional<AZ::EntityId>(it->second) : AZStd::nullopt;
+    }
+
+    AZStd::optional<AZStd::string> ROS2FrameGameSystemComponent::GetNamespacedFrameId(const AZ::EntityId& frameEntityId) const
+    {
+        auto it = m_entityIdToFrameId.find(frameEntityId);
+        return (it != m_entityIdToFrameId.end()) ? AZStd::optional<AZStd::string>(it->second) : AZStd::nullopt;
+    }
+
+    AZStd::unordered_set<AZStd::string> ROS2FrameGameSystemComponent::GetAllNamespacedFrameIds() const
+    {
+        AZStd::unordered_set<AZStd::string> frameIds;
+        AZStd::ranges::transform(
+            m_entityIdToFrameId | AZStd::views::values,
+            AZStd::inserter(frameIds, frameIds.end()),
+            [](const auto& frameId)
+            {
+                return frameId;
+            });
+
+        return frameIds;
+    }
+
+} // namespace ROS2
