@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Contributors to the Open 3D Engine Project.
+ * Copyright (c) Contributors to the Open 3D Engine Project.
  * For complete copyright and license terms please see the LICENSE at the root of this distribution.
  *
  * SPDX-License-Identifier: Apache-2.0 OR MIT
@@ -12,6 +12,7 @@
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
+
 namespace ROS2
 {
     //! This method computes the namespace for a given entity based on the provided configuration.
@@ -37,9 +38,9 @@ namespace ROS2
     AZStd::vector<AZ::EntityId> GetEntitiesWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
     //! Returns the oldest ancestor entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
-    AZ::EntityId GetFirstEntityWithROS2FrameComponent (const AZStd::vector<AZ::EntityId>& predecessors);
+    AZ::EntityId GetFirstEntityWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
     //! Returns the oldest ancestor entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
-    AZ::EntityId GetLastEntityWithROS2FrameComponent (const AZStd::vector<AZ::EntityId>& predecessors);
+    AZ::EntityId GetLastEntityWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
-}
+} // namespace ROS2

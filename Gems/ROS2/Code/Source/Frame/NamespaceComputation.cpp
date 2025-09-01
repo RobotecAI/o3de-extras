@@ -8,9 +8,9 @@
 
 #include "NamespaceComputation.h"
 
-#include "AzCore/Component/ComponentApplicationBus.h"
-#include "AzCore/Component/Entity.h"
-#include "AzCore/Component/TransformBus.h"
+#include <AzCore/Component/ComponentApplicationBus.h>
+#include <AzCore/Component/Entity.h>
+#include <AzCore/Component/TransformBus.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2/Frame/ROS2FrameConfiguration.h>
 #include <ROS2/ROS2NamesBus.h>

@@ -5,15 +5,16 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+
 #pragma once
 
-#include "AzCore/Component/TickBus.h"
+#include "ROS2FrameGameSystemComponent.h"
 #include "ROS2FrameSystemBus.h"
 
-#include "ROS2FrameGameSystemComponent.h"
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Component/EntityId.h>
+#include <AzCore/Component/TickBus.h>
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/RTTI/RTTIMacros.h>
