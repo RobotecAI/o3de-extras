@@ -31,7 +31,7 @@ namespace ROS2
         AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
         if (!entity)
         {
-            return ROS2FrameConfiguration();
+            return AZStd::nullopt;
         }
         const auto* componentEditor = entity->FindComponent(AZ::Uuid(ROS2FrameEditorComponentTypeId));
         if (componentEditor)
