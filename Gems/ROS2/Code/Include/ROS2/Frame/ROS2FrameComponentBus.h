@@ -46,8 +46,10 @@ namespace ROS2
         virtual AZStd::string GetFrameName() const = 0;
 
         //! Global frame name in ros2 ecosystem.
-        //! @return The name of the global frame with namespace attached. It is typically "odom", "map", "world".
-        virtual AZStd::string GetGlobalFrameName() const = 0;
+        //! It is configurable through Settings Registry at /O3DE/ROS2/GlobalFrameName
+        //! If not configured, it defaults to "odom".
+        //! It is typically "odom", "map", "world".
+        virtual AZStd::string GetGlobalFrameID() const = 0;
     };
 
     using ROS2FrameComponentBus = AZ::EBus<ROS2FrameComponentRequests>;

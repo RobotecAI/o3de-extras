@@ -44,10 +44,8 @@ namespace ROS2
                         "Publish Transform",
                         "Publish Transform")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &ROS2FrameConfiguration::m_forceDynamic, "Force Dynamic", "Force Dynamic");
-
             }
         }
     }
-
 
 } // namespace ROS2

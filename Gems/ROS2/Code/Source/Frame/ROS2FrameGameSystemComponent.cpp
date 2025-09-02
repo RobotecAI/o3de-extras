@@ -86,7 +86,7 @@ namespace ROS2
 
     bool ROS2FrameGameSystemComponent::IsFrameRegistered(const AZ::EntityId& frameEntityId) const
     {
-        return m_registeredEntities.find(frameEntityId) != m_registeredEntities.end();
+        return m_registeredEntities.contains(frameEntityId);
     }
 
     size_t ROS2FrameGameSystemComponent::GetRegisteredFrameCount() const
@@ -108,15 +108,8 @@ namespace ROS2
 
     AZStd::unordered_set<AZStd::string> ROS2FrameGameSystemComponent::GetAllNamespacedFrameIds() const
     {
-        AZStd::unordered_set<AZStd::string> frameIds;
-        AZStd::ranges::transform(
-            m_entityIdToFrameId | AZStd::views::values,
-            AZStd::inserter(frameIds, frameIds.end()),
-            [](const auto& frameId)
-            {
-                return frameId;
-            });
-
+        const auto valueView = AZStd::ranges::views::values(m_entityIdToFrameId);
+        AZStd::unordered_set<AZStd::string> frameIds{ valueView.begin(), valueView.end() };
         return frameIds;
     }
 

@@ -62,7 +62,7 @@ namespace ROS2
         ROS2FrameEditorComponentBus::Handler::BusDisconnect();
     }
 
-    AZStd::string ROS2FrameEditorComponent::GetGlobalFrameName() const
+    AZStd::string ROS2FrameEditorComponent::GetGlobalFrameID() const
     {
         // Get odometry frame, from settings registry
         AZStd::string odometryFrame;

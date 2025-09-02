@@ -24,7 +24,7 @@ namespace ROS2
     namespace
     {
         inline constexpr const char* DefaultGlobalFrameName = "odom";
-        inline constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/DefaultGlobalFrameName";
+        inline constexpr const char* DefaultGlobalFrameNameConfigurationKey = "/O3DE/ROS2/GlobalFrameName";
     } // namespace
 
     //! This component marks an interesting reference frame for ROS2 ecosystem.
@@ -69,7 +69,7 @@ namespace ROS2
         AZStd::string GetNamespacedJointName() const override;
         AZStd::string GetJointName() const override;
         AZStd::string GetFrameName() const override;
-        AZStd::string GetGlobalFrameName() const override;
+        AZStd::string GetGlobalFrameID() const override;
 
         // ROSFrameInterface overrides
         ROS2FrameConfiguration GetConfiguration() const override;

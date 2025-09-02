@@ -40,12 +40,12 @@ namespace ROS2
 
         //! Get the entity ID for a frame with the given namespaced frame ID.
         //! @param namespacedFrameId The namespaced frame ID to search for
-        //! @return EntityId of the frame, or invalid EntityId if not found
+        //! @return EntityId of the frame, or nullopt if not found
         virtual AZStd::optional<AZ::EntityId> GetFrameEntityByNamespacedId(const AZStd::string& namespacedFrameId) const = 0;
 
         //! Get the namespaced frame ID for a given entity.
         //! @param frameEntityId The EntityId to get the namespaced frame ID for
-        //! @return The namespaced frame ID, or empty string if not found
+        //! @return The namespaced frame ID, or nullopt if not found
         virtual AZStd::optional<AZStd::string> GetNamespacedFrameId(const AZ::EntityId& frameEntityId) const = 0;
 
         //! Get all namespaced frame IDs currently tracked.

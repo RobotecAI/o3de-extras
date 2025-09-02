@@ -165,8 +165,8 @@ namespace UnitTest
     {
         ROS2::ROS2FrameConfiguration config;
 
-        std::vector<AZStd::unique_ptr<AZ::Entity>> entities;
-        std::vector<const ROS2::ROS2FrameComponent*> frames;
+        AZStd::vector<AZStd::unique_ptr<AZ::Entity>> entities;
+        AZStd::vector<const ROS2::ROS2FrameComponent*> frames;
 
         constexpr int numOfEntities = 3;
 
@@ -307,7 +307,7 @@ namespace UnitTest
         ROS2::ROS2FrameComponentBus::EventResult(jointNameRaw_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetJointName);
         ROS2::ROS2FrameComponentBus::EventResult(frameName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetFrameName);
         ROS2::ROS2FrameComponentBus::EventResult(
-            globalFrameName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetGlobalFrameName);
+            globalFrameName_result, entity.GetId(), &ROS2::ROS2FrameComponentRequests::GetGlobalFrameID);
 
         EXPECT_EQ(namespace_result, "test_entity");
         EXPECT_EQ(frameId_result, "test_entity/test_frame");

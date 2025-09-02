@@ -40,10 +40,10 @@ namespace ROS2
     //! @note to be used in Game and Editor contexts
     AZStd::vector<AZ::EntityId> GetEntitiesWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
-    //! Returns the oldest ancestor entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
+    //! Returns the first entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
     AZ::EntityId GetFirstEntityWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
-    //! Returns the oldest ancestor entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
+    //! Returns the last entity that has a ROS2FrameComponent or ROS2FrameEditorComponent.
     AZ::EntityId GetLastEntityWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors);
 
 } // namespace ROS2

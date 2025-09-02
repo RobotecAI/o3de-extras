@@ -81,11 +81,13 @@ namespace ROS2
             predecessors.push_back(id);
             AZ::Entity* entity = nullptr;
             AZ::ComponentApplicationBus::BroadcastResult(entity, &AZ::ComponentApplicationRequests::FindEntity, id);
+            AZ_Assert(entity, "No entity for id : %s", id.ToString().c_str());
             if (!entity)
             {
                 return;
             }
             auto* transformInterface = entity->GetTransform();
+            AZ_Assert(transformInterface, "No transform for id : %s", id.ToString().c_str());
             if (!transformInterface)
             {
                 return;
@@ -153,7 +155,7 @@ namespace ROS2
                 return *it;
             }
         }
-        return AZ::EntityId();
+        return AZ::EntityId(AZ::EntityId::InvalidEntityId);
     }
 
     AZ::EntityId GetLastEntityWithROS2FrameComponent(const AZStd::vector<AZ::EntityId>& predecessors)
@@ -165,7 +167,7 @@ namespace ROS2
                 return *it;
             }
         }
-        return AZ::EntityId();
+        return AZ::EntityId(AZ::EntityId::InvalidEntityId);
     }
 
     AZStd::string GetNamespacedName(const AZStd::string& namespaceName, const AZStd::string& name)

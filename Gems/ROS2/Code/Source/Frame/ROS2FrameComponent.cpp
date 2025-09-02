@@ -153,8 +153,11 @@ namespace ROS2
             else
             {
                 m_parentFrame = AZStd::nullopt;
-                AZStd::string odometryFrame = GetGlobalFrameName();
-                m_sourceFrame = odometryFrame;
+                AZStd::string odometryFrame = GetGlobalFrameID();
+                if (!odometryFrame.empty())
+                {
+                    m_sourceFrame = odometryFrame;
+                }
             }
         }
 
@@ -185,7 +188,10 @@ namespace ROS2
                 return;
             }
         }
-        m_ros2Transform->Publish(GetFrameTransform());
+        if (m_ros2Transform)
+        {
+            m_ros2Transform->Publish(GetFrameTransform());
+        }
     }
 
     const ROS2FrameComponent* ROS2FrameComponent::GetParentROS2FrameComponent() const
@@ -330,7 +336,7 @@ namespace ROS2
         m_configuration = config;
     }
 
-    AZStd::string ROS2FrameComponent::GetGlobalFrameName() const
+    AZStd::string ROS2FrameComponent::GetGlobalFrameID() const
     {
         AZStd::string odometryFrame;
         auto* registry = AZ::SettingsRegistry::Get();
@@ -341,6 +347,10 @@ namespace ROS2
             {
                 odometryFrame = DefaultGlobalFrameName;
             }
+        }
+        if (odometryFrame.empty())
+        {
+            return "";
         }
         return GetNamespacedName(m_computedNamespace, odometryFrame);
     }
