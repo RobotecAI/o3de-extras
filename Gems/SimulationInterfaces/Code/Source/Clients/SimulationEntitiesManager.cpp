@@ -752,6 +752,15 @@ namespace SimulationInterfaces
         m_spawnedTickets[ticketId] = ticket;
     }
 
+    AZ::EntityId SimulationEntitiesManager::GetEntityIdByName(const AZStd::string& name)
+    {
+        if (auto findIt = m_simulatedEntityToEntityIdMap.find(name); findIt != m_simulatedEntityToEntityIdMap.end())
+        {
+            return findIt->second;
+        }
+        return AZ::EntityId{ AZ::EntityId::InvalidEntityId };
+    }
+
     AZStd::string SimulationEntitiesManager::GetSimulatedEntityName(AZ::EntityId entityId, const AZStd::string& proposedName) const
     {
         // Get O3DE entity name

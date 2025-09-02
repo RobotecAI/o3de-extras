@@ -34,5 +34,6 @@ namespace UnitTest
                 const AZ::Transform& initialPose,
                 const bool allowRename,
                 SpawnCompletedCb completedCb));
+        MOCK_METHOD1(GetEntityIdByName,AZ::EntityId(const AZStd::string& name));
     };
 } // namespace UnitTest

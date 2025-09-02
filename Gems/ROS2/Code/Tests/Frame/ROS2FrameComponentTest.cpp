@@ -30,7 +30,7 @@
 #include <ROS2/Frame/ROS2FrameComponentBus.h>
 #include <ROS2/Frame/ROS2FrameTrackingInterface.h>
 #include <ROS2/ROS2Bus.h>
-
+#include "Frame/NamespaceComputation.h"
 #include <QApplication>
 #include <gtest/gtest.h>
 #include <memory>
@@ -78,6 +78,68 @@ namespace UnitTest
     class ROS2FrameComponentFixture : public ::testing::Test
     {
     };
+
+    // Simple test, default configuration, no hierarchy, no namespace change
+    TEST_F(ROS2FrameComponentFixture, TestNamespaceResolvementDefault)
+    {
+        AZStd::vector<AZStd::pair<AZStd::string, ROS2::ROS2FrameConfiguration>> configurations;
+        ROS2::ROS2FrameConfiguration config;
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+        configurations.emplace_back("root", config);
+        const auto namespaceName = ROS2::ComputeNamespace(configurations);
+        EXPECT_STREQ(namespaceName.c_str(), "root");
+    }
+
+    TEST_F(ROS2FrameComponentFixture, TestNamespaceResolvementCustom)
+    {
+        AZStd::vector<AZStd::pair<AZStd::string, ROS2::ROS2FrameConfiguration>> configurations;
+        ROS2::ROS2FrameConfiguration config;
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+        config.m_namespaceConfiguration.m_customNamespace = "foo";
+        configurations.emplace_back("root", config);
+        const auto namespaceName = ROS2::ComputeNamespace(configurations);
+        EXPECT_STREQ(namespaceName.c_str(), "foo");
+    }
+
+    TEST_F(ROS2FrameComponentFixture, TestNamespaceResolvementHierachy1)
+    {
+        AZStd::vector<AZStd::pair<AZStd::string, ROS2::ROS2FrameConfiguration>> configurations;
+        ROS2::ROS2FrameConfiguration config;
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+        configurations.emplace_back("child1", config);
+        configurations.emplace_back("root", config);
+        const auto namespaceName = ROS2::ComputeNamespace(configurations);
+        EXPECT_STREQ(namespaceName.c_str(), "root");
+    }
+
+    TEST_F(ROS2FrameComponentFixture, TestNamespaceResolvementHierachy2)
+    {
+        AZStd::vector<AZStd::pair<AZStd::string, ROS2::ROS2FrameConfiguration>> configurations;
+        ROS2::ROS2FrameConfiguration config;
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+        config.m_namespaceConfiguration.m_customNamespace = "foo";
+        configurations.emplace_back("child1", config);
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+        configurations.emplace_back("root", config);
+        const auto namespaceName = ROS2::ComputeNamespace(configurations);
+        EXPECT_STREQ(namespaceName.c_str(), "root/foo");
+    }
+
+    TEST_F(ROS2FrameComponentFixture, TestNamespaceResolvementHierachy4)
+    {
+        AZStd::vector<AZStd::pair<AZStd::string, ROS2::ROS2FrameConfiguration>> configurations;
+        ROS2::ROS2FrameConfiguration config;
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+        config.m_namespaceConfiguration.m_customNamespace = "bar";
+        configurations.emplace_back("child2", config);
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Custom;
+        config.m_namespaceConfiguration.m_customNamespace = "foo";
+        configurations.emplace_back("child1", config);
+        config.m_namespaceConfiguration.m_namespaceStrategy = ROS2::NamespaceConfiguration::NamespaceStrategy::Default;
+        configurations.emplace_back("root", config);
+        const auto namespaceName = ROS2::ComputeNamespace(configurations);
+        EXPECT_STREQ(namespaceName.c_str(), "root/foo/bar");
+    }
 
     TEST_F(ROS2FrameComponentFixture, SingleFrameDefault)
     {

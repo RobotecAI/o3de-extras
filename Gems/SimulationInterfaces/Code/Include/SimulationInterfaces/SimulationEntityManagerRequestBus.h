@@ -106,6 +106,10 @@ namespace SimulationInterfaces
         //! Reset the simulation to begin.
         //! This will revert the entire simulation to the initial state.
         virtual void ResetAllEntitiesToInitialState() = 0;
+
+        //! Get the entity id by its name
+        //! @return valid entity id if entity with the given name exists, invalid entity id otherwise
+        virtual AZ::EntityId GetEntityIdByName(const AZStd::string& name) = 0;
     };
 
     class SimulationInterfacesBusTraits : public AZ::EBusTraits

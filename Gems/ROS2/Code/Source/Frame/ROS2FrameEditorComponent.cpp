@@ -39,7 +39,6 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::Activate()
     {
-        AZ_Printf("BuildGameEntity", "ROS2FrameEditorComponent::Activate for entity %s", this->GetEntityId().ToString().c_str());
         ROS2FrameEditorComponentBus::Handler::BusConnect(GetEntityId());
         AZ::EntityBus::Handler::BusConnect(GetEntityId());
         if (auto* frameSystemInterface = ROS2FrameSystemInterface::Get())
@@ -101,8 +100,6 @@ namespace ROS2
 
     void ROS2FrameEditorComponent::UpdateNamespace()
     {
-        AZ_Printf("ROS2FrameEditorComponent", "Updating namespace for entity %s", GetEntity()->GetName().c_str());
-
         m_effectiveNamespace = ComputeNamespace(m_configuration, GetEntityId());
         m_fullName = GetNamespacedName(m_effectiveNamespace, m_configuration.m_frameName);
 

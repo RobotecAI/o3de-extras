@@ -14,15 +14,18 @@ namespace UnitTest
 {
     void SimulationInterfaceTestEnvironment::AddGemsAndComponents()
     {
-        constexpr AZStd::array<AZStd::string_view, 3> requiredGems = { "PhysX5", // required for PhysX Dynamic
+        constexpr AZStd::array<AZStd::string_view, 4> requiredGems = { "PhysX5", // required for PhysX Dynamic
                                                                        "LmbrCentral", // for shapes
+                                                                       "ROS2", // For frame component
                                                                        "SimulationInterfaces" };
         AddActiveGems(requiredGems);
         AddDynamicModulePaths({ "PhysX5.Gem" });
         AddDynamicModulePaths({ "LmbrCentral" });
-        AddComponentDescriptors({
-            SimulationInterfaces::SimulationEntitiesManager::CreateDescriptor(),
-        });
+        AddDynamicModulePaths({ "ROS2" });
+        AddComponentDescriptors(
+            {
+                SimulationInterfaces::SimulationEntitiesManager::CreateDescriptor(),
+            });
         AddRequiredComponents({ SimulationInterfaces::SimulationEntitiesManager::TYPEINFO_Uuid() });
     }
 

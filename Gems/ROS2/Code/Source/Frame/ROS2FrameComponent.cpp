@@ -320,6 +320,13 @@ namespace ROS2
         {
             AZ_Assert(GetEntity()->GetState() != AZ::Entity::State::Active, "API can be called only for disabled components");
         }
+        if (!config.m_namespaceConfiguration.m_customNamespace.empty())
+        {
+            AZ_Warning(
+                "ROS2FrameComponent",
+                config.m_namespaceConfiguration.m_namespaceStrategy == NamespaceConfiguration::NamespaceStrategy::Custom,
+                "Custom namespace is set but the namespace strategy is not set to Custom. The custom namespace will be ignored.");
+        }
         m_configuration = config;
     }
 
