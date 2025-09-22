@@ -81,6 +81,8 @@ namespace ROS2::VehicleDynamics
 
         auto id = AZ::EntityComponentIdPair(steeringEntity, jointComponent);
 
+        auto scaledSteering = steering * wheelData.m_steeringScale;
+
         if (wheelData.m_isArticulation)
         {
             PhysX::ArticulationJointRequestBus::Event(
@@ -88,7 +90,7 @@ namespace ROS2::VehicleDynamics
                 [&](PhysX::ArticulationJointRequests* joint)
                 {
                     double currentSteeringAngle = joint->GetJointPosition(wheelData.m_axis);
-                    const double pidCommand = m_steeringPid.ComputeCommand(steering - currentSteeringAngle, deltaTimeNs);
+                    const double pidCommand = m_steeringPid.ComputeCommand(scaledSteering - currentSteeringAngle, deltaTimeNs);
                     joint->SetDriveTargetVelocity(wheelData.m_axis, pidCommand);
                 });
         }
@@ -99,7 +101,7 @@ namespace ROS2::VehicleDynamics
                 [&](PhysX::JointRequests* joint)
                 {
                     double currentSteeringAngle = joint->GetPosition();
-                    const double pidCommand = m_steeringPid.ComputeCommand(steering - currentSteeringAngle, deltaTimeNs);
+                    const double pidCommand = m_steeringPid.ComputeCommand(scaledSteering - currentSteeringAngle, deltaTimeNs);
                     joint->SetVelocity(pidCommand);
                 });
         }
