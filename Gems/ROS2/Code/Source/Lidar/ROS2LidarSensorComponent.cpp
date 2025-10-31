@@ -162,6 +162,7 @@ namespace ROS2
                 // Copy the message to a string to avoid lifetime issues.
                 AZStd::string msgString = msg->data.c_str();
                 SetConfigurationFormJsonString(msgString);
+                PublishConfiguration();
             });
 
         m_parametersGetConfigurationTopicPublisher = ros2Node->create_publisher<std_msgs::msg::String>(

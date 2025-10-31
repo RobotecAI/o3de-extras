@@ -43,15 +43,16 @@ namespace ROS2::SegmentationUtils
             }
         }
 
-        if (!classId.has_value())
-        {
-            AZ_Warning(
-                "EntityManager",
-                false,
-                "Entity with ID: %s has no class tag. Assigning unknown class ID: %u",
-                entityId.ToString().c_str(),
-                UnknownClassId);
-        }
+        // Comment out to reduce log spam in large scenes
+        // if (!classId.has_value())
+        // {
+        //     AZ_Warning(
+        //         "EntityManager",
+        //         false,
+        //         "Entity with ID: %s has no class tag. Assigning unknown class ID: %u",
+        //         entityId.ToString().c_str(),
+        //         UnknownClassId);
+        // }
 
         return classId.value_or(UnknownClassId);
     }

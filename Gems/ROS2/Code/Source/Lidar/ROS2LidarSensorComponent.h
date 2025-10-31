@@ -16,8 +16,8 @@
 #include <ROS2/Sensor/ROS2SensorComponentBase.h>
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
-#include <vision_msgs/msg/label_info.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <vision_msgs/msg/label_info.hpp>
 
 #include "LidarCore.h"
 #include "LidarRaycaster.h"
@@ -57,7 +57,7 @@ namespace ROS2
 
         LidarId m_lidarRaycasterId;
 
-	// Specific changes for the project
+        // Specific changes for the project
         // Deactivates and reactivates the component to apply changes loaded using JsonSerialization.
         void SetConfigurationFormJsonString(AZStd::string configString);
 
@@ -69,7 +69,5 @@ namespace ROS2
 
         ROS2::TopicConfiguration m_parametersGetterConfigurationTopic;
         rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_parametersGetConfigurationTopicPublisher;
-
-
     };
 } // namespace ROS2
