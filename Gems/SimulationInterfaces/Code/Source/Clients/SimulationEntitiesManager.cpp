@@ -26,6 +26,8 @@
 #include <AzCore/std/string/regex.h>
 #include <AzCore/std/string/string.h>
 #include <AzFramework/Components/TransformComponent.h>
+#include <AzFramework/Entity/EntityContextBus.h>
+#include <AzFramework/Entity/GameEntityContextBus.h>
 #include <AzFramework/Physics/Common/PhysicsSceneQueries.h>
 #include <AzFramework/Physics/Common/PhysicsSimulatedBody.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
@@ -34,8 +36,6 @@
 #include <AzFramework/Physics/SimulatedBodies/StaticRigidBody.h>
 #include <AzFramework/Spawnable/Spawnable.h>
 #include <AzFramework/Spawnable/SpawnableEntitiesInterface.h>
-#include <AzFramework/Entity/EntityContextBus.h>
-#include <AzFramework/Entity/GameEntityContextBus.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <SimulationInterfaces/Bounds.h>
 #include <SimulationInterfaces/Result.h>
@@ -761,9 +761,8 @@ namespace SimulationInterfaces
         if (!initialPose.IsOrthogonal())
         {
             AZ_Warning("SimulationInterfaces", false, "Initial pose is not orthogonal");
-            completedCb(
-                AZ::Failure(FailedResult(
-                    simulation_interfaces::srv::SpawnEntity::Response::INVALID_POSE, "Initial pose is not orthogonal"))); //  INVALID_POSE
+            completedCb(AZ::Failure(FailedResult(
+                simulation_interfaces::srv::SpawnEntity::Response::INVALID_POSE, "Initial pose is not orthogonal"))); //  INVALID_POSE
             return;
         }
 
@@ -1008,20 +1007,21 @@ namespace SimulationInterfaces
         {
             return AZ::Success(Bounds{ 0, {} });
         }
+        // Check if entity has dynamic or static rigid body.
         auto rigidBody = azdynamic_cast<AzPhysics::RigidBody*>(simulatedBodyOutcome.GetValue());
-        if (!rigidBody)
+        auto staticRigidBody = azdynamic_cast<AzPhysics::StaticRigidBody*>(simulatedBodyOutcome.GetValue());
+        if (rigidBody == nullptr && staticRigidBody == nullptr)
         {
             return AZ::Success(Bounds{ 0, {} });
         }
-        if (rigidBody->GetShapeCount() == 0)
+        bool hasDynamicShapes = rigidBody ? rigidBody->GetShapeCount() > 0 : false;
+        bool hasStaticShapes = staticRigidBody ? staticRigidBody->GetShapeCount() > 0 : false;
+        bool hasAnyShapes = hasDynamicShapes || hasStaticShapes;
+        if (!hasAnyShapes)
         {
             return AZ::Failure(FailedResult(
                 simulation_interfaces::msg::Result::RESULT_OPERATION_FAILED, "Entity doesn't have colliders/boundss to return"));
         }
-        AZ_Warning(
-            "Simulation Interfaces",
-            rigidBody->GetShapeCount() == 1,
-            "Entity Bounds in simulation interfaces doesn't support multiple shapes, only first one will be taken ");
         auto boundsOutput = Utils::ConvertPhysicalShapeToBounds(m_simulatedEntityToEntityIdMap.at(name));
         if (boundsOutput.IsSuccess())
         {
