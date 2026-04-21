@@ -53,12 +53,18 @@ namespace ROS2::Controllers
 
     void PidConfiguration::InitializePid()
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         m_pid.initPid(m_p, m_i, m_d, m_iMax, m_iMin, m_antiWindup);
+#pragma GCC diagnostic pop
     }
 
     double PidConfiguration::ComputeCommand(double error, uint64_t deltaTimeNanoseconds)
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         double output = m_pid.computeCommand(error, deltaTimeNanoseconds);
+#pragma GCC diagnostic pop
         if (m_outputLimit > 0.0)
         {
             output = AZStd::clamp<float>(output, -m_outputLimit, m_outputLimit);

@@ -8,6 +8,8 @@
 #pragma once
 
 #include <AzCore/Serialization/SerializeContext.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <control_toolbox/pid.hpp>
 
 namespace ROS2::Controllers
@@ -41,3 +43,4 @@ namespace ROS2::Controllers
         control_toolbox::Pid m_pid; //!< PID implementation object from control_toolbox (of ros2_control).
     };
 } // namespace ROS2::Controllers
+#pragma GCC diagnostic pop
