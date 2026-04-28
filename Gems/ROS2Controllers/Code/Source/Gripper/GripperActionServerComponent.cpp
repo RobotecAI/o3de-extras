@@ -82,10 +82,14 @@ namespace ROS2Controllers
         float effort = 0.0f;
         GripperRequestBus::EventResult(position, GetEntityId(), &GripperRequestBus::Events::GetGripperPosition);
         GripperRequestBus::EventResult(effort, GetEntityId(), &GripperRequestBus::Events::GetGripperEffort);
+        bool stalled = false;
+        bool reachedGoal = false;
+        GripperRequestBus::EventResult(stalled, GetEntityId(), &GripperRequestBus::Events::IsGripperNotMoving);
+        GripperRequestBus::EventResult(reachedGoal, GetEntityId(), &GripperRequestBus::Events::HasGripperReachedGoal);
         feedback->position = position;
         feedback->effort = effort;
-        feedback->reached_goal = false;
-        feedback->stalled = false;
+        feedback->reached_goal = reachedGoal;
+        feedback->stalled = stalled;
         return feedback;
     }
 
