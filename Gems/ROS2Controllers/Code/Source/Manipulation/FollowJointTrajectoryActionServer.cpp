@@ -43,6 +43,16 @@ namespace ROS2Controllers
         }
     }
 
+    void FollowJointTrajectoryActionServer::AbortGoal(std::shared_ptr<FollowJointTrajectory::Result> result)
+    {
+        AZ_Assert(m_goalHandle, "Invalid goal handle!");
+        if (m_goalHandle && (m_goalHandle->is_executing() || m_goalHandle->is_canceling()))
+        {
+            AZ_Trace("FollowJointTrajectoryActionServer", "Goal aborted\n");
+            m_goalHandle->abort(result);
+        }
+    }
+
     void FollowJointTrajectoryActionServer::PublishFeedback(std::shared_ptr<FollowJointTrajectory::Feedback> feedback)
     {
         AZ_Assert(m_goalHandle, "Invalid goal handle!");

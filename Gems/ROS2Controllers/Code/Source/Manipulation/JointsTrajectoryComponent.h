@@ -80,5 +80,7 @@ namespace ROS2Controllers
         bool m_checkForVelocity = false; //!< If true, check if joints velocity is below threshold before reporting success
         float m_jointVelocityTolerance = 0.01f; //!< The threshold for joint velocities under which to report the goal as reached
         bool ShouldCheckForVelocity();
+
+        float m_actionTimeout = 30.0f; //!< Maximum execution time in seconds before the goal is aborted (0 = no timeout)
     };
 } // namespace ROS2Controllers
