@@ -108,24 +108,14 @@ namespace ROS2Controllers
     {
         AZ_Trace("FollowJointTrajectoryActionServer", "Goal accepted\n");
 
-        if (!IsReadyForExecution())
+        if (m_goalHandle && IsGoalActiveState())
         {
-            AZ_Trace("FollowJointTrajectoryActionServer", "Goal aborted: server is not ready for execution!");
-            if (m_goalHandle)
-            {
-                AZ_Trace(
-                    "FollowJointTrajectoryActionServer",
-                    " is_active: %d,  is_executing %d, is_canceling : %d",
-                    m_goalHandle->is_active(),
-                    m_goalHandle->is_executing(),
-                    m_goalHandle->is_canceling());
-            }
-
-            auto result = std::make_shared<FollowJointTrajectory::Result>();
-            result->error_string = "Goal aborted: server is not ready for execution!";
-            result->error_code = FollowJointTrajectory::Result::INVALID_GOAL;
-            goalHandle->abort(result);
-            return;
+            AZ_Trace("FollowJointTrajectoryActionServer", "Preempting active goal for incoming goal\n");
+            auto preemptResult = std::make_shared<FollowJointTrajectory::Result>();
+            preemptResult->error_code = FollowJointTrajectory::Result::INVALID_GOAL;
+            preemptResult->error_string = "Current goal cancelled due to new incoming action.";
+            m_goalHandle->canceled(preemptResult);
+            m_goalHandle.reset();
         }
 
         AZ::Outcome<void, FollowJointTrajectory::Result> executionOrderOutcome;
