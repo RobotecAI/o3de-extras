@@ -161,22 +161,67 @@ namespace ROS2Controllers
 
     AZ::Outcome<void, JointsTrajectoryComponent::TrajectoryResult> JointsTrajectoryComponent::ValidateGoal(TrajectoryGoalPtr trajectoryGoal)
     {
-        // Check joint names validity
+        using Result = JointsTrajectoryComponent::TrajectoryResult;
+        auto reject = [](int32_t code, const AZStd::string& message)
+        {
+            Result result;
+            result.error_code = code;
+            result.error_string = std::string(message.c_str());
+            return AZ::Failure(result);
+        };
+
+        if (trajectoryGoal->trajectory.points.empty())
+        {
+            return reject(Result::INVALID_GOAL, "Trajectory goal is invalid: empty trajectory");
+        }
+
         for (const auto& jointName : trajectoryGoal->trajectory.joint_names)
         {
             AZStd::string azJointName(jointName.c_str());
             if (m_manipulationJoints.find(azJointName) == m_manipulationJoints.end())
             {
-                AZ_Printf("JointsTrajectoryComponent", "Trajectory goal is invalid: no joint %s in manipulator", azJointName.c_str());
-
-                auto result = JointsTrajectoryComponent::TrajectoryResult();
-                result.error_code = JointsTrajectoryComponent::TrajectoryResult::INVALID_JOINTS;
-                result.error_string = std::string(
-                    AZStd::string::format("Trajectory goal is invalid: no joint %s in manipulator", azJointName.c_str()).c_str());
-
-                return AZ::Failure(result);
+                return reject(
+                    Result::INVALID_JOINTS,
+                    AZStd::string::format("Trajectory goal is invalid: no joint %s in manipulator", azJointName.c_str()));
             }
         }
+
+        const size_t jointCount = trajectoryGoal->trajectory.joint_names.size();
+        for (size_t i = 0; i < trajectoryGoal->trajectory.points.size(); i++)
+        {
+            const auto& point = trajectoryGoal->trajectory.points[i];
+            if (point.positions.size() != jointCount)
+            {
+                return reject(
+                    Result::INVALID_GOAL,
+                    AZStd::string::format(
+                        "Trajectory point %zu has %zu positions, expected %zu", i, point.positions.size(), jointCount));
+            }
+            if (!point.velocities.empty() && point.velocities.size() != jointCount)
+            {
+                return reject(
+                    Result::INVALID_GOAL,
+                    AZStd::string::format(
+                        "Trajectory point %zu has %zu velocities, expected 0 or %zu", i, point.velocities.size(), jointCount));
+            }
+            if (!point.accelerations.empty() && point.accelerations.size() != jointCount)
+            {
+                return reject(
+                    Result::INVALID_GOAL,
+                    AZStd::string::format(
+                        "Trajectory point %zu has %zu accelerations, expected 0 or %zu", i, point.accelerations.size(), jointCount));
+            }
+            if (i > 0)
+            {
+                const auto& prev = trajectoryGoal->trajectory.points[i - 1];
+                if (rclcpp::Duration(point.time_from_start) <= rclcpp::Duration(prev.time_from_start))
+                {
+                    return reject(
+                        Result::INVALID_GOAL, AZStd::string::format("Trajectory point %zu has non-monotonic time_from_start", i));
+                }
+            }
+        }
+
         return AZ::Success();
     }
 
