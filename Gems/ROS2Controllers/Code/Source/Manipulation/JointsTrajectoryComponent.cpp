@@ -148,10 +148,7 @@ namespace ROS2Controllers
     {
         if (m_goalStatus == JointsTrajectoryRequests::TrajectoryActionStatus::Executing)
         {
-            auto result = JointsTrajectoryComponent::TrajectoryResult();
-            result.error_code = JointsTrajectoryComponent::TrajectoryResult::INVALID_GOAL;
-            result.error_string = "Another trajectory goal is executing. Wait for completion or cancel it";
-            return AZ::Failure(result);
+            JointsManipulationRequestBus::Event(GetEntityId(), &JointsManipulationRequests::Stop);
         }
 
         auto validationResult = ValidateGoal(trajectoryGoal);
