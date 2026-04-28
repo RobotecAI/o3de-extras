@@ -40,6 +40,10 @@ namespace ROS2Controllers
         //! @param result Result which contains success code.
         void GoalSuccess(std::shared_ptr<FollowJointTrajectory::Result> result);
 
+        //! Abort the current goal.
+        //! @param result Result to be passed through action server to the client.
+        void AbortGoal(std::shared_ptr<FollowJointTrajectory::Result> result);
+
         //! Publish feedback during an active action.
         //! @param feedback An action feedback message informing about the progress.
         void PublishFeedback(std::shared_ptr<FollowJointTrajectory::Feedback> feedback);

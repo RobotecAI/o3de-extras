@@ -67,7 +67,8 @@ namespace ROS2Controllers
                 ->Field("Check for position errors", &JointsTrajectoryComponent::m_checkForPositionErrors)
                 ->Field("Joint goal tolerance", &JointsTrajectoryComponent::m_jointPositionTolerance)
                 ->Field("Check for velocity", &JointsTrajectoryComponent::m_checkForVelocity)
-                ->Field("Joint velocity tolerance", &JointsTrajectoryComponent::m_jointVelocityTolerance);
+                ->Field("Joint velocity tolerance", &JointsTrajectoryComponent::m_jointVelocityTolerance)
+                ->Field("Action timeout", &JointsTrajectoryComponent::m_actionTimeout);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -106,7 +107,12 @@ namespace ROS2Controllers
                         "Joint Velocity Tolerance",
                         "The threshold for joint velocities under which to report the goal as reached (one value for all joints, units depend on joint type)"
                     )
-                        ->Attribute(AZ::Edit::Attributes::Visibility, &JointsTrajectoryComponent::ShouldCheckForVelocity);
+                        ->Attribute(AZ::Edit::Attributes::Visibility, &JointsTrajectoryComponent::ShouldCheckForVelocity)
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &JointsTrajectoryComponent::m_actionTimeout,
+                        "Action Timeout",
+                        "Maximum execution time in seconds before the goal is aborted (0 = no timeout)");
             }
         }
     }
@@ -323,12 +329,27 @@ namespace ROS2Controllers
             return;
         }
 
-        auto desiredGoal = m_trajectoryGoal.trajectory.points.front();
-        rclcpp::Duration targetGoalTime = rclcpp::Duration(desiredGoal.time_from_start); //!< Requested arrival time for trajectory point.
         builtin_interfaces::msg::Time timestamp;
         ROS2::ROS2ClockRequestBus::BroadcastResult(timestamp, &ROS2::ROS2ClockRequestBus::Events::GetROSTimestamp);
+        const rclcpp::Time timeNow = rclcpp::Time(timestamp);
 
-        const rclcpp::Time timeNow = rclcpp::Time(timestamp); //!< Current simulation time.
+        if (m_actionTimeout > 0.0f)
+        {
+            const rclcpp::Duration elapsed = timeNow - m_trajectoryExecutionStartTime;
+            if (elapsed.seconds() > static_cast<double>(m_actionTimeout))
+            {
+                JointsManipulationRequestBus::Event(GetEntityId(), &JointsManipulationRequests::Stop);
+                auto result = std::make_shared<FollowJointTrajectoryActionServer::FollowJointTrajectory::Result>();
+                result->error_code = FollowJointTrajectoryActionServer::FollowJointTrajectory::Result::GOAL_TOLERANCE_VIOLATED;
+                result->error_string = AZStd::string::format("Goal timed out after %.1f seconds", m_actionTimeout).c_str();
+                m_followTrajectoryServer->AbortGoal(result);
+                m_goalStatus = JointsTrajectoryRequests::TrajectoryActionStatus::Idle;
+                return;
+            }
+        }
+
+        auto desiredGoal = m_trajectoryGoal.trajectory.points.front();
+        rclcpp::Duration targetGoalTime = rclcpp::Duration(desiredGoal.time_from_start);
         rclcpp::Duration threshold = rclcpp::Duration::from_nanoseconds(1e7);
 
         // Jump to the next point if current simulation time is ahead of timeFromStart
