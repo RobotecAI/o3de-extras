@@ -217,11 +217,19 @@ namespace ROS2Controllers
             // Acceleration should also be filled in somehow, or removed from the trajectory altogether.
         }
 
+        // velocities and accelerations are optional per trajectory_msgs/JointTrajectoryPoint;
+        // only publish the error component for fields the goal supplied. Error sign follows
+        // control_msgs/JointTrajectoryControllerState convention: reference - feedback.
+        const bool hasDesiredVelocities = desiredPoint.velocities.size() == jointCount;
+
         trajectory_msgs::msg::JointTrajectoryPoint currentError;
         for (size_t jointIndex = 0; jointIndex < jointCount; jointIndex++)
         {
-            currentError.positions.push_back(actualPoint.positions[jointIndex] - desiredPoint.positions[jointIndex]);
-            currentError.velocities.push_back(actualPoint.velocities[jointIndex] - desiredPoint.velocities[jointIndex]);
+            currentError.positions.push_back(desiredPoint.positions[jointIndex] - actualPoint.positions[jointIndex]);
+            if (hasDesiredVelocities)
+            {
+                currentError.velocities.push_back(desiredPoint.velocities[jointIndex] - actualPoint.velocities[jointIndex]);
+            }
         }
 
         feedback->desired = desiredPoint;
