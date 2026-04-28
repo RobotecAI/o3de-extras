@@ -47,5 +47,6 @@ namespace ROS2Controllers
         std::shared_ptr<GripperActionServer::GripperCommand::Result> ProduceResult() const;
         AZStd::string m_gripperActionServerName{ "gripper_server" }; //! name of the GripperCommand action server
         AZStd::unique_ptr<GripperActionServer> m_gripperActionServer; //! action server for GripperCommand
+        bool m_allowStalling{ false }; //! If true, treat stall as success (object grasped). If false, treat stall as failure. Matches ros2_control allow_stalling.
     };
 } // namespace ROS2Controllers
