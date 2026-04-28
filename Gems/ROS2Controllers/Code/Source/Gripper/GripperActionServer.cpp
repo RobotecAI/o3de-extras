@@ -118,6 +118,16 @@ namespace ROS2Controllers
         }
     }
 
+    void GripperActionServer::AbortGoal(std::shared_ptr<GripperCommand::Result> result)
+    {
+        AZ_Assert(m_goalHandle, "Invalid goal handle!");
+        if (m_goalHandle && (m_goalHandle->is_executing() || m_goalHandle->is_canceling()))
+        {
+            AZ_Trace("GripperActionServer", "Goal aborted\n");
+            m_goalHandle->abort(result);
+        }
+    }
+
     void GripperActionServer::PublishFeedback(std::shared_ptr<GripperCommand::Feedback> feedback)
     {
         AZ_Assert(m_goalHandle, "Invalid goal handle!");

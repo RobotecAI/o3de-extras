@@ -42,7 +42,8 @@ namespace ROS2Controllers
         {
             serialize->Class<GripperActionServerComponent, AZ::Component>()
                 ->Field("ActionServerName", &GripperActionServerComponent::m_gripperActionServerName)
-                ->Version(1);
+                ->Field("AllowStalling", &GripperActionServerComponent::m_allowStalling)
+                ->Version(2);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -56,7 +57,12 @@ namespace ROS2Controllers
                         AZ::Edit::UIHandlers::Default,
                         &GripperActionServerComponent::m_gripperActionServerName,
                         "Gripper Action Server",
-                        "Action name for the gripper server.");
+                        "Action name for the gripper server.")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &GripperActionServerComponent::m_allowStalling,
+                        "Allow Stalling",
+                        "If true, a stalled gripper is reported as success (e.g. grasped an object). If false, stall is reported as failure.");
             }
         }
     }
@@ -129,14 +135,27 @@ namespace ROS2Controllers
             m_gripperActionServer->CancelGoal(ProduceResult());
             return;
         }
-        if (isDone || isStalled)
+        if (isDone)
         {
             AZ_Printf("GripperActionServer::OnTick", "GripperActionServer::OnTick: Gripper reached goal!");
             m_gripperActionServer->GoalSuccess(ProduceResult());
             return;
         }
+        if (isStalled)
+        {
+            if (m_allowStalling)
+            {
+                AZ_Printf("GripperActionServer::OnTick", "GripperActionServer::OnTick: Gripper stalled (treated as success)");
+                m_gripperActionServer->GoalSuccess(ProduceResult());
+            }
+            else
+            {
+                AZ_Printf("GripperActionServer::OnTick", "GripperActionServer::OnTick: Gripper stalled (aborting)");
+                m_gripperActionServer->AbortGoal(ProduceResult());
+            }
+            return;
+        }
         m_gripperActionServer->PublishFeedback(ProduceFeedback());
-        return;
     }
 
 } // namespace ROS2Controllers
