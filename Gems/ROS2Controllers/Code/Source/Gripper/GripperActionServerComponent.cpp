@@ -101,7 +101,7 @@ namespace ROS2Controllers
         GripperRequestBus::EventResult(stalled, GetEntityId(), &GripperRequestBus::Events::IsGripperNotMoving);
         GripperRequestBus::EventResult(reachedGoal, GetEntityId(), &GripperRequestBus::Events::HasGripperReachedGoal);
         result->position = position;
-        result->position = effort;
+        result->effort = effort;
         result->reached_goal = reachedGoal;
         result->stalled = stalled;
         return result;
