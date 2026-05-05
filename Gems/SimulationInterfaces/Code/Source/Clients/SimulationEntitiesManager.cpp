@@ -14,6 +14,7 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Component/TransformBus.h>
 #include <AzCore/Console/IConsole.h>
+#include <AzCore/Math/Aabb.h>
 #include <AzCore/Math/Capsule.h>
 #include <AzCore/Math/Obb.h>
 #include <AzCore/Outcome/Outcome.h>
@@ -1089,30 +1090,26 @@ namespace SimulationInterfaces
         auto simulatedBodyOutcome = Utils::GetSimulatedBody(m_simulatedEntityToEntityIdMap.at(name));
         if (!simulatedBodyOutcome.IsSuccess())
         {
-            return AZ::Success(Bounds{ 0, {} });
-        }
-        auto rigidBody = azdynamic_cast<AzPhysics::RigidBody*>(simulatedBodyOutcome.GetValue());
-        if (!rigidBody)
-        {
-            return AZ::Success(Bounds{ 0, {} });
-        }
-        if (rigidBody->GetShapeCount() == 0)
-        {
-            return AZ::Failure(FailedResult(
-                simulation_interfaces::msg::Result::RESULT_OPERATION_FAILED, "Entity doesn't have colliders/boundss to return"));
-        }
-        AZ_Warning(
-            "Simulation Interfaces",
-            rigidBody->GetShapeCount() == 1,
-            "Entity Bounds in simulation interfaces doesn't support multiple shapes, only first one will be taken ");
-        auto shape = rigidBody->GetShape(0);
-        auto boundsOutput = Utils::ConvertPhysicalShapeToBounds(shape, m_simulatedEntityToEntityIdMap.at(name));
-        if (boundsOutput.IsSuccess())
-        {
-            return AZ::Success(boundsOutput.GetValue());
+            return AZ::Success(Bounds{ simulation_interfaces::msg::Bounds::TYPE_EMPTY, {} });
         }
 
-        return AZ::Failure(FailedResult(simulation_interfaces::msg::Result::RESULT_OPERATION_FAILED, boundsOutput.GetError()));
+        // Default to an axis-aligned bounding box per simulation_interfaces/GetEntityBounds.srv:
+        // "Bounds with TYPE_BOX should be returned, unless there is a configuration parameter
+        // for the simulator to control the type and it is set otherwise."
+        // SimulatedBody::GetAabb() unions all colliders on the body, so this works for compound
+        // bodies and for primitive types that have no direct Bounds counterpart (capsule,
+        // cylinder, mesh, heightfield, ...).
+        const AZ::Aabb aabb = simulatedBodyOutcome.GetValue()->GetAabb();
+        if (!aabb.IsValid())
+        {
+            return AZ::Success(Bounds{ simulation_interfaces::msg::Bounds::TYPE_EMPTY, {} });
+        }
+
+        Bounds bounds;
+        bounds.m_boundsType = simulation_interfaces::msg::Bounds::TYPE_BOX;
+        bounds.m_points.emplace_back(aabb.GetMax()); // upper right
+        bounds.m_points.emplace_back(aabb.GetMin()); // lower left
+        return AZ::Success(bounds);
     }
 
     AZ::Outcome<AZ::EntityId, FailedResult> SimulationEntitiesManager::GetEntityId(const AZStd::string& name)
