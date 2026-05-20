@@ -34,6 +34,7 @@
 #include <AzFramework/Physics/Common/PhysicsSimulatedBody.h>
 #include <AzFramework/Physics/PhysicsSystem.h>
 #include <AzFramework/Physics/RigidBodyBus.h>
+#include <AzFramework/Physics/Shape.h>
 #include <AzFramework/Physics/SimulatedBodies/RigidBody.h>
 #include <AzFramework/Physics/SimulatedBodies/StaticRigidBody.h>
 #include <AzFramework/Spawnable/Spawnable.h>
@@ -1093,22 +1094,43 @@ namespace SimulationInterfaces
             return AZ::Success(Bounds{ simulation_interfaces::msg::Bounds::TYPE_EMPTY, {} });
         }
 
-        // Default to an axis-aligned bounding box per simulation_interfaces/GetEntityBounds.srv:
-        // "Bounds with TYPE_BOX should be returned, unless there is a configuration parameter
-        // for the simulator to control the type and it is set otherwise."
-        // SimulatedBody::GetAabb() unions all colliders on the body, so this works for compound
-        // bodies and for primitive types that have no direct Bounds counterpart (capsule,
-        // cylinder, mesh, heightfield, ...).
-        const AZ::Aabb aabb = simulatedBodyOutcome.GetValue()->GetAabb();
-        if (!aabb.IsValid())
+        // Bounds are reported in the entity's canonical link frame, per
+        // simulation_interfaces/msg/Bounds: "For entities, these limits are
+        // relative to entity's canonical link transform". SimulatedBody::GetAabb()
+        // returns the *world* AABB, so we union each collider shape's local-frame
+        // AABB instead. This keeps compound-collider support and is correct
+        // regardless of the body's current world pose.
+        auto* simulatedBody = simulatedBodyOutcome.GetValue();
+        auto* rigidBody = azdynamic_cast<AzPhysics::RigidBody*>(simulatedBody);
+        auto* staticRigidBody = azdynamic_cast<AzPhysics::StaticRigidBody*>(simulatedBody);
+        const AZ::u32 shapeCount =
+            rigidBody ? rigidBody->GetShapeCount() : (staticRigidBody ? staticRigidBody->GetShapeCount() : 0u);
+        if (shapeCount == 0)
+        {
+            // Articulation links / characters expose no shape iterator here;
+            // report empty rather than a frame-mismatched world AABB.
+            return AZ::Success(Bounds{ simulation_interfaces::msg::Bounds::TYPE_EMPTY, {} });
+        }
+
+        AZ::Aabb localAabb = AZ::Aabb::CreateNull();
+        for (AZ::u32 i = 0; i < shapeCount; ++i)
+        {
+            AZStd::shared_ptr<const Physics::Shape> shape =
+                rigidBody ? rigidBody->GetShape(i) : staticRigidBody->GetShape(i);
+            if (shape)
+            {
+                localAabb.AddAabb(shape->GetAabbLocal());
+            }
+        }
+        if (!localAabb.IsValid())
         {
             return AZ::Success(Bounds{ simulation_interfaces::msg::Bounds::TYPE_EMPTY, {} });
         }
 
         Bounds bounds;
         bounds.m_boundsType = simulation_interfaces::msg::Bounds::TYPE_BOX;
-        bounds.m_points.emplace_back(aabb.GetMax()); // upper right
-        bounds.m_points.emplace_back(aabb.GetMin()); // lower left
+        bounds.m_points.emplace_back(localAabb.GetMax()); // upper right
+        bounds.m_points.emplace_back(localAabb.GetMin()); // lower left
         return AZ::Success(bounds);
     }
 
