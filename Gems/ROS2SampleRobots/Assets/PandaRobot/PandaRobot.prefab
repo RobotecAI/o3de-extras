@@ -3032,7 +3032,8 @@
                     "$type": "GenericComponentWrapper",
                     "Id": 4674038609218834419,
                     "m_template": {
-                        "$type": "FingerGripperComponent"
+                        "$type": "FingerGripperComponent",
+                        "StallTime": 0.5
                     }
                 },
                 "GripperActionServerComponent": {
@@ -3040,7 +3041,8 @@
                     "Id": 17571685017909850211,
                     "m_template": {
                         "$type": "GripperActionServerComponent",
-                        "ActionServerName": "panda_hand_controller/gripper_cmd"
+                        "ActionServerName": "panda_hand_controller/gripper_cmd",
+                        "AllowStalling": true
                     }
                 },
                 "ROS2FrameEditorComponent": {
