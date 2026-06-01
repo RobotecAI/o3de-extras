@@ -2295,6 +2295,7 @@
                     "Id": 7723381465733372693,
                     "ArticulationConfiguration": {
                         "entityId": "",
+                        "Mass": 0.014999999664723873,
                         "Articulation Joint Type": 2,
                         "Local Rotation": [
                             0.0,
@@ -2420,6 +2421,7 @@
                     "Id": 10123562292261619834,
                     "ArticulationConfiguration": {
                         "entityId": "",
+                        "Mass": 0.014999999664723873,
                         "Articulation Joint Type": 2,
                         "Local Rotation": [
                             0.0,
@@ -3033,7 +3035,8 @@
                     "Id": 4674038609218834419,
                     "m_template": {
                         "$type": "FingerGripperComponent",
-                        "StallTime": 0.5
+                        "StallTime": 0.5,
+                        "MaxJointVelocity": 0.05000000074505806
                     }
                 },
                 "GripperActionServerComponent": {

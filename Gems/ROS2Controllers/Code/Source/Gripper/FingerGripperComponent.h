@@ -67,6 +67,9 @@ namespace ROS2Controllers
 
         float GetDefaultPosition();
         void SetPosition(float position, float maxEffort);
+        //! Clamp each finger joint's velocity via the articulation's native limit, so a position
+        //! command can't slam a low-mass finger shut in a single physics step. Applied once at startup.
+        void ApplyMaxJointVelocity();
         bool IsGripperVelocity0() const;
         void PublishFeedback() const;
 
@@ -82,5 +85,10 @@ namespace ROS2Controllers
         float m_goalTolerance{ 0.001f }; //!< The epsilon value used to determine whether the gripper reached it's goal
         float m_stallTime{ 1.0f }; //!< The time in seconds to wait before determining the gripper is stalled
         float m_initialPosition{ 0.0f }; //!< The initial position of the gripper in units of the gripper's joints
+
+        //!< Per-joint velocity clamp in joint units per second (m/s for prismatic fingers), applied via the
+        //!< articulation's native limit. Matches the panda_finger_joint URDF velocity limit; 0 leaves the
+        //!< PhysX default (effectively unlimited), restoring the single-step close.
+        float m_maxJointVelocity{ 0.2f };
     };
 } // namespace ROS2Controllers

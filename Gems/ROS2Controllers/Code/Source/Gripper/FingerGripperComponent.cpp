@@ -14,6 +14,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 
 #include <AzFramework/Physics/PhysicsSystem.h>
+#include <PhysX/ArticulationJointBus.h>
 #include <ROS2/Frame/ROS2FrameComponent.h>
 #include <ROS2Controllers/Manipulation/JointsManipulationRequests.h>
 #include <imgui/imgui.h>
@@ -57,7 +58,8 @@ namespace ROS2Controllers
                 ->Field("DistanceEpsilon", &FingerGripperComponent::m_goalTolerance)
                 ->Field("StallTime", &FingerGripperComponent::m_stallTime)
                 ->Field("InitialPosition", &FingerGripperComponent::m_initialPosition)
-                ->Version(2);
+                ->Field("MaxJointVelocity", &FingerGripperComponent::m_maxJointVelocity)
+                ->Version(3);
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
@@ -86,7 +88,14 @@ namespace ROS2Controllers
                         AZ::Edit::UIHandlers::Default,
                         &FingerGripperComponent::m_initialPosition,
                         "Initial Position",
-                        "The initial position of the gripper in units of the gripper's joints (meters if prismatic, radians if revolute).");
+                        "The initial position of the gripper in units of the gripper's joints (meters if prismatic, radians if revolute).")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &FingerGripperComponent::m_maxJointVelocity,
+                        "Max Joint Velocity",
+                        "Clamps each finger joint's velocity, in joint units per second (m/s for prismatic fingers), via the "
+                        "articulation's native limit. The drive otherwise reaches the goal in a single step and slams a "
+                        "low-mass finger shut. 0 leaves the PhysX default (effectively unlimited).");
             }
         }
     }
@@ -171,6 +180,32 @@ namespace ROS2Controllers
         }
     }
 
+    void FingerGripperComponent::ApplyMaxJointVelocity()
+    {
+        if (m_maxJointVelocity <= 0.0f)
+        { // leave the PhysX default (effectively unlimited) in place
+            return;
+        }
+
+        for (const auto& [jointName, jointInfo] : m_fingerJoints)
+        {
+            if (!jointInfo.m_isArticulation)
+            { // SetMaxJointVelocity is a PhysX articulation feature; PID-driven grippers have no equivalent here
+                AZ_Warning(
+                    "FingerGripperComponent",
+                    false,
+                    "Joint %s is not an articulation; max joint velocity limit not applied.",
+                    jointName.c_str());
+                continue;
+            }
+
+            PhysX::ArticulationJointRequestBus::Event(
+                jointInfo.m_entityComponentIdPair.GetEntityId(),
+                &PhysX::ArticulationJointRequests::SetMaxJointVelocity,
+                m_maxJointVelocity);
+        }
+    }
+
     AZ::Outcome<void, AZStd::string> FingerGripperComponent::GripperCommand(float position, float maxEffort)
     {
         if (maxEffort == 0.0f)
@@ -183,6 +218,9 @@ namespace ROS2Controllers
         m_stallingFor = 0.0f;
         m_cancelled = false;
 
+        // The closing speed is bounded by the per-joint max velocity applied in
+        // ApplyMaxJointVelocity(), so a plain position command no longer slams a
+        // low-mass finger shut in a single physics step.
         SetPosition(position, maxEffort);
 
         return AZ::Success();
@@ -275,12 +313,13 @@ namespace ROS2Controllers
         ImGui::End();
     }
 
-    void FingerGripperComponent::OnTick([[maybe_unused]] float delta, [[maybe_unused]] AZ::ScriptTimePoint timePoint)
+    void FingerGripperComponent::OnTick(float delta, [[maybe_unused]] AZ::ScriptTimePoint timePoint)
     {
         if (!m_initialised)
         {
             m_initialised = true;
             GetFingerJoints();
+            ApplyMaxJointVelocity();
             SetPosition(m_initialPosition, AZStd::numeric_limits<float>::infinity());
         }
 
