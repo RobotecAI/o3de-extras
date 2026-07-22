@@ -29,6 +29,8 @@ set(FILES
     Source/Camera/CameraUtilities.h
     Source/Camera/ROS2CameraSensorComponent.cpp
     Source/Camera/ROS2CameraSensorComponent.h
+    Source/Camera/ROS2CubemapCameraComponent.cpp
+    Source/Camera/ROS2CubemapCameraComponent.h
     Source/Camera/ROS2CameraSystemComponent.cpp
     Source/Camera/ROS2CameraSystemComponent.h
     Source/GNSS/ROS2GNSSSensorComponent.cpp
