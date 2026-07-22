@@ -8,6 +8,8 @@
 
 #include "ROS2CubemapCameraComponent.h"
 #include "CameraUtilities.h"
+#include "EquirectangularConverter.h"
+#include "FisheyeConverter.h"
 
 #include <Atom/Feature/PostProcess/PostProcessFeatureProcessorInterface.h>
 #include <Atom/Feature/Utils/FrameCaptureBus.h>
@@ -53,10 +55,12 @@ namespace ROS2Sensors
         if (auto* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<ROS2CubemapCameraComponent, AZ::Component>()
-                ->Version(3)
+                ->Version(4)
                 ->Field("Topic", &ROS2CubemapCameraComponent::m_topic)
+                ->Field("Projection", &ROS2CubemapCameraComponent::m_projection)
                 ->Field("FaceSize", &ROS2CubemapCameraComponent::m_faceSize)
-                ->Field("EquirectWidth", &ROS2CubemapCameraComponent::m_equirectWidth);
+                ->Field("OutputWidth", &ROS2CubemapCameraComponent::m_outputWidth)
+                ->Field("FisheyeFovDeg", &ROS2CubemapCameraComponent::m_fisheyeFovDeg);
 
             if (auto* editContext = serialize->GetEditContext())
             {
@@ -69,6 +73,13 @@ namespace ROS2Sensors
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default, &ROS2CubemapCameraComponent::m_topic, "Topic", "Image topic name (namespaced)")
                     ->DataElement(
+                        AZ::Edit::UIHandlers::ComboBox,
+                        &ROS2CubemapCameraComponent::m_projection,
+                        "Projection",
+                        "Projection model used to convert the cubemap into the published image")
+                    ->EnumAttribute(CubemapProjection::Equirectangular, "Equirectangular")
+                    ->EnumAttribute(CubemapProjection::Fisheye, "Fisheye")
+                    ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2CubemapCameraComponent::m_faceSize,
                         "Cube face size",
@@ -77,11 +88,18 @@ namespace ROS2Sensors
                     ->Attribute(AZ::Edit::Attributes::Max, 2048)
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
-                        &ROS2CubemapCameraComponent::m_equirectWidth,
-                        "Equirect width",
-                        "Output equirectangular image width in pixels (height is half)")
+                        &ROS2CubemapCameraComponent::m_outputWidth,
+                        "Output width",
+                        "Output image width in pixels (equirectangular height is half; fisheye is square)")
                     ->Attribute(AZ::Edit::Attributes::Min, 32)
-                    ->Attribute(AZ::Edit::Attributes::Max, 8192);
+                    ->Attribute(AZ::Edit::Attributes::Max, 8192)
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::Default,
+                        &ROS2CubemapCameraComponent::m_fisheyeFovDeg,
+                        "Fisheye FOV (deg)",
+                        "Field of view for the fisheye projection in degrees")
+                    ->Attribute(AZ::Edit::Attributes::Min, 30.0f)
+                    ->Attribute(AZ::Edit::Attributes::Max, 360.0f);
             }
         }
     }
@@ -108,7 +126,28 @@ namespace ROS2Sensors
         m_publisher = ros2Node->create_publisher<sensor_msgs::msg::Image>(fullTopic.data(), rclcpp::SensorDataQoS());
 
         SetupFacePipelines();
-        BuildRemapTable();
+
+        // Choose the projection model (what the published image looks like / which faces are rendered).
+        switch (m_projection)
+        {
+        case CubemapProjection::Fisheye:
+            m_converter = AZStd::make_unique<FisheyeConverter>(m_outputWidth, m_fisheyeFovDeg);
+            break;
+        case CubemapProjection::Equirectangular:
+        default:
+            m_converter = AZStd::make_unique<EquirectangularConverter>(m_outputWidth);
+            break;
+        }
+        m_converter->Initialize(m_faceSize, ComputeFaceWorldToClip());
+
+        m_expectedFaces = 0;
+        for (int i = 0; i < NumFaces; ++i)
+        {
+            if (m_converter->IsFaceRequired(i))
+            {
+                ++m_expectedFaces;
+            }
+        }
 
         Camera::CameraNotificationBus::Handler::BusConnect();
         AZ::TickBus::Handler::BusConnect();
@@ -253,6 +292,12 @@ namespace ROS2Sensors
         int failedToQueue = 0;
         for (int i = 0; i < NumFaces; ++i)
         {
+            // Only render faces the projection actually samples (e.g. a forward fisheye needs fewer).
+            if (m_converter && !m_converter->IsFaceRequired(i))
+            {
+                continue;
+            }
+
             FacePipeline& face = m_faces[i];
 
             // Rotate the face basis (right, up, back) into world space and set it as the camera transform.
@@ -272,12 +317,12 @@ namespace ROS2Sensors
 
         // Faces that failed to queue produce no async callback, so account for them here. In the normal
         // path the queued callbacks have not fired yet, so this only completes the cycle when *every*
-        // face failed - in which case we abort and let OnTick retry next frame (no recursive re-arm).
+        // required face failed - in which case we abort and let OnTick retry next frame (no recursive re-arm).
         if (failedToQueue > 0)
         {
             AZStd::lock_guard<AZStd::mutex> lock(m_mutex);
             m_facesReceived += failedToQueue;
-            if (m_facesReceived >= NumFaces)
+            if (m_facesReceived >= m_expectedFaces)
             {
                 m_capturing = false;
                 AZ_Warning("ROS2CubemapCameraComponent", false, "Cubemap capture cycle aborted: no faces could be queued");
@@ -302,7 +347,7 @@ namespace ROS2Sensors
                     m_faceData[faceIndex].clear();
                 }
 
-                if (++m_facesReceived == NumFaces)
+                if (++m_facesReceived == m_expectedFaces)
                 {
                     cycleComplete = true;
                 }
@@ -343,12 +388,8 @@ namespace ROS2Sensors
 
     }
 
-    void ROS2CubemapCameraComponent::BuildRemapTable()
+    AZStd::array<AZ::Matrix4x4, ROS2CubemapCameraComponent::NumFaces> ROS2CubemapCameraComponent::ComputeFaceWorldToClip() const
     {
-        const int width = m_equirectWidth;
-        const int height = m_equirectWidth / 2;
-        const int faceStep = m_faceSize * 4; // R8G8B8A8_UNORM bytes per row
-
         // Recreate the exact projection used to render the faces and, via temporary views with identity
         // translation, obtain each face's world-to-clip matrix in the sensor's local frame. Using Atom's
         // own matrices means the remap matches how pixels were actually rasterized (no convention guessing).
@@ -365,98 +406,23 @@ namespace ROS2Sensors
             view->SetCameraTransform(cameraTransform);
             worldToClip[i] = view->GetWorldToClipMatrix();
         }
-
-        m_remapFace.assign(static_cast<size_t>(width) * height, -1);
-        m_remapOffset.assign(static_cast<size_t>(width) * height, 0);
-
-        for (int y = 0; y < height; ++y)
-        {
-            // Latitude: +pi/2 at the top row (zenith) to -pi/2 at the bottom row.
-            const float lat = AZ::Constants::HalfPi - (y + 0.5f) / height * AZ::Constants::Pi;
-            for (int x = 0; x < width; ++x)
-            {
-                // Longitude: -pi..pi across the width, 0 (image centre) = sensor forward.
-                const float lon = (x + 0.5f) / width * AZ::Constants::TwoPi - AZ::Constants::Pi;
-
-                // Direction in the sensor's local (O3DE entity) frame: X right, Y forward, Z up.
-                const AZ::Vector3 dir(
-                    std::sin(lon) * std::cos(lat), std::cos(lon) * std::cos(lat), std::sin(lat));
-                const AZ::Vector4 dir4(dir.GetX(), dir.GetY(), dir.GetZ(), 0.0f);
-
-                int bestFace = -1;
-                float bestCentering = std::numeric_limits<float>::max();
-                float bestNdcX = 0.0f;
-                float bestNdcY = 0.0f;
-                for (int i = 0; i < NumFaces; ++i)
-                {
-                    const AZ::Vector4 clip = worldToClip[i] * dir4;
-                    const float w = clip.GetW();
-                    if (w <= 1e-6f)
-                    {
-                        continue; // Behind this face's view plane.
-                    }
-                    const float ndcX = clip.GetX() / w;
-                    const float ndcY = clip.GetY() / w;
-                    const float centering = AZ::GetMax(std::abs(ndcX), std::abs(ndcY));
-                    if (centering <= 1.0f && centering < bestCentering)
-                    {
-                        bestCentering = centering;
-                        bestFace = i;
-                        bestNdcX = ndcX;
-                        bestNdcY = ndcY;
-                    }
-                }
-
-                if (bestFace < 0)
-                {
-                    continue;
-                }
-
-                int col = static_cast<int>((bestNdcX * 0.5f + 0.5f) * m_faceSize);
-                int row = static_cast<int>((0.5f - bestNdcY * 0.5f) * m_faceSize);
-                col = AZ::GetClamp(col, 0, m_faceSize - 1);
-                row = AZ::GetClamp(row, 0, m_faceSize - 1);
-
-                const size_t idx = static_cast<size_t>(y) * width + x;
-                m_remapFace[idx] = bestFace;
-                m_remapOffset[idx] = row * faceStep + col * 4;
-            }
-        }
+        return worldToClip;
     }
 
     void ROS2CubemapCameraComponent::AssembleAndPublish()
     {
-        const uint32_t width = static_cast<uint32_t>(m_equirectWidth);
-        const uint32_t height = static_cast<uint32_t>(m_equirectWidth / 2);
-        const uint32_t step = width * 4; // rgba8
+        if (!m_converter)
+        {
+            return;
+        }
 
         sensor_msgs::msg::Image image;
         image.header.stamp = ROS2::ROS2ClockInterface::Get()->GetROSTimestamp();
         image.header.frame_id = m_frameId.c_str();
-        image.width = width;
-        image.height = height;
-        image.encoding = "rgba8";
-        image.step = step;
-        image.is_bigendian = 0;
-        image.data.assign(static_cast<size_t>(step) * height, 0);
 
         {
             AZStd::lock_guard<AZStd::mutex> lock(m_mutex);
-            const size_t pixels = static_cast<size_t>(width) * height;
-            for (size_t idx = 0; idx < pixels; ++idx)
-            {
-                const int face = m_remapFace[idx];
-                if (face < 0)
-                {
-                    continue;
-                }
-                const auto& faceBuffer = m_faceData[face];
-                const int offset = m_remapOffset[idx];
-                if (offset >= 0 && static_cast<size_t>(offset) + 4 <= faceBuffer.size())
-                {
-                    memcpy(image.data.data() + idx * 4, faceBuffer.data() + offset, 4);
-                }
-            }
+            m_converter->Convert(m_faceData, image);
         }
 
         m_publisher->publish(image);

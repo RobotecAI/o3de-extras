@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include "CubemapConverter.h"
+
 #include <Atom/RPI.Public/Base.h>
 #include <Atom/RPI.Public/Pass/AttachmentReadback.h>
 #include <Atom/RPI.Public/RenderPipeline.h>
@@ -14,10 +16,12 @@
 #include <Atom/RPI.Public/View.h>
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/TickBus.h>
+#include <AzCore/Math/Matrix4x4.h>
 #include <AzCore/Math/Quaternion.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/std/containers/array.h>
 #include <AzCore/std/parallel/mutex.h>
+#include <AzCore/std/smart_ptr/unique_ptr.h>
 #include <AzFramework/Components/CameraBus.h>
 #include <rclcpp/publisher.hpp>
 #include <sensor_msgs/msg/image.hpp>
@@ -26,6 +30,13 @@
 
 namespace ROS2Sensors
 {
+    //! Projection model used to turn the rendered cubemap into the published image.
+    enum class CubemapProjection : AZ::u8
+    {
+        Equirectangular,
+        Fisheye,
+    };
+
     //! Sensor component that renders a cubemap around the entity and publishes it as a single
     //! sensor_msgs/Image (six faces stacked vertically).
     //!
@@ -80,13 +91,15 @@ namespace ROS2Sensors
         //! Called from the last face's readback callback: assemble + publish, then re-arm the next cycle.
         void HandleCycleComplete();
         void AssembleAndPublish();
-        //! Precompute the equirectangular-pixel -> (cube face, face pixel) lookup table. Built once from
-        //! the same projection used to render the faces, so it is pose-independent (sensor frame).
-        void BuildRemapTable();
+        //! World-to-clip matrix of each cube face in the sensor's local frame (identity pose). Used to
+        //! initialize the projection converter's remap table.
+        AZStd::array<AZ::Matrix4x4, NumFaces> ComputeFaceWorldToClip() const;
 
         AZStd::string m_topic{ "cubemap" };
+        CubemapProjection m_projection = CubemapProjection::Equirectangular; //!< Output projection model.
         int m_faceSize = 512; //!< Per-face (cube face) resolution in pixels (square).
-        int m_equirectWidth = 1024; //!< Output equirectangular width; height is half of this (2:1).
+        int m_outputWidth = 1024; //!< Output image width (equirect height = half; fisheye is square width x width).
+        float m_fisheyeFovDeg = 180.0f; //!< Fisheye field of view in degrees (used only for the fisheye projection).
 
         AZStd::string m_frameId;
         AZ::RPI::Scene* m_scene = nullptr;
@@ -96,14 +109,12 @@ namespace ROS2Sensors
         AZStd::mutex m_mutex;
         AZStd::array<AZStd::vector<uint8_t>, NumFaces> m_faceData;
         int m_facesReceived = 0;
+        int m_expectedFaces = NumFaces; //!< Number of faces actually captured this cycle (projection may need fewer).
         bool m_capturing = false;
         bool m_shuttingDown = false; //!< Set on Deactivate so in-flight callbacks stop re-arming.
 
-        // Equirectangular remap lookup table (size = m_equirectWidth * m_equirectWidth/2).
-        // For each output pixel: the source cube face index (-1 if unmapped) and byte offset into that
-        // face's readback buffer.
-        AZStd::vector<int32_t> m_remapFace;
-        AZStd::vector<int32_t> m_remapOffset;
+        //! Projection model that turns the six rendered faces into the published image.
+        AZStd::unique_ptr<CubemapConverter> m_converter;
 
         std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Image>> m_publisher;
     };

@@ -31,6 +31,12 @@ set(FILES
     Source/Camera/ROS2CameraSensorComponent.h
     Source/Camera/ROS2CubemapCameraComponent.cpp
     Source/Camera/ROS2CubemapCameraComponent.h
+    Source/Camera/CubemapConverter.cpp
+    Source/Camera/CubemapConverter.h
+    Source/Camera/EquirectangularConverter.cpp
+    Source/Camera/EquirectangularConverter.h
+    Source/Camera/FisheyeConverter.cpp
+    Source/Camera/FisheyeConverter.h
     Source/Camera/ROS2CameraSystemComponent.cpp
     Source/Camera/ROS2CameraSystemComponent.h
     Source/GNSS/ROS2GNSSSensorComponent.cpp
