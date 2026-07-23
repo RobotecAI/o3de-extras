@@ -29,14 +29,16 @@ set(FILES
     Source/Camera/CameraUtilities.h
     Source/Camera/ROS2CameraSensorComponent.cpp
     Source/Camera/ROS2CameraSensorComponent.h
-    Source/Camera/ROS2CubemapCameraComponent.cpp
-    Source/Camera/ROS2CubemapCameraComponent.h
-    Source/Camera/CubemapConverter.cpp
-    Source/Camera/CubemapConverter.h
-    Source/Camera/EquirectangularConverter.cpp
-    Source/Camera/EquirectangularConverter.h
-    Source/Camera/FisheyeConverter.cpp
-    Source/Camera/FisheyeConverter.h
+    Source/Cubemap/ROS2CubemapCameraComponent.cpp
+    Source/Cubemap/ROS2CubemapCameraComponent.h
+    Source/Cubemap/CubemapConverter.cpp
+    Source/Cubemap/CubemapConverter.h
+    Source/Cubemap/EquirectangularConverter.cpp
+    Source/Cubemap/EquirectangularConverter.h
+    Source/Cubemap/FisheyeConverter.cpp
+    Source/Cubemap/FisheyeConverter.h
+    Source/Cubemap/NaiveCubemapConverter.cpp
+    Source/Cubemap/NaiveCubemapConverter.h
     Source/Camera/ROS2CameraSystemComponent.cpp
     Source/Camera/ROS2CameraSystemComponent.h
     Source/GNSS/ROS2GNSSSensorComponent.cpp

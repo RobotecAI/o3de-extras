@@ -7,15 +7,18 @@
  */
 
 #include "ROS2CubemapCameraComponent.h"
-#include "CameraUtilities.h"
 #include "EquirectangularConverter.h"
 #include "FisheyeConverter.h"
+#include "NaiveCubemapConverter.h"
+
+#include <Camera/CameraUtilities.h>
 
 #include <Atom/Feature/PostProcess/PostProcessFeatureProcessorInterface.h>
 #include <Atom/Feature/Utils/FrameCaptureBus.h>
 #include <Atom/RPI.Public/Pass/Specific/RenderToTexturePass.h>
 #include <Atom/RPI.Public/RPISystemInterface.h>
 #include <AzCore/Component/TransformBus.h>
+#include <AzCore/Debug/Profiler.h>
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/Matrix3x3.h>
 #include <AzCore/Math/Matrix3x4.h>
@@ -55,9 +58,10 @@ namespace ROS2Sensors
         if (auto* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<ROS2CubemapCameraComponent, AZ::Component>()
-                ->Version(4)
+                ->Version(5)
                 ->Field("Topic", &ROS2CubemapCameraComponent::m_topic)
                 ->Field("Projection", &ROS2CubemapCameraComponent::m_projection)
+                ->Field("Interpolation", &ROS2CubemapCameraComponent::m_interpolation)
                 ->Field("FaceSize", &ROS2CubemapCameraComponent::m_faceSize)
                 ->Field("OutputWidth", &ROS2CubemapCameraComponent::m_outputWidth)
                 ->Field("FisheyeFovDeg", &ROS2CubemapCameraComponent::m_fisheyeFovDeg);
@@ -79,6 +83,14 @@ namespace ROS2Sensors
                         "Projection model used to convert the cubemap into the published image")
                     ->EnumAttribute(CubemapProjection::Equirectangular, "Equirectangular")
                     ->EnumAttribute(CubemapProjection::Fisheye, "Fisheye")
+                    ->EnumAttribute(CubemapProjection::Cubemap, "Cubemap (raw faces)")
+                    ->DataElement(
+                        AZ::Edit::UIHandlers::ComboBox,
+                        &ROS2CubemapCameraComponent::m_interpolation,
+                        "Interpolation",
+                        "How the output samples the cube faces")
+                    ->EnumAttribute(CubemapInterpolation::Nearest, "Nearest")
+                    ->EnumAttribute(CubemapInterpolation::Bilinear, "Bilinear")
                     ->DataElement(
                         AZ::Edit::UIHandlers::Default,
                         &ROS2CubemapCameraComponent::m_faceSize,
@@ -133,11 +145,15 @@ namespace ROS2Sensors
         case CubemapProjection::Fisheye:
             m_converter = AZStd::make_unique<FisheyeConverter>(m_outputWidth, m_fisheyeFovDeg);
             break;
+        case CubemapProjection::Cubemap:
+            m_converter = AZStd::make_unique<NaiveCubemapConverter>();
+            break;
         case CubemapProjection::Equirectangular:
         default:
             m_converter = AZStd::make_unique<EquirectangularConverter>(m_outputWidth);
             break;
         }
+        m_converter->SetInterpolation(m_interpolation);
         m_converter->Initialize(m_faceSize, ComputeFaceWorldToClip());
 
         m_expectedFaces = 0;
@@ -274,6 +290,7 @@ namespace ROS2Sensors
 
     void ROS2CubemapCameraComponent::StartCaptureCycle()
     {
+        AZ_PROFILE_SCOPE(ROS2Sensors, "ROS2CubemapCamera::StartCaptureCycle");
         {
             AZStd::lock_guard<AZStd::mutex> lock(m_mutex);
             if (m_shuttingDown)
@@ -334,6 +351,7 @@ namespace ROS2Sensors
     {
         auto callback = [this, faceIndex](const AZ::RPI::AttachmentReadback::ReadbackResult& result)
         {
+            AZ_PROFILE_SCOPE(ROS2Sensors, "ROS2CubemapCamera::callback");
             bool cycleComplete = false;
             {
                 AZStd::lock_guard<AZStd::mutex> lock(m_mutex);
@@ -411,6 +429,7 @@ namespace ROS2Sensors
 
     void ROS2CubemapCameraComponent::AssembleAndPublish()
     {
+        AZ_PROFILE_SCOPE(ROS2Sensors, "ROS2CubemapCamera::AssembleAndPublish");
         if (!m_converter)
         {
             return;

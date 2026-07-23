@@ -35,6 +35,7 @@ namespace ROS2Sensors
     {
         Equirectangular,
         Fisheye,
+        Cubemap, //!< Raw cubemap: the six faces laid out side by side (debug/passthrough).
     };
 
     //! Sensor component that renders a cubemap around the entity and publishes it as a single
@@ -97,6 +98,7 @@ namespace ROS2Sensors
 
         AZStd::string m_topic{ "cubemap" };
         CubemapProjection m_projection = CubemapProjection::Equirectangular; //!< Output projection model.
+        CubemapInterpolation m_interpolation = CubemapInterpolation::Nearest; //!< Sampling of the cube faces.
         int m_faceSize = 512; //!< Per-face (cube face) resolution in pixels (square).
         int m_outputWidth = 1024; //!< Output image width (equirect height = half; fisheye is square width x width).
         float m_fisheyeFovDeg = 180.0f; //!< Fisheye field of view in degrees (used only for the fisheye projection).

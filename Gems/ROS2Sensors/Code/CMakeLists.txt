@@ -261,6 +261,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                     AZ::AzFramework
                     Gem::${gem_name}.Private.Object
         )
+        target_depends_on_ros2_packages(${gem_name}.Tests rclcpp sensor_msgs)
 
         # Add ${gem_name}.Tests to googletest
         ly_add_googletest(
