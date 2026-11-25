@@ -7,10 +7,8 @@
  */
 
 #include "ROS2SpawnerEditorComponent.h"
-#include "AzCore/Debug/Trace.h"
-#include "ROS2SpawnPointEditorComponent.h"
 #include "Spawner/ROS2SpawnerComponentController.h"
-#include <AzCore/Component/TransformBus.h>
+#include <AzCore/Debug/Trace.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
 #include <ROS2/Spawner/SpawnerBus.h>
@@ -36,7 +34,7 @@ namespace ROS2
             {
                 editContext->Class<ROS2SpawnerEditorComponent>("ROS2 Spawner", "Spawner component")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "Manages spawning of robots in configurable locations")
-                    ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
+                    // Deprecated: not listed in the Add Component menu, kept only so that existing levels and prefabs still load.
                     ->Attribute(AZ::Edit::Attributes::Category, "ROS2")
                     ->Attribute(AZ::Edit::Attributes::Icon, "Editor/Icons/Components/ROS2Spawner.svg")
                     ->Attribute(AZ::Edit::Attributes::ViewportIcon, "Editor/Icons/Components/Viewport/ROS2Spawner.svg");
@@ -44,40 +42,16 @@ namespace ROS2
         }
     }
 
-    AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerEditorComponent::GetSpawnPoints() const
-    {
-        AZStd::unordered_map<AZStd::string, SpawnPointInfo> result;
-        result[GetEntity()->GetName() + " - default"] =
-            SpawnPointInfo{ "Default spawn pose defined in the Editor", m_controller.GetDefaultSpawnPose() };
-
-        AZStd::vector<AZ::EntityId> children;
-        AZ::TransformBus::EventResult(children, m_controller.GetEditorEntityId(), &AZ::TransformBus::Events::GetChildren);
-
-        for (const AZ::EntityId& child : children)
-        {
-            AZ::Entity* childEntity = nullptr;
-            AZ::ComponentApplicationBus::BroadcastResult(childEntity, &AZ::ComponentApplicationRequests::FindEntity, child);
-            AZ_Assert(childEntity, "No child entity found for entity %s", child.ToString().c_str());
-
-            const auto* editorSpawnPoint = childEntity->FindComponent<ROS2SpawnPointEditorComponent>();
-
-            if (editorSpawnPoint != nullptr)
-            {
-                result.insert({ GetEntity()->GetName() + " - " + editorSpawnPoint->GetInfo().first, editorSpawnPoint->GetInfo().second });
-            }
-        }
-
-        return result;
-    }
-
     const AZ::Transform& ROS2SpawnerEditorComponent::GetDefaultSpawnPose() const
     {
-        return m_controller.GetDefaultSpawnPose();
+        AZ_Error("ROS2SpawnerEditorComponent", false, "GetDefaultSpawnPose: %s", SpawnerRemovedMessage);
+        return m_controller.GetConfiguration().m_defaultSpawnPose;
     }
 
     AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerEditorComponent::GetAllSpawnPointInfos() const
     {
-        return GetSpawnPoints();
+        AZ_Error("ROS2SpawnerEditorComponent", false, "GetAllSpawnPointInfos: %s", SpawnerRemovedMessage);
+        return {};
     }
 
     bool ROS2SpawnerEditorComponent::ShouldActivateController() const

@@ -9,18 +9,10 @@ set(FILES
     Source/Frame/ROS2FrameEditorSystemComponent.cpp
     Source/Frame/ROS2FrameEditorSystemComponent.h
     Source/Frame/ROS2FrameSystemBus.h
+    Source/Spawner/ROS2SpawnerEditorComponent.cpp
+    Source/Spawner/ROS2SpawnerEditorComponent.h
     Source/Tools/ROS2EditorSystemComponent.cpp
     Source/Tools/ROS2EditorSystemComponent.h
     Source/Tools/ROS2EditorClockSystemComponent.cpp
     Source/Tools/ROS2EditorClockSystemComponent.h
 )
-
-# optional, legacy features compilation
-if (WITH_GAZEBO_MSGS)
-    list(APPEND FILES
-        Source/Spawner/ROS2SpawnerEditorComponent.cpp
-        Source/Spawner/ROS2SpawnerEditorComponent.h
-        Source/Spawner/ROS2SpawnPointEditorComponent.cpp
-        Source/Spawner/ROS2SpawnPointEditorComponent.h
-    )
-endif ()

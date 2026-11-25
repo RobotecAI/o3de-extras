@@ -62,11 +62,3 @@ set(FILES
     Source/Odometry/ROS2OdometrySensorComponent.cpp
     Source/Odometry/ROS2OdometrySensorComponent.h
 )
-
-# optional, legacy features compilation
-if (WITH_GAZEBO_MSGS)
-        list(APPEND FILES
-                Source/ContactSensor/ROS2ContactSensorComponent.cpp
-                Source/ContactSensor/ROS2ContactSensorComponent.h
-        )
-endif ()

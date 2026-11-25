@@ -38,8 +38,7 @@ namespace ROS2RobotImporter
             const sdf::Root* root,
             AZStd::string prefabPath,
             const ImportSessionId sessionId,
-            bool useArticulations = false,
-            AZStd::optional<AZ::Transform> spawnPosition = AZStd::nullopt);
+            bool useArticulations = false);
 
         ~SdfPrefabMaker() = default;
 
@@ -67,7 +66,6 @@ namespace ROS2RobotImporter
             const sdf::Model* attachedModel,
             AZ::EntityId parentEntityId,
             AZStd::vector<AZ::EntityId>& createdEntities);
-        static void MoveEntityToDefaultSpawnPoint(const AZ::EntityId& rootEntityId, AZStd::optional<AZ::Transform> spawnPosition);
 
         // Returns if SDF document contains any model objects, be that at the root or within an <world> tag
         bool ContainsModel() const;
@@ -84,7 +82,5 @@ namespace ROS2RobotImporter
 
         const ImportSessionId m_sessionId;
         bool m_useArticulations{ false };
-
-        const AZStd::optional<AZ::Transform> m_spawnPosition;
     };
 } // namespace ROS2RobotImporter

@@ -59,7 +59,7 @@
     "Entities": {
         "Entity_[112314723493220]": {
             "Id": "Entity_[112314723493220]",
-            "Name": "RobotSpawner",
+            "Name": "SpawnPoints",
             "Components": {
                 "Component_[11496703102337902766]": {
                     "$type": "EditorDisabledCompositionComponent",
@@ -86,24 +86,6 @@
                 "Component_[4373493893052679413]": {
                     "$type": "EditorLockComponent",
                     "Id": 4373493893052679413
-                },
-                "Component_[4933737581982406853]": {
-                    "$type": "ROS2SpawnerEditorComponent",
-                    "Id": 11259578117255245776,
-                    "Controller": {
-                        "Configuration": {
-                            "Editor entity id": "Entity_[112314723493220]",
-                            "Spawnables": {
-                                "proteus": {
-                                    "assetId": {
-                                        "guid": "{D8E729B1-F767-5E45-8D90-7A49CFB9DA4B}",
-                                        "subId": 815852738
-                                    },
-                                    "assetHint": "prefabs/proteuslaserscanner.spawnable"
-                                }
-                            }
-                        }
-                    }
                 },
                 "Component_[5675755823016497202]": {
                     "$type": "EditorVisibilityComponent",
@@ -157,16 +139,6 @@
                         ]
                     }
                 },
-                "Component_[2115342656585992410]": {
-                    "$type": "ROS2SpawnPointEditorComponent",
-                    "Id": 11018288690574626473,
-                    "Controller": {
-                        "Configuration": {
-                            "Name": "spawnPoint2",
-                            "Info": "spawnPoint2"
-                        }
-                    }
-                },
                 "Component_[4848442694260332496]": {
                     "$type": "EditorEntitySortComponent",
                     "Id": 4848442694260332496
@@ -183,9 +155,20 @@
                     "$type": "EditorVisibilityComponent",
                     "Id": 7023949458099299980
                 },
+                "Component_[7364950024837051849]": {
+                    "$type": "EditorTagComponent",
+                    "Id": 7364950024837051849
+                },
                 "Component_[8619546883183719655]": {
                     "$type": "EditorEntityIconComponent",
                     "Id": 8619546883183719655
+                },
+                "Component_[9157084215259574938]": {
+                    "$type": "NamedPoseEditorComponent",
+                    "Id": 9157084215259574938,
+                    "NamedPoseConfig": {
+                        "description": "spawnPoint2"
+                    }
                 }
             }
         },
@@ -222,16 +205,6 @@
                         ]
                     }
                 },
-                "Component_[2115342656585992410]": {
-                    "$type": "ROS2SpawnPointEditorComponent",
-                    "Id": 11018288690574626473,
-                    "Controller": {
-                        "Configuration": {
-                            "Name": "spawnPoint3",
-                            "Info": "spawnPoint3"
-                        }
-                    }
-                },
                 "Component_[4848442694260332496]": {
                     "$type": "EditorEntitySortComponent",
                     "Id": 4848442694260332496
@@ -248,9 +221,20 @@
                     "$type": "EditorVisibilityComponent",
                     "Id": 7023949458099299980
                 },
+                "Component_[7364950024837051849]": {
+                    "$type": "EditorTagComponent",
+                    "Id": 7364950024837051849
+                },
                 "Component_[8619546883183719655]": {
                     "$type": "EditorEntityIconComponent",
                     "Id": 8619546883183719655
+                },
+                "Component_[9157084215259574938]": {
+                    "$type": "NamedPoseEditorComponent",
+                    "Id": 9157084215259574938,
+                    "NamedPoseConfig": {
+                        "description": "spawnPoint3"
+                    }
                 }
             }
         },
@@ -287,16 +271,6 @@
                         ]
                     }
                 },
-                "Component_[2115342656585992410]": {
-                    "$type": "ROS2SpawnPointEditorComponent",
-                    "Id": 11018288690574626473,
-                    "Controller": {
-                        "Configuration": {
-                            "Name": "spawnPoint1",
-                            "Info": "spawnPoint1"
-                        }
-                    }
-                },
                 "Component_[4848442694260332496]": {
                     "$type": "EditorEntitySortComponent",
                     "Id": 4848442694260332496
@@ -313,9 +287,20 @@
                     "$type": "EditorVisibilityComponent",
                     "Id": 7023949458099299980
                 },
+                "Component_[7364950024837051849]": {
+                    "$type": "EditorTagComponent",
+                    "Id": 7364950024837051849
+                },
                 "Component_[8619546883183719655]": {
                     "$type": "EditorEntityIconComponent",
                     "Id": 8619546883183719655
+                },
+                "Component_[9157084215259574938]": {
+                    "$type": "NamedPoseEditorComponent",
+                    "Id": 9157084215259574938,
+                    "NamedPoseConfig": {
+                        "description": "spawnPoint1"
+                    }
                 }
             }
         },
@@ -352,16 +337,6 @@
                         ]
                     }
                 },
-                "Component_[2115342656585992410]": {
-                    "$type": "ROS2SpawnPointEditorComponent",
-                    "Id": 11018288690574626473,
-                    "Controller": {
-                        "Configuration": {
-                            "Name": "spawnPoint4",
-                            "Info": "spawnPoint4"
-                        }
-                    }
-                },
                 "Component_[4848442694260332496]": {
                     "$type": "EditorEntitySortComponent",
                     "Id": 4848442694260332496
@@ -378,9 +353,20 @@
                     "$type": "EditorVisibilityComponent",
                     "Id": 7023949458099299980
                 },
+                "Component_[7364950024837051849]": {
+                    "$type": "EditorTagComponent",
+                    "Id": 7364950024837051849
+                },
                 "Component_[8619546883183719655]": {
                     "$type": "EditorEntityIconComponent",
                     "Id": 8619546883183719655
+                },
+                "Component_[9157084215259574938]": {
+                    "$type": "NamedPoseEditorComponent",
+                    "Id": 9157084215259574938,
+                    "NamedPoseConfig": {
+                        "description": "spawnPoint4"
+                    }
                 }
             }
         },

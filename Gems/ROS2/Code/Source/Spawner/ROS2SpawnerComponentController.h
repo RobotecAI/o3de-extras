@@ -8,17 +8,24 @@
 
 #pragma once
 
-#include "ROS2/Spawner/SpawnerBus.h"
-#include "ROS2SpawnPointComponent.h"
+#include <ROS2/Spawner/SpawnerBus.h>
+#include <AzCore/Component/Component.h>
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Memory/Memory_fwd.h>
 #include <AzCore/Memory/SystemAllocator.h>
+#include <AzCore/Math/Transform.h>
 #include <AzCore/base.h>
+#include <AzCore/std/containers/unordered_map.h>
+#include <AzCore/std/string/string.h>
 #include <AzFramework/Spawnable/Spawnable.h>
 
 namespace ROS2
 {
+    //! Error reported by the deprecated Spawner components when SpawnerRequestsBus is used.
+    inline constexpr const char* SpawnerRemovedMessage =
+        "The ROS2 Spawner component is deprecated and no longer functional: spawning was removed together with the gazebo_msgs "
+        "package. Use the SimulationInterfaces Gem (SpawnEntity service and NamedPose components) instead.";
 
     struct ROS2SpawnerServiceNames
     {
@@ -70,15 +77,10 @@ namespace ROS2
 
         //////////////////////////////////////////////////////////////////////////
         // SpawnerRequestsBus::Handler overrides
+        // Deprecated: both report an error; GetAllSpawnPointInfos returns an empty map.
         const AZ::Transform& GetDefaultSpawnPose() const override;
         SpawnPointInfoMap GetAllSpawnPointInfos() const override;
         //////////////////////////////////////////////////////////////////////////
-
-        const ROS2SpawnerServiceNames& GetServiceNames() const;
-        SpawnPointInfoMap GetSpawnPoints() const;
-        AZ::EntityId GetEditorEntityId() const;
-        AZStd::unordered_map<AZStd::string, AZ::Data::Asset<AzFramework::Spawnable>> GetSpawnables() const;
-        bool GetSupportWGS() const;
 
     private:
         ROS2SpawnerComponentConfig m_config;

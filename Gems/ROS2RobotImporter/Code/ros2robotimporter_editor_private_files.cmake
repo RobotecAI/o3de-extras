@@ -99,14 +99,3 @@ set(FILES
     Source/SdfAssetBuilder/SdfAssetBuilderSystemComponent.cpp
     Source/SdfAssetBuilder/SdfAssetBuilderSystemComponent.h
 )
-
-# optional, legacy features compilation
-if (WITH_GAZEBO_MSGS)
-    list(APPEND FILES
-        Source/Spawner/ROS2SpawnerEditorComponent.cpp
-        Source/Spawner/ROS2SpawnerEditorComponent.h
-        Source/Spawner/ROS2SpawnPointEditorComponent.cpp
-        Source/Spawner/ROS2SpawnPointEditorComponent.h
-    )
-endif ()
-

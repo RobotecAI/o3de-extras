@@ -233,7 +233,7 @@ jobs:
             --output /tmp/ros2-apt-source.deb --clobber
           sudo dpkg -i /tmp/ros2-apt-source.deb
 
-      # Install ROS 2 packages. gazebo-msgs only exists for humble/jazzy.
+      # Install ROS 2 packages.
       - name: Install ROS 2 ${{ env.ROS_DISTRO }} packages required by the gems
         run: |
           PACKAGES="ros-dev-tools \
@@ -255,9 +255,6 @@ jobs:
             libevdev-dev \
             libevdev2 \
             libxcb-cursor0"
-          if [ "$ROS_DISTRO" = "humble" ] || [ "$ROS_DISTRO" = "jazzy" ]; then
-            PACKAGES="$PACKAGES ros-${ROS_DISTRO}-gazebo-msgs"
-          fi
           sudo apt-get update
           sudo apt-get install -y $PACKAGES
 

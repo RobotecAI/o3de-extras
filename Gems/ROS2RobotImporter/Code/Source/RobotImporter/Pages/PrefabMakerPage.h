@@ -9,8 +9,6 @@
 #pragma once
 
 #include <AzCore/Component/Entity.h>
-#include <ROS2/Spawner/SpawnerInfo.h>
-#include <qcombobox.h>
 #if !defined(Q_MOC_RUN)
 #include <AzCore/Math/Crc.h>
 #include <AzCore/std/string/string.h>
@@ -42,21 +40,14 @@ namespace ROS2RobotImporter
         void ReportArticulationLinkCount(size_t linkCount, bool useArticulations);
         void SetSuccess(bool success);
         bool isComplete() const override;
-        AZStd::optional<AZ::Transform> getSelectedSpawnPoint() const;
     Q_SIGNALS:
         void onCreateButtonPressed();
 
     private:
-        static bool IsZeroPoint(AZStd::string spawnPointName);
-
-        static constexpr AZStd::string_view zeroPoint = "Simulation origin";
-
         bool m_success;
         QLineEdit* m_prefabName;
         QPushButton* m_createButton;
         QTextEdit* m_log;
-        QComboBox* m_spawnPointsComboBox;
         WarningBanner* m_articulationWarning{};
-        ROS2::SpawnPointInfoMap m_spawnPointsInfos;
     };
 } // namespace ROS2RobotImporter

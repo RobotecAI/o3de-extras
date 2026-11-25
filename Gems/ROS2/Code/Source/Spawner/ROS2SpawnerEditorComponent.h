@@ -40,10 +40,9 @@ namespace ROS2
 
         //////////////////////////////////////////////////////////////////////////
         // SpawnerRequestsBus::Handler overrides.
+        // Deprecated: both report an error; GetAllSpawnPointInfos returns an empty map.
         const AZ::Transform& GetDefaultSpawnPose() const override;
         AZStd::unordered_map<AZStd::string, SpawnPointInfo> GetAllSpawnPointInfos() const override;
         //////////////////////////////////////////////////////////////////////////
-
-        AZStd::unordered_map<AZStd::string, SpawnPointInfo> GetSpawnPoints() const;
     };
 } // namespace ROS2

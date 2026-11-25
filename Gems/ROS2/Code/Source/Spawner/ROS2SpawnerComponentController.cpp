@@ -7,10 +7,8 @@
  */
 
 #include "ROS2SpawnerComponentController.h"
-#include "Spawner/ROS2SpawnPointComponent.h"
-#include "Spawner/ROS2SpawnerComponent.h"
 #include <AzCore/Component/ComponentBus.h>
-#include <AzCore/Component/TransformBus.h>
+#include <AzCore/Debug/Trace.h>
 #include <AzCore/RTTI/RTTIMacros.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/EditContextConstants.inl>
@@ -19,6 +17,23 @@
 
 namespace ROS2
 {
+    namespace
+    {
+        //! Warns when a deprecated Spawner configuration is read from a level or a prefab.
+        //! OnWriteEnd is also called when objects are cloned, hence the warning is reported only once.
+        class ROS2SpawnerComponentConfigEventHandler : public AZ::SerializeContext::IEventHandler
+        {
+        public:
+            void OnWriteEnd([[maybe_unused]] void* classPtr) override
+            {
+                AZ_WarningOnce(
+                    "ROS2SpawnerComponent",
+                    false,
+                    "A deprecated ROS2 Spawner component was loaded from a level or a prefab. %s",
+                    SpawnerRemovedMessage);
+            }
+        };
+    } // namespace
 
     void ROS2SpawnerServiceNames::Reflect(AZ::ReflectContext* context)
     {
@@ -73,6 +88,7 @@ namespace ROS2
         {
             serializeContext->Class<ROS2SpawnerComponentConfig, AZ::ComponentConfig>()
                 ->Version(1)
+                ->EventHandler<ROS2SpawnerComponentConfigEventHandler>()
                 ->Field("Editor entity id", &ROS2SpawnerComponentConfig::m_editorEntityId)
                 ->Field("Support WGS", &ROS2SpawnerComponentConfig::m_supportWGS)
                 ->Field("Spawnables", &ROS2SpawnerComponentConfig::m_spawnables)
@@ -98,29 +114,16 @@ namespace ROS2
         }
     }
 
-    AZ::EntityId ROS2SpawnerComponentController::GetEditorEntityId() const
-    {
-        return m_config.m_editorEntityId;
-    }
-
-    AZStd::unordered_map<AZStd::string, AZ::Data::Asset<AzFramework::Spawnable>> ROS2SpawnerComponentController::GetSpawnables() const
-    {
-        return m_config.m_spawnables;
-    }
-
     const AZ::Transform& ROS2SpawnerComponentController::GetDefaultSpawnPose() const
     {
+        AZ_Error("ROS2SpawnerComponent", false, "GetDefaultSpawnPose: %s", SpawnerRemovedMessage);
         return m_config.m_defaultSpawnPose;
     }
 
     AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponentController::GetAllSpawnPointInfos() const
     {
-        return GetSpawnPoints();
-    }
-
-    bool ROS2SpawnerComponentController::GetSupportWGS() const
-    {
-        return m_config.m_supportWGS;
+        AZ_Error("ROS2SpawnerComponent", false, "GetAllSpawnPointInfos: %s", SpawnerRemovedMessage);
+        return {};
     }
 
     void ROS2SpawnerComponentController::Reflect(AZ::ReflectContext* context)
@@ -141,31 +144,6 @@ namespace ROS2
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly);
             }
         }
-    }
-
-    AZStd::unordered_map<AZStd::string, SpawnPointInfo> ROS2SpawnerComponentController::GetSpawnPoints() const
-    {
-        AZStd::vector<AZ::EntityId> children;
-        AZ::TransformBus::EventResult(children, m_config.m_editorEntityId, &AZ::TransformBus::Events::GetChildren);
-
-        AZStd::unordered_map<AZStd::string, SpawnPointInfo> result;
-
-        for (const AZ::EntityId& child : children)
-        {
-            AZ::Entity* childEntity = nullptr;
-            AZ::ComponentApplicationBus::BroadcastResult(childEntity, &AZ::ComponentApplicationRequests::FindEntity, child);
-            AZ_Assert(childEntity, "No child entity found for entity %s", child.ToString().c_str());
-
-            if (const auto* spawnPoint = childEntity->FindComponent<ROS2SpawnPointComponent>(); spawnPoint != nullptr)
-            {
-                result.insert(spawnPoint->GetInfo());
-            }
-        }
-
-        // setting name of spawn point component "default" in a child entity will have no effect since it is overwritten here with the
-        // default spawn pose of spawner
-        result["default"] = SpawnPointInfo{ "Default spawn pose defined in the Editor", m_config.m_defaultSpawnPose };
-        return result;
     }
 
     void ROS2SpawnerComponentController::Init()
@@ -196,11 +174,6 @@ namespace ROS2
     const ROS2SpawnerComponentConfig& ROS2SpawnerComponentController::GetConfiguration() const
     {
         return m_config;
-    }
-
-    const ROS2SpawnerServiceNames& ROS2SpawnerComponentController::GetServiceNames() const
-    {
-        return m_config.m_serviceNames;
     }
 
 } // namespace ROS2

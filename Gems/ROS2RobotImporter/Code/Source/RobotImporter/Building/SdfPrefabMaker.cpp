@@ -36,15 +36,13 @@ namespace ROS2RobotImporter
         const sdf::Root* root,
         AZStd::string prefabPath,
         const ImportSessionId sessionId,
-        bool useArticulations,
-        const AZStd::optional<AZ::Transform> spawnPosition)
+        bool useArticulations)
         : m_root(root)
         , m_visualsMaker(sessionId)
         , m_collidersMaker(sessionId)
         , m_sensorsMaker(sessionId)
         , m_controlMaker(sessionId)
         , m_prefabPath(AZStd::move(prefabPath))
-        , m_spawnPosition(spawnPosition)
         , m_useArticulations(useArticulations)
         , m_sessionId(sessionId)
     {
@@ -586,12 +584,7 @@ namespace ROS2RobotImporter
         {
             // If the template saved successfully, also instantiate it into the level.
             auto prefabInterface = AZ::Interface<AzToolsFramework::Prefab::PrefabPublicInterface>::Get();
-            [[maybe_unused]] auto createPrefabOutcome =
-                prefabInterface->InstantiatePrefab(relativePath.String(), AZ::EntityId(), AZ::Vector3::CreateZero());
-            if (createPrefabOutcome.IsSuccess())
-            {
-                MoveEntityToDefaultSpawnPoint(createPrefabOutcome.GetValue(), m_spawnPosition);
-            }
+            prefabInterface->InstantiatePrefab(relativePath.String(), AZ::EntityId(), AZ::Vector3::CreateZero());
         }
         else
         {
@@ -704,29 +697,6 @@ namespace ROS2RobotImporter
     const AZStd::string& SdfPrefabMaker::GetPrefabPath() const
     {
         return m_prefabPath;
-    }
-
-    void SdfPrefabMaker::MoveEntityToDefaultSpawnPoint(
-        const AZ::EntityId& rootEntityId, AZStd::optional<AZ::Transform> spawnPosition = AZStd::nullopt)
-    {
-        if (!spawnPosition.has_value())
-        {
-            AZ_Trace("SdfPrefabMaker", "SpawnPosition is null - spawning in Editors default position\n");
-            return;
-        }
-
-        if (auto entity_ = AzToolsFramework::GetEntityById(rootEntityId); entity_ != nullptr)
-        {
-            auto* transformInterface_ = entity_->FindComponent<AzToolsFramework::Components::TransformComponent>();
-
-            if (transformInterface_ == nullptr)
-            {
-                AZ_Trace("SdfPrefabMaker", "TransformComponent not found in created entity\n") return;
-            }
-
-            transformInterface_->SetWorldTM(*spawnPosition);
-            AZ_Trace("SdfPrefabMaker", "Successfully set spawn position\n")
-        }
     }
 
     bool SdfPrefabMaker::ContainsModel() const

@@ -624,8 +624,7 @@ namespace ROS2RobotImporter
         const auto& sdfAssetBuilderSettings = m_fileSelectPage->GetSdfAssetBuilderSettings();
         const bool useArticulation = sdfAssetBuilderSettings.m_useArticulations;
         ImportSession session(m_referencedAssetMap);
-        SdfPrefabMaker prefabMaker(
-            &m_parsedSdf, prefabPath.String(), session.GetId(), useArticulation, m_prefabMakerPage->getSelectedSpawnPoint());
+        SdfPrefabMaker prefabMaker(&m_parsedSdf, prefabPath.String(), session.GetId(), useArticulation);
 
         auto prefabOutcome = prefabMaker.CreatePrefabFromUrdfOrSdf();
         if (prefabOutcome.IsSuccess())
