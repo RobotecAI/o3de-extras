@@ -9,6 +9,8 @@
 #pragma once
 
 #include <ROS2/Spawner/SpawnerBus.h>
+#include <AzCore/Asset/AssetCommon.h>
+#include <AzCore/Asset/AssetSerializer.h>
 #include <AzCore/Component/Component.h>
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Component/EntityId.h>
